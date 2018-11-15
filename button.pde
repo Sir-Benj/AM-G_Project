@@ -1,6 +1,6 @@
 class Button
 {
-  int buttonX, buttonY, buttonSize;
+  int buttonX, buttonY, buttonSize, lastButtonPressed;
   String buttonName;
   boolean localState;
   color buttonColour = color(100), buttonHighlight = color(200);
@@ -12,6 +12,7 @@ class Button
     buttonSize = newSize;
     buttonName = newName;
     localState = false;
+    lastButtonPressed = -1;
   }
 
   void DisplayButton()
@@ -52,10 +53,19 @@ class Button
       if (btns[i].OverButton() && !btns[i].localState)
       {
         btns[i].localState = true;
+        for (int j = 0; j < btns.length; j++ )
+        {
+          if (j != i)
+          {
+            btns[j].localState = false;
+          }
+        }
+        println("option 1");
       }
       else if (btns[i].OverButton() && btns[i].localState)
       {
         btns[i].localState = false;
+        println("option 2");
       }
     }
   }
