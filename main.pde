@@ -1,8 +1,9 @@
 //ImageUI win;
 //PaintUI win2;
-Button btn1;
-Button btn2;
-SmoothButton btn3;
+TopBarManager topBar;
+Button control;
+Button[] btns;
+Button[][] buttonMenu;
 
 public void settings()
 {
@@ -11,53 +12,62 @@ public void settings()
 
 void setup()
 {
+  noSmooth();
   surface.setResizable(true);
   background(255, 255, 255, 255);
-  btn1 = new Button(10, 10, 50, "paint");
-  btn2 = new Button(10, 70, 50, "erase");
-  btn3 = new SmoothButton(10, 130, 50, 8, "smooth");
+  btns = new Button[3];
+  btns[0] = new Button(10, 30, 50, "paint");
+  btns[1] = new Button(10, 90, 50, "erase");
+  btns[2] = new Button(10, 150, 50, "smooth");
+  control = new Button(0, 0, 0, "control");
+  topBar = new TopBarManager();
+  buttonMenu = topBar.InitialiseMenu();
 }
 
 void mousePressed()
 {
-  btn1.buttonPressed(btn2);
-  btn2.buttonPressed(btn1);
-  btn3.buttonPressed(btn1);
+  topBar.TopMenuPressed();
+  control.ButtonPressed(btns);
 
-
-  if (btn1.changeState && !btn2.changeState)
-  {
-    stroke(0);
-    fill(0);
-    ellipse(mouseX, mouseY, 20, 20);
-  }
-  if (btn2.changeState && !btn1.changeState)
-  {
-    stroke(255);
-    fill(255);
-    ellipse(mouseX, mouseY, 20, 20);
-  }
+  // if (btn1.localState && !btn2.localState)
+  // {
+  //   noStroke();
+  //   fill(0);
+  //   ellipse(mouseX, mouseY, 20, 20);
+  // }
+  // if (btn2.localState && !btn1.localState)
+  // {
+  //   noStroke();
+  //   fill(255);
+  //   ellipse(mouseX, mouseY, 20, 20);
+  // }
 }
 
 void mouseDragged()
 {
-  if (btn1.changeState() && !btn2.changeState)
-  {
-    stroke(0);
-    fill(0);
-    ellipse(mouseX, mouseY, 20, 20);
-  }
-  if (btn2.changeState() && !btn1.changeState)
-  {
-    stroke(255);
-    fill(255);
-    ellipse(mouseX, mouseY, 20, 20);
-  }
+  // if (btn1.localState && !btn2.localState)
+  // {
+  //   noStroke();
+  //   fill(0);
+  //   ellipse(mouseX, mouseY, 20, 20);
+  // }
+  // if (btn2.localState && !btn1.localState)
+  // {
+  //   noStroke();
+  //   fill(255);
+  //   ellipse(mouseX, mouseY, 20, 20);
+  // }
 }
 
 void draw()
 {
-  btn1.displayButton();
-  btn2.displayButton();
-  btn3.displayButton();
+  background(255);
+  topBar.DisplayMenu();
+  for (int i = 0; i < btns.length; i++)
+  {
+    btns[i].DisplayButton();
+  }
+  // btn1.DisplayButton();
+  // btn2.DisplayButton();
+  // btn3.DisplayButton();
 }

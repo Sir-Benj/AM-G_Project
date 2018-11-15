@@ -2,7 +2,7 @@ class Button
 {
   int buttonX, buttonY, buttonSize;
   String buttonName;
-  boolean changeState;
+  boolean localState;
   color buttonColour = color(100), buttonHighlight = color(200);
 
   Button(int newX, int newY, int newSize, String newName)
@@ -11,19 +11,19 @@ class Button
     buttonY = newY;
     buttonSize = newSize;
     buttonName = newName;
-    changeState = false;
+    localState = false;
   }
 
-  void displayButton()
+  void DisplayButton()
   {
     //If mouse is over button highlight it
-    if (buttonOver() || changeState)
+    if (OverButton() || localState)
     {
       stroke(0);
       fill(buttonHighlight);
     }
     //If mouse isnt over and it isnt on then display normal colour
-    else if (!buttonOver() && !changeState)
+    else if (!OverButton() || !localState)
     {
       stroke(255);
       fill(buttonColour);
@@ -31,7 +31,7 @@ class Button
     rect(buttonX, buttonY, buttonSize, buttonSize);
   }
 
-  boolean buttonOver()
+  boolean OverButton()
   {
     //Is mouse within the button area
     if (mouseX > buttonX && mouseX < buttonX + buttonSize
@@ -45,24 +45,44 @@ class Button
         }
   }
 
-  void buttonPressed(Button btn)
+  void ButtonPressed(Button[] btns)
   {
-    if (buttonOver() && !changeState)
+    for (int i = 0; i < btns.length; i++)
     {
-      //Button on
-      changeState = true;
-      btn.changeState = false;
-    }
-    else if (buttonOver() && changeState || btn.changeState)
-    {
-      //Button off
-      changeState = false;
+      if (btns[i].OverButton() && !btns[i].localState)
+      {
+        btns[i].localState = true;
+      }
+      else if (btns[i].OverButton() && btns[i].localState)
+      {
+        btns[i].localState = false;
+      }
     }
   }
 
-  boolean changeState()
+  void TopMenuButtonPressed(Button btn)
   {
-    return changeState;
+    if (OverButton() && !localState)
+    {
+      //Button on
+      localState = true;
+      btn.localState = false;
+    }
+    else if (!OverButton() && localState && btn.OverButton())
+    {
+      //Button off
+      localState = false;
+    }
+    else if (!OverButton() && !btn.OverButton())
+    {
+      localState = false;
+      btn.localState = false;
+    }
+  }
+
+  boolean LocalState()
+  {
+    return localState;
   }
 }
 
@@ -75,20 +95,20 @@ class SmoothButton extends Button
   {
     super(newX, newY, newSize, newName);
     buttonSmooth = newSmooth;
-    changeState = false;
+    localState = false;
   }
 
   void displayButton()
   {
     {
       //If mouse is over button highlight it
-      if (buttonOver() || changeState)
+      if (OverButton() || localState)
       {
         stroke(0);
         fill(buttonHighlight);
       }
       //If mouse isnt over and it isnt on then display normal colour
-      else if (!buttonOver() && !changeState)
+      else if (!OverButton() && !localState)
       {
         stroke(255);
         fill(buttonColour);
@@ -97,3 +117,11 @@ class SmoothButton extends Button
     }
   }
 }
+
+// class RectButton extends Button
+// {
+//   RectButton()
+//   {
+//     //do something!
+//   }
+// }
