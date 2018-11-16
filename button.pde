@@ -1,18 +1,21 @@
 class Button
 {
-  int buttonX, buttonY, buttonSize, lastButtonPressed;
-  String buttonName;
-  boolean localState;
-  color buttonColour = color(100), buttonHighlight = color(200);
+  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
+  protected String buttonName;
+  protected boolean isSmooth, hasBorder, localState;
+  protected color buttonColour = color(100), buttonHighlight = color(200);
 
-  Button(int newX, int newY, int newSize, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
   {
     buttonX = newX;
     buttonY = newY;
-    buttonSize = newSize;
+    buttonWidth = newWidth;
+    buttonHeight = newHeight;
+    isSmooth = smooth;
+    hasBorder = border;
     buttonName = newName;
+    smoothing = 8;
     localState = false;
-    lastButtonPressed = -1;
   }
 
   void DisplayButton()
@@ -20,23 +23,51 @@ class Button
     //If mouse is over button highlight it
     if (OverButton() || localState)
     {
-      stroke(0);
-      fill(buttonHighlight);
+      if (hasBorder)
+      {
+        stroke(0);
+        fill(buttonHighlight);
+      }
+      else
+      {
+        noStroke();
+        fill(buttonHighlight);
+      }
     }
     //If mouse isnt over and it isnt on then display normal colour
     else if (!OverButton() || !localState)
     {
-      stroke(255);
-      fill(buttonColour);
+      if (hasBorder)
+      {
+        stroke(0);
+        fill(buttonColour);
+      }
+      else
+      {
+        noStroke();
+        fill(buttonColour);
+      }
     }
-    rect(buttonX, buttonY, buttonSize, buttonSize);
+
+    if (isSmooth)
+    {
+      rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
+      fill(0);
+      text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+    }
+    else
+    {
+      rect(buttonX, buttonY, buttonWidth, buttonHeight);
+      fill(0);
+      text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+    }
   }
 
   boolean OverButton()
   {
     //Is mouse within the button area
-    if (mouseX > buttonX && mouseX < buttonX + buttonSize
-        && mouseY > buttonY && mouseY < buttonY + buttonSize)
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth
+        && mouseY > buttonY && mouseY < buttonY + buttonHeight)
         {
           return true;
         }
@@ -50,7 +81,7 @@ class Button
   {
     for (int i = 0; i < btns.length; i++)
     {
-      if (btns[i].OverButton() && !btns[i].localState)
+      if (btns[i].OverButton() && !btns[i].LocalState())
       {
         btns[i].localState = true;
         for (int j = 0; j < btns.length; j++ )
@@ -60,12 +91,10 @@ class Button
             btns[j].localState = false;
           }
         }
-        println("option 1");
       }
-      else if (btns[i].OverButton() && btns[i].localState)
+      else if (btns[i].OverButton() && btns[i].LocalState())
       {
         btns[i].localState = false;
-        println("option 2");
       }
     }
   }
@@ -90,48 +119,33 @@ class Button
     }
   }
 
-  boolean LocalState()
+  public int ButtonX()
+  {
+    return buttonX;
+  }
+
+  public int ButtonY()
+  {
+    return buttonY;
+  }
+
+  public int ButtonWidth()
+  {
+    return buttonWidth;
+  }
+
+  public int ButtonHeight()
+  {
+    return buttonHeight;
+  }
+
+  public boolean LocalState()
   {
     return localState;
   }
-}
 
-
-class SmoothButton extends Button
-{
-  private int buttonSmooth;
-
-  SmoothButton(int newX, int newY, int newSize, int newSmooth, String newName)
+  public String ButtonName()
   {
-    super(newX, newY, newSize, newName);
-    buttonSmooth = newSmooth;
-    localState = false;
-  }
-
-  void displayButton()
-  {
-    {
-      //If mouse is over button highlight it
-      if (OverButton() || localState)
-      {
-        stroke(0);
-        fill(buttonHighlight);
-      }
-      //If mouse isnt over and it isnt on then display normal colour
-      else if (!OverButton() && !localState)
-      {
-        stroke(255);
-        fill(buttonColour);
-      }
-      rect(buttonX, buttonY, buttonSize, buttonSize, buttonSmooth);
-    }
+    return buttonName;
   }
 }
-
-// class RectButton extends Button
-// {
-//   RectButton()
-//   {
-//     //do something!
-//   }
-// }

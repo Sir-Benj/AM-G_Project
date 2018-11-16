@@ -23,7 +23,7 @@ Button[][] buttonMenu;
 
 public void settings()
 {
-  size(600, 600);
+  size(1000, 800);
 }
 
 public void setup()
@@ -31,11 +31,16 @@ public void setup()
   
   surface.setResizable(true);
   background(255, 255, 255, 255);
-  btns = new Button[3];
-  btns[0] = new Button(10, 30, 50, "paint");
-  btns[1] = new Button(10, 90, 50, "erase");
-  btns[2] = new Button(10, 150, 50, "smooth");
-  control = new Button(0, 0, 0, "control");
+  btns = new Button[7];
+  btns[0] = new Button(10, 30, 50, 50, true, true, "paint");
+  btns[1] = new Button(10, 90, 50, 50, true, true, "erase");
+  btns[2] = new Button(10, 150, 50, 50, true, true, "thirdtester");
+  btns[3] = new Button(70, 30, 20, 50, false, true, "firstRect");
+  btns[4] = new Button(70, 90, 20, 50, true, false, "secondRect");
+  btns[5] = new Button(70, 150, 20, 50, true, true, "thirdRect");
+  btns[6] = new Button(70, 210, 20, 50, false, false, "forthRect");
+
+  control = new Button(0, 0, 0, 0, false, false, "control");
   topBar = new TopBarManager();
   buttonMenu = topBar.InitialiseMenu();
 }
@@ -78,60 +83,67 @@ public void mouseDragged()
 public void draw()
 {
   background(255);
-  topBar.DisplayMenu();
+
   for (int i = 0; i < btns.length; i++)
   {
     btns[i].DisplayButton();
   }
-  // btn1.DisplayButton();
-  // btn2.DisplayButton();
-  // btn3.DisplayButton();
+
+  topBar.DisplayMenu();
 }
 class TopBarManager
 {
   String[][] topBar;
   Button[][] menuButtons;
+  Button[] sub1;
+  Button[] sub2;
+  Button[] sub3;
+
   PFont font;
   //int topBheight;
   //int topBwidth
 
   TopBarManager()
   {
-    topBar = new String[][] { {"File", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
+    topBar = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
     font = createFont("arial.ttf", 16);
 
-    int maxY = 0;
-    for (int i = 0; i < topBar.length; i++)
-    {
-      maxY = Math.max(maxY, topBar[i].length);
-    }
-    menuButtons = new Button[topBar.length][maxY];
+    menuButtons = new Button[topBar.length][];
+    sub1 = new Button[topBar[0].length];
+    sub2 = new Button[topBar[1].length];
+    sub3 = new Button[topBar[2].length];
+
+    menuButtons[0] = sub1;
+    menuButtons[1] = sub2;
+    menuButtons[2] = sub3;
   }
 
   public Button[][] InitialiseMenu()
   {
     noStroke();
-    fill(130);
+    fill(180);
     rect(0, 0, width, 20);
     textFont(font, 14);
 
     int topXstart = 0;
     int topYstart = 0;
-    int topBSize = 20;
+    int topBwidth = 50;
+    int topBheight = 20;
     int subXstart = 0;
     int subYstart = 20;
-    int subBSize = 50;
+    int subBwidth = 80;
+    int subBheight = 20;
 
     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
     {
-      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBSize, topBar[topMenu][0]);
+      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
       //menuButtons[topMenu][0].displayButton();
-      topXstart += 20;
+      topXstart += 50;
 
       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
       {
-        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBSize, topBar[topMenu][subMenu]);
-        subYstart += 50;
+        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
+        subYstart += 20;
       }
       subXstart += 50;
       subYstart = 20;
@@ -142,6 +154,11 @@ class TopBarManager
 
   public void DisplayMenu()
   {
+    noStroke();
+    fill(180);
+    rect(0, 0, width, 20);
+    textFont(font, 14);
+
     for (int i = 0; i < menuButtons.length; i++)
     {
       for (int y = 0; y < menuButtons[i].length; y++)
@@ -169,19 +186,22 @@ class TopBarManager
 }
 class Button
 {
-  int buttonX, buttonY, buttonSize, lastButtonPressed;
-  String buttonName;
-  boolean localState;
-  int buttonColour = color(100), buttonHighlight = color(200);
+  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
+  protected String buttonName;
+  protected boolean isSmooth, hasBorder, localState;
+  protected int buttonColour = color(100), buttonHighlight = color(200);
 
-  Button(int newX, int newY, int newSize, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
   {
     buttonX = newX;
     buttonY = newY;
-    buttonSize = newSize;
+    buttonWidth = newWidth;
+    buttonHeight = newHeight;
+    isSmooth = smooth;
+    hasBorder = border;
     buttonName = newName;
+    smoothing = 8;
     localState = false;
-    lastButtonPressed = -1;
   }
 
   public void DisplayButton()
@@ -189,23 +209,51 @@ class Button
     //If mouse is over button highlight it
     if (OverButton() || localState)
     {
-      stroke(0);
-      fill(buttonHighlight);
+      if (hasBorder)
+      {
+        stroke(0);
+        fill(buttonHighlight);
+      }
+      else
+      {
+        noStroke();
+        fill(buttonHighlight);
+      }
     }
     //If mouse isnt over and it isnt on then display normal colour
     else if (!OverButton() || !localState)
     {
-      stroke(255);
-      fill(buttonColour);
+      if (hasBorder)
+      {
+        stroke(0);
+        fill(buttonColour);
+      }
+      else
+      {
+        noStroke();
+        fill(buttonColour);
+      }
     }
-    rect(buttonX, buttonY, buttonSize, buttonSize);
+
+    if (isSmooth)
+    {
+      rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
+      fill(0);
+      text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+    }
+    else
+    {
+      rect(buttonX, buttonY, buttonWidth, buttonHeight);
+      fill(0);
+      text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+    }
   }
 
   public boolean OverButton()
   {
     //Is mouse within the button area
-    if (mouseX > buttonX && mouseX < buttonX + buttonSize
-        && mouseY > buttonY && mouseY < buttonY + buttonSize)
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth
+        && mouseY > buttonY && mouseY < buttonY + buttonHeight)
         {
           return true;
         }
@@ -219,7 +267,7 @@ class Button
   {
     for (int i = 0; i < btns.length; i++)
     {
-      if (btns[i].OverButton() && !btns[i].localState)
+      if (btns[i].OverButton() && !btns[i].LocalState())
       {
         btns[i].localState = true;
         for (int j = 0; j < btns.length; j++ )
@@ -229,12 +277,10 @@ class Button
             btns[j].localState = false;
           }
         }
-        println("option 1");
       }
-      else if (btns[i].OverButton() && btns[i].localState)
+      else if (btns[i].OverButton() && btns[i].LocalState())
       {
         btns[i].localState = false;
-        println("option 2");
       }
     }
   }
@@ -259,51 +305,36 @@ class Button
     }
   }
 
+  public int ButtonX()
+  {
+    return buttonX;
+  }
+
+  public int ButtonY()
+  {
+    return buttonY;
+  }
+
+  public int ButtonWidth()
+  {
+    return buttonWidth;
+  }
+
+  public int ButtonHeight()
+  {
+    return buttonHeight;
+  }
+
   public boolean LocalState()
   {
     return localState;
   }
-}
 
-
-class SmoothButton extends Button
-{
-  private int buttonSmooth;
-
-  SmoothButton(int newX, int newY, int newSize, int newSmooth, String newName)
+  public String ButtonName()
   {
-    super(newX, newY, newSize, newName);
-    buttonSmooth = newSmooth;
-    localState = false;
-  }
-
-  public void displayButton()
-  {
-    {
-      //If mouse is over button highlight it
-      if (OverButton() || localState)
-      {
-        stroke(0);
-        fill(buttonHighlight);
-      }
-      //If mouse isnt over and it isnt on then display normal colour
-      else if (!OverButton() && !localState)
-      {
-        stroke(255);
-        fill(buttonColour);
-      }
-      rect(buttonX, buttonY, buttonSize, buttonSize, buttonSmooth);
-    }
+    return buttonName;
   }
 }
-
-// class RectButton extends Button
-// {
-//   RectButton()
-//   {
-//     //do something!
-//   }
-// }
 class ButtonManager
 {
   

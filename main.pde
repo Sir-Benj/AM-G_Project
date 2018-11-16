@@ -7,7 +7,7 @@ Button[][] buttonMenu;
 
 public void settings()
 {
-  size(600, 600);
+  size(1000, 800);
 }
 
 void setup()
@@ -15,11 +15,16 @@ void setup()
   noSmooth();
   surface.setResizable(true);
   background(255, 255, 255, 255);
-  btns = new Button[3];
-  btns[0] = new Button(10, 30, 50, "paint");
-  btns[1] = new Button(10, 90, 50, "erase");
-  btns[2] = new Button(10, 150, 50, "smooth");
-  control = new Button(0, 0, 0, "control");
+  btns = new Button[7];
+  btns[0] = new Button(10, 30, 50, 50, true, true, "paint");
+  btns[1] = new Button(10, 90, 50, 50, true, true, "erase");
+  btns[2] = new Button(10, 150, 50, 50, true, true, "thirdtester");
+  btns[3] = new Button(70, 30, 20, 50, false, true, "firstRect");
+  btns[4] = new Button(70, 90, 20, 50, true, false, "secondRect");
+  btns[5] = new Button(70, 150, 20, 50, true, true, "thirdRect");
+  btns[6] = new Button(70, 210, 20, 50, false, false, "forthRect");
+
+  control = new Button(0, 0, 0, 0, false, false, "control");
   topBar = new TopBarManager();
   buttonMenu = topBar.InitialiseMenu();
 }
@@ -62,12 +67,11 @@ void mouseDragged()
 void draw()
 {
   background(255);
-  topBar.DisplayMenu();
+
   for (int i = 0; i < btns.length; i++)
   {
     btns[i].DisplayButton();
   }
-  // btn1.DisplayButton();
-  // btn2.DisplayButton();
-  // btn3.DisplayButton();
+
+  topBar.DisplayMenu();
 }
