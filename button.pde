@@ -60,12 +60,10 @@ class Button
             btns[j].localState = false;
           }
         }
-        println("option 1");
       }
       else if (btns[i].OverButton() && btns[i].localState)
       {
         btns[i].localState = false;
-        println("option 2");
       }
     }
   }
