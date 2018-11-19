@@ -1,16 +1,17 @@
 class Button
 {
-  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
+  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing, layer;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, localState;
   protected color buttonColour = color(100), buttonHighlight = color(200);
 
-  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, int newLayer, boolean smooth, boolean border, String newName)
   {
     buttonX = newX;
     buttonY = newY;
     buttonWidth = newWidth;
     buttonHeight = newHeight;
+    layer = newLayer;
     isSmooth = smooth;
     hasBorder = border;
     buttonName = newName;

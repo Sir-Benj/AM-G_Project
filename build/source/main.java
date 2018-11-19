@@ -32,15 +32,15 @@ public void setup()
   surface.setResizable(true);
   background(255, 255, 255, 255);
   btns = new Button[7];
-  btns[0] = new Button(10, 30, 50, 50, true, true, "paint");
-  btns[1] = new Button(10, 90, 50, 50, true, true, "erase");
-  btns[2] = new Button(10, 150, 50, 50, true, true, "thirdtester");
-  btns[3] = new Button(70, 30, 20, 50, false, true, "firstRect");
-  btns[4] = new Button(70, 90, 20, 50, true, false, "secondRect");
-  btns[5] = new Button(70, 150, 20, 50, true, true, "thirdRect");
-  btns[6] = new Button(70, 210, 20, 50, false, false, "forthRect");
+  btns[0] = new Button(10, 30, 50, 50, 1, true, true, "paint");
+  btns[1] = new Button(10, 90, 50, 50, 1, true, true, "erase");
+  btns[2] = new Button(10, 150, 50, 50, 1, true, true, "thirdtester");
+  btns[3] = new Button(70, 30, 20, 50, 1, false, true, "firstRect");
+  btns[4] = new Button(70, 90, 20, 50, 1, true, false, "secondRect");
+  btns[5] = new Button(70, 150, 20, 50, 1, true, true, "thirdRect");
+  btns[6] = new Button(70, 210, 20, 50, 1, false, false, "forthRect");
 
-  control = new Button(0, 0, 0, 0, false, false, "control");
+  control = new Button(0, 0, 0, 0, 1, false, false, "control");
   topBar = new TopBarManager();
   buttonMenu = topBar.InitialiseMenu();
 }
@@ -136,13 +136,13 @@ class TopBarManager
 
     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
     {
-      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
+      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, 1, false, false, topBar[topMenu][0]);
       //menuButtons[topMenu][0].displayButton();
       topXstart += 50;
 
       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
       {
-        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
+        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, 1, false, false, topBar[topMenu][subMenu]);
         subYstart += 20;
       }
       subXstart += 50;
@@ -186,17 +186,18 @@ class TopBarManager
 }
 class Button
 {
-  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
+  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing, layer;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, localState;
   protected int buttonColour = color(100), buttonHighlight = color(200);
 
-  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, int newLayer, boolean smooth, boolean border, String newName)
   {
     buttonX = newX;
     buttonY = newY;
     buttonWidth = newWidth;
     buttonHeight = newHeight;
+    layer = newLayer;
     isSmooth = smooth;
     hasBorder = border;
     buttonName = newName;

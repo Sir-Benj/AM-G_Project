@@ -43,13 +43,13 @@ class TopBarManager
 
     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
     {
-      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
+      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, 1, false, false, topBar[topMenu][0]);
       //menuButtons[topMenu][0].displayButton();
       topXstart += 50;
 
       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
       {
-        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
+        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, 1, false, false, topBar[topMenu][subMenu]);
         subYstart += 20;
       }
       subXstart += 50;
