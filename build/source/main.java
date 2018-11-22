@@ -14,12 +14,13 @@ import java.io.IOException;
 
 public class main extends PApplet {
 
-//ImageUI win;
-//PaintUI win2;
-TopBarManager topBar;
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
+
+Menu menu;
+
+PGraphics layer;
 
 public void settings()
 {
@@ -28,68 +29,29 @@ public void settings()
 
 public void setup()
 {
+  frameRate(60);
   
   surface.setResizable(true);
   background(255, 255, 255, 255);
-  btns = new Button[7];
-  btns[0] = new Button(10, 30, 50, 50, 1, true, true, "paint");
-  btns[1] = new Button(10, 90, 50, 50, 1, true, true, "erase");
-  btns[2] = new Button(10, 150, 50, 50, 1, true, true, "thirdtester");
-  btns[3] = new Button(70, 30, 20, 50, 1, false, true, "firstRect");
-  btns[4] = new Button(70, 90, 20, 50, 1, true, false, "secondRect");
-  btns[5] = new Button(70, 150, 20, 50, 1, true, true, "thirdRect");
-  btns[6] = new Button(70, 210, 20, 50, 1, false, false, "forthRect");
 
-  control = new Button(0, 0, 0, 0, 1, false, false, "control");
-  topBar = new TopBarManager();
-  buttonMenu = topBar.InitialiseMenu();
+  menu = new Menu();
+  menu.InitialiseMenu();
 }
 
 public void mousePressed()
 {
-  topBar.TopMenuPressed();
-  control.ButtonPressed(btns);
 
-  // if (btn1.localState && !btn2.localState)
-  // {
-  //   noStroke();
-  //   fill(0);
-  //   ellipse(mouseX, mouseY, 20, 20);
-  // }
-  // if (btn2.localState && !btn1.localState)
-  // {
-  //   noStroke();
-  //   fill(255);
-  //   ellipse(mouseX, mouseY, 20, 20);
-  // }
 }
 
 public void mouseDragged()
 {
-  // if (btn1.localState && !btn2.localState)
-  // {
-  //   noStroke();
-  //   fill(0);
-  //   ellipse(mouseX, mouseY, 20, 20);
-  // }
-  // if (btn2.localState && !btn1.localState)
-  // {
-  //   noStroke();
-  //   fill(255);
-  //   ellipse(mouseX, mouseY, 20, 20);
-  // }
+
 }
+
 
 public void draw()
 {
-  background(255);
-
-  for (int i = 0; i < btns.length; i++)
-  {
-    btns[i].DisplayButton();
-  }
-
-  topBar.DisplayMenu();
+  menu.DrawMenu();
 }
 class TopBarManager
 {
@@ -136,13 +98,13 @@ class TopBarManager
 
     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
     {
-      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, 1, false, false, topBar[topMenu][0]);
+      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
       //menuButtons[topMenu][0].displayButton();
       topXstart += 50;
 
       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
       {
-        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, 1, false, false, topBar[topMenu][subMenu]);
+        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
         subYstart += 20;
       }
       subXstart += 50;
@@ -155,7 +117,7 @@ class TopBarManager
   public void DisplayMenu()
   {
     noStroke();
-    fill(180);
+    fill(100);
     rect(0, 0, width, 20);
     textFont(font, 14);
 
@@ -186,18 +148,17 @@ class TopBarManager
 }
 class Button
 {
-  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing, layer;
+  protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, localState;
   protected int buttonColour = color(100), buttonHighlight = color(200);
 
-  Button(int newX, int newY, int newWidth, int newHeight, int newLayer, boolean smooth, boolean border, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
   {
     buttonX = newX;
     buttonY = newY;
     buttonWidth = newWidth;
     buttonHeight = newHeight;
-    layer = newLayer;
     isSmooth = smooth;
     hasBorder = border;
     buttonName = newName;
@@ -336,10 +297,6 @@ class Button
     return buttonName;
   }
 }
-class ButtonManager
-{
-  
-}
 // boolean buttonOver = false;
 // boolean buttonPressed = false;
 // color buttonColour, highlight;
@@ -430,6 +387,76 @@ class ButtonManager
 //     dispose();
 //   }
 // }
+class Menu
+{
+  // Arrays for holding button string names and buttons
+  String[][] topBarNames;
+  Button[][] topBarButtons;
+  Button[] topBarSubFirst;
+  Button[] topBarSubSecond;
+  Button[] topBarSubThird;
+
+  String[] illustratorNames;
+  Button[] illustratorMenu;
+
+  String[] photoEditNames;
+  Button[] photoEditMenu;
+
+  int btnFontSize = 16, sideMenuInset = 200,
+      topBarXStart = 0, topBarYStart = 0, topBarWidth = 50, topBarHeight = 20,
+      subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
+      topBarXIncrease = 50, topBarYIncrease = 20;
+
+  PFont btnFont;
+  //
+  Menu()
+  {
+    // String arrays - first string in each list is the head of the array, this becomes the name
+    // shown on the top bar menu, the rest become sub buttons of this name.
+    topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
+    illustratorNames = new String[] {"Pencil", "Line", "Rectangle", "Circle", "Polygon"};
+    photoEditNames = new String[] {"Resize", "Edge Find"};
+    btnFont = createFont("arial.ttf", 16);
+    // Button arrays for top menu
+    topBarButtons = new Button[topBarNames.length][];
+    topBarSubFirst = new Button[topBarNames[0].length];
+    topBarSubSecond = new Button[topBarNames[1].length];
+    topBarSubThird = new Button[topBarNames[2].length];
+    topBarButtons[0] = topBarSubFirst;
+    topBarButtons[1] = topBarSubSecond;
+    topBarButtons[2] = topBarSubThird;
+    // Button arrays for side menu
+    illustratorMenu = new Button[illustratorNames.length];
+    photoEditMenu = new Button[photoEditNames.length];
+  }
+
+  public void InitialiseMenu()
+  {
+
+  }
+
+  public void DrawMenu()
+  {
+    DrawTopBar();
+    DrawSideMenu();
+  }
+
+  public void DrawTopBar()
+  {
+    noStroke();
+    fill(200);
+    rect(0, 0, width, topBarHeight);
+    textFont(btnFont, btnFontSize);
+  }
+
+  public void DrawSideMenu()
+  {
+    noStroke();
+    fill(200);
+    rect(width - sideMenuInset, 0, sideMenuInset, height);
+    textFont(btnFont, btnFontSize);
+  }
+}
 class PaintUI extends PApplet
 {
   PaintUI()
