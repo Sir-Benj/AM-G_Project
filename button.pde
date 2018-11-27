@@ -3,7 +3,7 @@ class Button
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, localState;
-  protected color buttonColour = color(100), buttonHighlight = color(200);
+  protected color buttonColour = color(180), buttonHighlight = color(210);
 
   Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
   {

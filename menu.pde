@@ -14,9 +14,9 @@ class Menu
   Button[] photoEditMenu;
 
   int btnFontSize = 16, sideMenuInset = 200,
-      topBarXStart = 0, topBarYStart = 0, topBarWidth = 50, topBarHeight = 20,
+      topBarXStart = 0, topBarYStart = 0, topBarWidth = 60, topBarHeight = 20,
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
-      topBarXIncrease = 50, topBarYIncrease = 20;
+      topBarXIncrease = 60, topBarYIncrease = 20;
 
   PFont btnFont;
   //
@@ -43,6 +43,20 @@ class Menu
 
   void InitialiseMenu()
   {
+    for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
+    {
+      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0]);
+      topBarXStart += topBarXIncrease;
+
+      for (int subMenu = 1; subMenu < topBarButtons[topMenu].length; subMenu++)
+      {
+        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu]);
+        subYStart += topBarYIncrease;
+      }
+      subXStart += topBarXIncrease;
+      subYStart = topBarYIncrease;
+    }
+
 
   }
 
@@ -52,10 +66,50 @@ class Menu
     DrawSideMenu();
   }
 
+  void DisplayMenu()
+  {
+    noStroke();
+    fill(180);
+    rect(0, 0, width, topBarHeight);
+    textFont(btnFont, btnFontSize);
+
+    for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
+    {
+      for (int subMenu = 0; subMenu < topBarButtons[topMenu].length; subMenu++)
+      {
+        topBarButtons[topMenu][0].DisplayButton();
+        if (topBarButtons[topMenu][0].localState)
+        {
+          topBarButtons[topMenu][subMenu].DisplayButton();
+        }
+      }
+    }
+  }
+
+  void TopMenuPressed()
+  {
+    topBarButtons[0][0].TopMenuButtonPressed(topBarButtons[1][0]);
+    topBarButtons[0][0].TopMenuButtonPressed(topBarButtons[2][0]);
+    topBarButtons[1][0].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[1][0].TopMenuButtonPressed(topBarButtons[2][0]);
+    topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[1][0]);
+
+    topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
+
+    topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
+    topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
+
+    topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
+    topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+  }
+
   void DrawTopBar()
   {
     noStroke();
-    fill(200);
+    fill(180);
     rect(0, 0, width, topBarHeight);
     textFont(btnFont, btnFontSize);
   }
@@ -63,7 +117,7 @@ class Menu
   void DrawSideMenu()
   {
     noStroke();
-    fill(200);
+    fill(180);
     rect(width - sideMenuInset, 0, sideMenuInset, height);
     textFont(btnFont, btnFontSize);
   }
