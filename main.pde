@@ -31,6 +31,7 @@ void setup()
 void mousePressed()
 {
   menu.TopMenuPressed();
+  menu.SideMenuPressed();
 }
 
 void mouseDragged()
@@ -47,14 +48,17 @@ void draw()
 
   layer.beginDraw();
   layer.fill(0);
-  if (mouseX > 20 && mouseX < 820 && mouseY > 40 && mouseY < 640)
+  if (mousePressed)
   {
-    layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
-  }
-  if (menu.topBarButtons[0][1].localState)
-  {
-    layer.clear();
-    menu.topBarButtons[0][1].localState = false;
+    if (mouseX > 20 && mouseX < 820 && mouseY > 40 && mouseY < 640)
+    {
+      layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+    }
+    if (menu.topBarButtons[0][1].localState)
+    {
+      layer.clear();
+      menu.topBarButtons[0][1].localState = false;
+    }
   }
   layer.endDraw();
 
@@ -63,5 +67,4 @@ void draw()
   image(layer, 20, 40);
   menu.DrawMenu();
   menu.DisplayMenu();
-
 }

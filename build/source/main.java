@@ -47,6 +47,7 @@ public void setup()
 public void mousePressed()
 {
   menu.TopMenuPressed();
+  menu.SideMenuPressed();
 }
 
 public void mouseDragged()
@@ -63,14 +64,17 @@ public void draw()
 
   layer.beginDraw();
   layer.fill(0);
-  if (mouseX > 20 && mouseX < 820 && mouseY > 40 && mouseY < 640)
+  if (mousePressed)
   {
-    layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
-  }
-  if (menu.topBarButtons[0][1].localState)
-  {
-    layer.clear();
-    menu.topBarButtons[0][1].localState = false;
+    if (mouseX > 20 && mouseX < 820 && mouseY > 40 && mouseY < 640)
+    {
+      layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+    }
+    if (menu.topBarButtons[0][1].localState)
+    {
+      layer.clear();
+      menu.topBarButtons[0][1].localState = false;
+    }
   }
   layer.endDraw();
 
@@ -79,7 +83,6 @@ public void draw()
   image(layer, 20, 40);
   menu.DrawMenu();
   menu.DisplayMenu();
-
 }
 class TopBarManager
 {
@@ -433,7 +436,9 @@ class Menu
   int btnFontSize = 16, sideMenuInset = 200,
       topBarXStart = 0, topBarYStart = 0, topBarWidth = 60, topBarHeight = 20,
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
-      topBarXIncrease = 60, topBarYIncrease = 20;
+      topBarXIncrease = 60, topBarYIncrease = 20,
+      sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 200,
+      sideMenuSelYInset = 240, sideMenuSelWidth = 160, sideMenuSelHeight = 150;
 
   PFont btnFont;
   //
@@ -441,9 +446,9 @@ class Menu
   {
     // String arrays - first string in each list is the head of the array, this becomes the name
     // shown on the top bar menu, the rest become sub buttons of this name.
-    topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
-    illustratorNames = new String[] {"Pencil", "Line", "Rectangle", "Circle", "Polygon"};
-    photoEditNames = new String[] {"Resize", "Edge Find"};
+    topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"} };
+    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "Scale Shape", "Rotate Shape", "Clear Layer"};
+    photoEditNames = new String[] {"Resize", "Edge Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
     // Button arrays for top menu
     topBarButtons = new Button[topBarNames.length][];
@@ -474,6 +479,21 @@ class Menu
       subYStart = topBarYIncrease;
     }
 
+    int step = 1, startX = width - sideMenuXInset - 5, startY = 400, increaseX = 60, increaseY = 60;
+    for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
+    {
+      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll]);
+
+      startX += 60;
+      step++;
+      if (step == 4)
+      {
+        startX = width - sideMenuXInset - 5;
+        startY += 60;
+        step = 1;
+      }
+    }
+
 
   }
 
@@ -490,6 +510,15 @@ class Menu
     rect(0, 0, width, topBarHeight);
     textFont(btnFont, btnFontSize);
 
+    stroke(150);
+    fill(160);
+    rect(width - sideMenuXInset, sideMenuColYInset, sideMenuColWidth, sideMenuColHeight);
+
+    stroke(150);
+    fill(160);
+    rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
+
+
     for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
     {
       for (int subMenu = 0; subMenu < topBarButtons[topMenu].length; subMenu++)
@@ -500,6 +529,11 @@ class Menu
           topBarButtons[topMenu][subMenu].DisplayButton();
         }
       }
+    }
+
+    for (int sideBarIll = 0; sideBarIll < illustratorMenu.length; sideBarIll++)
+    {
+      illustratorMenu[sideBarIll].DisplayButton();
     }
   }
 
@@ -521,6 +555,11 @@ class Menu
 
     topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
     topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+  }
+
+  public void SideMenuPressed()
+  {
+    illustratorMenu[0].ButtonPressed(illustratorMenu);
   }
 
   public void DrawTopBar()
