@@ -12,18 +12,18 @@ PGraphics layer;
 
 public void settings()
 {
-  size(screenSizeX + menuSize, screenSizeY + topBarSize);
+  size(3*displayWidth>>2, 3*displayHeight>>2);//screenSizeX + menuSize, screenSizeY + topBarSize);
 }
 
 void setup()
 {
   frameRate(100);
   noSmooth();
-  surface.setResizable(true);
+  //surface.setResizable(true);
   background(255);
 
-  background = createGraphics(800, 600);
-  layer = createGraphics(800, 600);
+  background = createGraphics(width - 245, height - 60);//800, 600);
+  layer = createGraphics(width - 245, height - 60);//800, 600);
   menu = new Menu();
   menu.InitialiseMenu();
 }
@@ -50,7 +50,7 @@ void draw()
   layer.fill(0);
   if (mousePressed)
   {
-    if (mouseX > 20 && mouseX < 820 && mouseY > 40 && mouseY < 640)
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
     {
       layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
     }
@@ -59,8 +59,14 @@ void draw()
       layer.clear();
       menu.topBarButtons[0][1].localState = false;
     }
+    if (menu.topBarButtons[0][2].localState)
+    {
+      layer.save("test.png");
+    }
   }
   layer.endDraw();
+
+
 
   background(200);
   image(background, 20, 40);
