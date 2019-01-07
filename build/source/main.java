@@ -44,7 +44,7 @@ public void setup()
   menu.InitialiseMenu();
 }
 
-public void mouseClicked()
+public void mousePressed()
 {
   menu.TopMenuPressed();
   menu.SideMenuPressed();
@@ -83,114 +83,117 @@ public void draw()
   layer.endDraw();
 
 
-
+  tint(255);
   background(200);
   image(background, 20, 40);
   image(layer, 20, 40);
+
   menu.DrawMenu();
   menu.DisplayMenu();
 }
-class TopBarManager
-{
-  String[][] topBar;
-  Button[][] menuButtons;
-  Button[] sub1;
-  Button[] sub2;
-  Button[] sub3;
-
-  PFont font;
-  //int topBheight;
-  //int topBwidth
-
-  TopBarManager()
-  {
-    topBar = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
-    font = createFont("arial.ttf", 16);
-
-    menuButtons = new Button[topBar.length][];
-    sub1 = new Button[topBar[0].length];
-    sub2 = new Button[topBar[1].length];
-    sub3 = new Button[topBar[2].length];
-
-    menuButtons[0] = sub1;
-    menuButtons[1] = sub2;
-    menuButtons[2] = sub3;
-  }
-
-  public Button[][] InitialiseMenu()
-  {
-    noStroke();
-    fill(180);
-    rect(0, 0, width, 20);
-    textFont(font, 14);
-
-    int topXstart = 0;
-    int topYstart = 0;
-    int topBwidth = 50;
-    int topBheight = 20;
-    int subXstart = 0;
-    int subYstart = 20;
-    int subBwidth = 80;
-    int subBheight = 20;
-
-    for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
-    {
-      menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
-      //menuButtons[topMenu][0].displayButton();
-      topXstart += 50;
-
-      for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
-      {
-        menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
-        subYstart += 20;
-      }
-      subXstart += 50;
-      subYstart = 20;
-    }
-
-    return menuButtons;
-  }
-
-  public void DisplayMenu()
-  {
-    noStroke();
-    fill(100);
-    rect(0, 0, width, 20);
-    textFont(font, 14);
-
-    for (int i = 0; i < menuButtons.length; i++)
-    {
-      for (int y = 0; y < menuButtons[i].length; y++)
-      {
-        menuButtons[i][0].DisplayButton();
-        if (menuButtons[i][0].localState)
-        {
-          menuButtons[i][y].DisplayButton();
-        }
-      }
-    }
-  }
-
-  public void TopMenuPressed()
-  {
-    menuButtons[0][0].TopMenuButtonPressed(menuButtons[1][0]);
-    menuButtons[0][0].TopMenuButtonPressed(menuButtons[2][0]);
-    menuButtons[1][0].TopMenuButtonPressed(menuButtons[0][0]);
-    menuButtons[1][0].TopMenuButtonPressed(menuButtons[2][0]);
-    menuButtons[2][0].TopMenuButtonPressed(menuButtons[0][0]);
-    menuButtons[2][0].TopMenuButtonPressed(menuButtons[1][0]);
-  }
-
-
-}
+// class TopBarManager
+// {
+//   String[][] topBar;
+//   Button[][] menuButtons;
+//   Button[] sub1;
+//   Button[] sub2;
+//   Button[] sub3;
+//
+//   PFont font;
+//   //int topBheight;
+//   //int topBwidth
+//
+//   TopBarManager()
+//   {
+//     topBar = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
+//     font = createFont("arial.ttf", 16);
+//
+//     menuButtons = new Button[topBar.length][];
+//     sub1 = new Button[topBar[0].length];
+//     sub2 = new Button[topBar[1].length];
+//     sub3 = new Button[topBar[2].length];
+//
+//     menuButtons[0] = sub1;
+//     menuButtons[1] = sub2;
+//     menuButtons[2] = sub3;
+//   }
+//
+//   Button[][] InitialiseMenu()
+//   {
+//     noStroke();
+//     fill(180);
+//     rect(0, 0, width, 20);
+//     textFont(font, 14);
+//
+//     int topXstart = 0;
+//     int topYstart = 0;
+//     int topBwidth = 50;
+//     int topBheight = 20;
+//     int subXstart = 0;
+//     int subYstart = 20;
+//     int subBwidth = 80;
+//     int subBheight = 20;
+//
+//     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
+//     {
+//       menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
+//       //menuButtons[topMenu][0].displayButton();
+//       topXstart += 50;
+//
+//       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
+//       {
+//         menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
+//         subYstart += 20;
+//       }
+//       subXstart += 50;
+//       subYstart = 20;
+//     }
+//
+//     return menuButtons;
+//   }
+//
+//   void DisplayMenu()
+//   {
+//     noStroke();
+//     fill(100);
+//     rect(0, 0, width, 20);
+//     textFont(font, 14);
+//
+//     for (int i = 0; i < menuButtons.length; i++)
+//     {
+//       for (int y = 0; y < menuButtons[i].length; y++)
+//       {
+//         menuButtons[i][0].DisplayButton();
+//         if (menuButtons[i][0].localState)
+//         {
+//           menuButtons[i][y].DisplayButton();
+//         }
+//       }
+//     }
+//   }
+//
+//   void TopMenuPressed()
+//   {
+//     menuButtons[0][0].TopMenuButtonPressed(menuButtons[1][0]);
+//     menuButtons[0][0].TopMenuButtonPressed(menuButtons[2][0]);
+//     menuButtons[1][0].TopMenuButtonPressed(menuButtons[0][0]);
+//     menuButtons[1][0].TopMenuButtonPressed(menuButtons[2][0]);
+//     menuButtons[2][0].TopMenuButtonPressed(menuButtons[0][0]);
+//     menuButtons[2][0].TopMenuButtonPressed(menuButtons[1][0]);
+//   }
+//
+//
+// }
 class Button
 {
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
-  protected boolean isSmooth, hasBorder, localState;
+  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert;
   protected int buttonColour = color(180), buttonHighlight = color(210);
+  protected PImage iconImage;
 
-  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth,
+         boolean border, String newName, boolean nameOnOff, Boolean iconOnOff)
   {
     buttonX = newX;
     buttonY = newY;
@@ -199,8 +202,16 @@ class Button
     isSmooth = smooth;
     hasBorder = border;
     buttonName = newName;
+    showName = nameOnOff;
+    hasIcon = iconOnOff;
+    invert = false;
     smoothing = 8;
     localState = false;
+
+    if (hasIcon)
+    {
+      iconImage = loadImage("Icon" + buttonName + ".png");
+    }
   }
 
   public void DisplayButton()
@@ -238,13 +249,40 @@ class Button
     {
       rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
       fill(0);
-      text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+      if (showName)
+      {
+        text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+      }
     }
     else
     {
       rect(buttonX, buttonY, buttonWidth, buttonHeight);
       fill(0);
-      text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+      if (showName)
+      {
+        text(buttonName, buttonX, buttonY + buttonHeight/1.5f);
+      }
+    }
+
+    if (iconImage != null && hasIcon)
+    {
+      if (OverButton() || localState)
+      {
+        invert = true;
+      }
+      else if (!OverButton() || !localState)
+      {
+        invert = false;
+      }
+
+      if (invert)
+      {
+        iconImage.filter(INVERT);
+        invert = false;
+      }
+
+      image(iconImage, buttonX, buttonY);
+
     }
   }
 
@@ -453,8 +491,8 @@ class Menu
     // String arrays - first string in each list is the head of the array, this becomes the name
     // shown on the top bar menu, the rest become sub buttons of this name.
     topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"} };
-    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "Scale Shape", "Rotate Shape", "Clear Layer"};
-    photoEditNames = new String[] {"Resize", "Edge Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
+    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
+    photoEditNames = new String[] {"Resize", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
     // Button arrays for top menu
     topBarButtons = new Button[topBarNames.length][];
@@ -473,12 +511,12 @@ class Menu
   {
     for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
     {
-      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0]);
+      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0], true, false);
       topBarXStart += topBarXIncrease;
 
       for (int subMenu = 1; subMenu < topBarButtons[topMenu].length; subMenu++)
       {
-        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu]);
+        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu], true, false);
         subYStart += topBarYIncrease;
       }
       subXStart += topBarXIncrease;
@@ -488,7 +526,7 @@ class Menu
     int step = 1, startX = width - sideMenuXInset - 5, startY = 400, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
     {
-      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll]);
+      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll], false, true);
 
       startX += 60;
       step++;

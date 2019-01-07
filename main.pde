@@ -67,10 +67,11 @@ void draw()
   layer.endDraw();
 
 
-
+  tint(255);
   background(200);
   image(background, 20, 40);
   image(layer, 20, 40);
+
   menu.DrawMenu();
   menu.DisplayMenu();
 }

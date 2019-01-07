@@ -27,8 +27,8 @@ class Menu
     // String arrays - first string in each list is the head of the array, this becomes the name
     // shown on the top bar menu, the rest become sub buttons of this name.
     topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"} };
-    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "Scale Shape", "Rotate Shape", "Clear Layer"};
-    photoEditNames = new String[] {"Resize", "Edge Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
+    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
+    photoEditNames = new String[] {"Resize", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
     // Button arrays for top menu
     topBarButtons = new Button[topBarNames.length][];
@@ -47,12 +47,12 @@ class Menu
   {
     for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
     {
-      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0]);
+      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0], true, false);
       topBarXStart += topBarXIncrease;
 
       for (int subMenu = 1; subMenu < topBarButtons[topMenu].length; subMenu++)
       {
-        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu]);
+        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu], true, false);
         subYStart += topBarYIncrease;
       }
       subXStart += topBarXIncrease;
@@ -62,7 +62,7 @@ class Menu
     int step = 1, startX = width - sideMenuXInset - 5, startY = 400, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
     {
-      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll]);
+      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll], false, true);
 
       startX += 60;
       step++;

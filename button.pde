@@ -2,10 +2,12 @@ class Button
 {
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
-  protected boolean isSmooth, hasBorder, localState;
+  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted;
   protected color buttonColour = color(180), buttonHighlight = color(210);
+  protected PImage iconImage;
 
-  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth, boolean border, String newName)
+  Button(int newX, int newY, int newWidth, int newHeight, boolean smooth,
+         boolean border, String newName, boolean nameOnOff, Boolean iconOnOff)
   {
     buttonX = newX;
     buttonY = newY;
@@ -14,8 +16,17 @@ class Button
     isSmooth = smooth;
     hasBorder = border;
     buttonName = newName;
+    showName = nameOnOff;
+    hasIcon = iconOnOff;
+    invert = false;
+    inverted = false;
     smoothing = 8;
     localState = false;
+
+    if (hasIcon)
+    {
+      iconImage = loadImage("Icon" + buttonName + ".png");
+    }
   }
 
   void DisplayButton()
@@ -53,13 +64,24 @@ class Button
     {
       rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
       fill(0);
-      text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+      if (showName)
+      {
+        text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+      }
     }
     else
     {
       rect(buttonX, buttonY, buttonWidth, buttonHeight);
       fill(0);
-      text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+      if (showName)
+      {
+        text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+      }
+    }
+
+    if (iconImage != null && hasIcon)
+    {
+      image(iconImage, buttonX, buttonY);
     }
   }
 
