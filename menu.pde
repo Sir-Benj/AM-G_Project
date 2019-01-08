@@ -17,8 +17,8 @@ class Menu
       topBarXStart = 0, topBarYStart = 0, topBarWidth = 60, topBarHeight = 20,
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
       topBarXIncrease = 60, topBarYIncrease = 20,
-      sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 200,
-      sideMenuSelYInset = 240, sideMenuSelWidth = 160, sideMenuSelHeight = 150;
+      sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 350,
+      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 150;
 
   PFont btnFont;
   //
@@ -59,7 +59,7 @@ class Menu
       subYStart = topBarYIncrease;
     }
 
-    int step = 1, startX = width - sideMenuXInset - 5, startY = 400, increaseX = 60, increaseY = 60;
+    int step = 1, startX = width - sideMenuXInset - 5, startY = 550, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
     {
       illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll], false, true);

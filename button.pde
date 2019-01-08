@@ -4,7 +4,7 @@ class Button
   protected String buttonName;
   protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted;
   protected color buttonColour = color(180), buttonHighlight = color(210);
-  protected PImage iconImage;
+  protected PImage iconImage, iconImageInverted;
 
   Button(int newX, int newY, int newWidth, int newHeight, boolean smooth,
          boolean border, String newName, boolean nameOnOff, Boolean iconOnOff)
@@ -26,6 +26,11 @@ class Button
     if (hasIcon)
     {
       iconImage = loadImage("Icon" + buttonName + ".png");
+      iconImageInverted = loadImage("Icon" + buttonName + ".png");
+      if (iconImageInverted != null && hasIcon)
+      {
+        iconImageInverted.filter(INVERT);
+      }
     }
   }
 
@@ -44,6 +49,30 @@ class Button
         noStroke();
         fill(buttonHighlight);
       }
+
+      if (isSmooth)
+      {
+        rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
+        fill(0);
+        if (showName)
+        {
+          text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        }
+      }
+      else
+      {
+        rect(buttonX, buttonY, buttonWidth, buttonHeight);
+        fill(0);
+        if (showName)
+        {
+          text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        }
+      }
+
+      if (iconImage != null && hasIcon)
+      {
+        image(iconImageInverted, buttonX, buttonY);
+      }
     }
     //If mouse isnt over and it isnt on then display normal colour
     else if (!OverButton() || !localState)
@@ -58,30 +87,30 @@ class Button
         noStroke();
         fill(buttonColour);
       }
-    }
 
-    if (isSmooth)
-    {
-      rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
-      fill(0);
-      if (showName)
+      if (isSmooth)
       {
-        text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
+        fill(0);
+        if (showName)
+        {
+          text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        }
       }
-    }
-    else
-    {
-      rect(buttonX, buttonY, buttonWidth, buttonHeight);
-      fill(0);
-      if (showName)
+      else
       {
-        text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        rect(buttonX, buttonY, buttonWidth, buttonHeight);
+        fill(0);
+        if (showName)
+        {
+          text(buttonName, buttonX, buttonY + buttonHeight/1.5);
+        }
       }
-    }
 
-    if (iconImage != null && hasIcon)
-    {
-      image(iconImage, buttonX, buttonY);
+      if (iconImage != null && hasIcon)
+      {
+        image(iconImage, buttonX, buttonY);
+      }
     }
   }
 

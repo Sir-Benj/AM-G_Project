@@ -6,6 +6,7 @@ int screenSizeX = 840, screenSizeY = 640,
     menuSize = 200, topBarSize = 20;
 
 Menu menu;
+ColourPicker colourPicker;
 
 PGraphics background;
 PGraphics layer;
@@ -19,13 +20,14 @@ void setup()
 {
   frameRate(100);
   noSmooth();
-  //surface.setResizable(true);
+  colorMode(HSB);
   background(255);
 
   background = createGraphics(width - 245, height - 60);//800, 600);
   layer = createGraphics(width - 245, height - 60);//800, 600);
   menu = new Menu();
   menu.InitialiseMenu();
+  colourPicker = new ColourPicker();
 }
 
 void mousePressed()
@@ -47,11 +49,12 @@ void draw()
   background.endDraw();
 
   layer.beginDraw();
-  layer.fill(0);
+  layer.colorMode(HSB);
   if (mousePressed)
   {
     if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
     {
+      layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
       layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
     }
     if (menu.topBarButtons[0][1].localState)
@@ -74,4 +77,5 @@ void draw()
 
   menu.DrawMenu();
   menu.DisplayMenu();
+  colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
 }
