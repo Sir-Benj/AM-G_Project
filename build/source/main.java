@@ -27,6 +27,8 @@ ColourPicker colourPicker;
 PGraphics background;
 PGraphics layer;
 
+GraphicsFunctions graphicsFunctions;
+
 public void settings()
 {
   size(3*displayWidth>>2, 3*displayHeight>>2);//screenSizeX + menuSize, screenSizeY + topBarSize);
@@ -44,6 +46,7 @@ public void setup()
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
+  graphicsFunctions = new GraphicsFunctions();
 }
 
 public void mousePressed()
@@ -64,26 +67,35 @@ public void draw()
   background.background(255);
   background.endDraw();
 
-  layer.beginDraw();
-  layer.colorMode(HSB);
-  if (mousePressed)
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
+    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
     {
-      layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-      layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
-    }
-    if (menu.topBarButtons[0][1].localState)
-    {
-      layer.clear();
-      menu.topBarButtons[0][1].localState = false;
-    }
-    if (menu.topBarButtons[0][2].localState)
-    {
-      layer.save("test.png");
+      graphicsFunctions.Pencil(layer, colourPicker);
     }
   }
-  layer.endDraw();
+  //
+  // layer.beginDraw();
+  // layer.colorMode(HSB);
+  // if (mousePressed)
+  // {
+  //   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
+  //   {
+  //     layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+  //     layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+  //   }
+  //   if (menu.topBarButtons[0][1].localState)
+  //   {
+  //     layer.clear();
+  //     menu.topBarButtons[0][1].localState = false;
+  //   }
+  //   if (menu.topBarButtons[0][2].localState)
+  //   {
+  //     selectOutput("Select a file to write to:", "fileSelected");
+  //     menu.topBarButtons[0][2].localState = false;
+  //   }
+  // }
+  // layer.endDraw();
 
 
   tint(255);
@@ -163,6 +175,156 @@ class ColourPicker
 
     return hueVal;
   }
+}
+class GraphicsFunctions
+{
+
+  GraphicsFunctions() {}
+
+  public void New(PGraphics layer, Button button)
+  {
+    layer.clear();
+    button.localState = false;
+  }
+
+  public void Save()
+  {
+
+  }
+
+  public void Load()
+  {
+
+  }
+
+  public void Undo()
+  {
+
+  }
+
+  public void Redo()
+  {
+
+  }
+
+  public void Blur()
+  {
+
+  }
+
+  public void Sharpen()
+  {
+
+  }
+
+  public void Greyscale()
+  {
+
+  }
+
+  public void Monochrome()
+  {
+
+  }
+
+  public void Pencil(PGraphics layer, ColourPicker colourPicker)
+  {
+    layer.beginDraw();
+    layer.colorMode(HSB);
+    if (mousePressed)
+    {
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
+      {
+        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+      }
+    }
+    layer.endDraw();
+  }
+
+  public void Eraser()
+  {
+
+  }
+
+  public void Line()
+  {
+
+  }
+
+  public void Rectangle()
+  {
+
+  }
+
+  public void Circle()
+  {
+
+  }
+
+  public void Polygon()
+  {
+
+  }
+
+  public void Duplicate()
+  {
+
+  }
+
+  public void ScaleShape()
+  {
+
+  }
+
+  public void RotateShape()
+  {
+
+  }
+
+  public void ClearLayer()
+  {
+
+  }
+
+  public void Resize()
+  {
+
+  }
+
+  public void EdgeDetect()
+  {
+
+  }
+
+  public void Rotate()
+  {
+
+  }
+
+  public void Hue()
+  {
+
+  }
+
+  public void Saturation()
+  {
+
+  }
+
+  public void Brightness()
+  {
+
+  }
+
+  public void Contrast()
+  {
+
+  }
+}
+class Slider
+{
+  
 }
 // class TopBarManager
 // {
