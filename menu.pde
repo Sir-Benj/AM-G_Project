@@ -135,6 +135,20 @@ class Menu
 
     topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
     topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+
+    for (int i = 0; i < topBarButtons.length; i++)
+    {
+      for (int y = 0; y < topBarButtons[i].length; y++)
+      {
+        if (topBarButtons[i][y].localState)
+        {
+          for (int sideMenu = 0; sideMenu < illustratorMenu.length; sideMenu++)
+          {
+            illustratorMenu[sideMenu].localState = false;
+          }
+        }
+      }
+    }
   }
 
   void SideMenuPressed()

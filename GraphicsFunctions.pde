@@ -51,7 +51,7 @@ class GraphicsFunctions
 
   void Pencil(PGraphics layer, ColourPicker colourPicker)
   {
-    
+
     layer.beginDraw();
     layer.colorMode(HSB);
     if (mousePressed)
@@ -59,20 +59,54 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        layer.strokeWeight(5);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
     layer.endDraw();
   }
 
-  void Eraser()
+  void Eraser(PGraphics layer)
   {
-
+    layer.beginDraw();
+    layer.colorMode(HSB);
+    if (mousePressed)
+    {
+      if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
+      {
+        layer.stroke(255);
+        layer.strokeWeight(10);
+        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+      }
+    }
+    layer.endDraw();
   }
 
-  void Line()
+  void Line(PGraphics layer, boolean firstClick)
   {
+    int pmX = 0;
+    int pmY = 0;
 
+    layer.beginDraw();
+    layer.colorMode(HSB);
+    if (mousePressed)
+    {
+      if (firstClick)
+      {
+        pmX = mouseX;
+        pmY = mouseY;
+
+        firstClick = false;
+      }
+      else if (!firstClick)
+      {
+        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        strokeWeight(10);
+        line(mouseX, mouseY, pmX, pmY);
+
+        firstClick = true;
+      }
+    }
   }
 
   void Rectangle()

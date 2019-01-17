@@ -2,6 +2,8 @@ Button control;
 Button[] btns;
 Button[][] buttonMenu;
 
+boolean clicked = true;
+
 int screenSizeX = 840, screenSizeY = 640,
     menuSize = 200, topBarSize = 20;
 
@@ -51,11 +53,34 @@ void draw()
   background.background(255);
   background.endDraw();
 
+  layer.beginDraw();
+  layer.endDraw();
+
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.Pencil(layer, colourPicker);
+    }
+    if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.Eraser(layer);
+    }
+    if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.Line(layer, clicked);
+    }
+
+  }
+
+  for (int i = 0; i < menu.topBarButtons.length; i++)
+  {
+    for (int y = 0; y < menu.topBarButtons[i].length; y++)
+    {
+      if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
+      {
+        graphicsFunctions.New(layer, menu.topBarButtons[i][y]);
+      }
     }
   }
   //
