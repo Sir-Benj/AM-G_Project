@@ -1,7 +1,8 @@
 class GraphicsFunctions
 {
-
-  GraphicsFunctions() {}
+  GraphicsFunctions()
+  {
+  }
 
   void New(PGraphics layer, Button button)
   {
@@ -9,9 +10,11 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Save()
+  void Save(PGraphics layer, Button button, String newPath)
   {
-
+    selectOutput("Select Output", "fileSelected");
+    layer.save(newPath);
+    button.localState = false;
   }
 
   void Load()
@@ -178,4 +181,5 @@ class GraphicsFunctions
   {
 
   }
+
 }
