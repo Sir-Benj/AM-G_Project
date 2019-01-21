@@ -1,13 +1,12 @@
 import java.util.LinkedList;
 
+int xFirstClick, yFirstClick, xSecondCLick, ySecondClick;
+
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
 
-boolean clicked = true;
-
-int screenSizeX = 840, screenSizeY = 640,
-    menuSize = 200, topBarSize = 20;
+boolean clicked;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -19,10 +18,11 @@ MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
 
 String path;
+File selectOne;
 
 public void settings()
 {
-  size(3*displayWidth>>2, 3*displayHeight>>2);//screenSizeX + menuSize, screenSizeY + topBarSize);
+  size(3*displayWidth>>2, 3*displayHeight>>2);
 }
 
 void setup()
@@ -32,13 +32,15 @@ void setup()
   colorMode(HSB);
   background(255);
 
-  background = createGraphics(width - 245, height - 60);//800, 600);
-  layer = createGraphics(width - 245, height - 60);//800, 600);
+  background = createGraphics(width - 245, height - 60);
+  layer = createGraphics(width - 245, height - 60);
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
   messageQueue = new MessageQueue();
   graphicsFunctions = new GraphicsFunctions();
+  path = "";
+  selectOne = new File(sketchPath("") + "/*.png");
 }
 
 void mousePressed()
@@ -50,6 +52,24 @@ void mousePressed()
 void mouseDragged()
 {
 
+}
+
+void mouseClicked()
+{
+  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
+  {
+    if (clicked)
+    {
+      xSecondCLick = mouseX;
+      ySecondClick = mouseY;
+      clicked = false;
+      return;
+    }
+
+    xFirstClick = mouseX;
+    yFirstClick = mouseY;
+    clicked = true;
+  }
 }
 
 
@@ -74,7 +94,12 @@ void draw()
     }
     if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Line(layer, clicked);
+      graphicsFunctions.Line(layer, clicked, xFirstClick, xSecondCLick,
+                             yFirstClick, ySecondClick, colourPicker);
+    }
+    if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.ClearLayer(layer, menu.illustratorMenu[i]);
     }
 
   }
@@ -89,15 +114,30 @@ void draw()
       }
       if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path);
+        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path, selectOne);
       }
     }
   }
+
 
   //tint(255);
   background(200);
   image(background, 20, 40);
   image(layer, 20, 40);
+
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+    {
+      if (clicked)
+      {
+        //strokeWeight(10);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        line(xFirstClick, yFirstClick, mouseX, mouseY);
+        println("X1 = " + xFirstClick + " Y1 = " + yFirstClick);
+      }
+    }
+  }
 
   menu.DrawMenu();
   menu.DisplayMenu();
@@ -106,6 +146,14 @@ void draw()
 
 void fileSelected(File selection)
 {
-  messageQueue.put(selection);
-  path = selection.getAbsolutePath();
+  if (selection == null)
+  {
+    println("Window was closed or the user hit cancel.");
+  }
+  else
+  {
+    messageQueue.put(selection);
+    path = selection.getAbsolutePath();
+    println(path);
+  }
 }

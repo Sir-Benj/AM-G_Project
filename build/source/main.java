@@ -18,14 +18,13 @@ public class main extends PApplet {
 
 
 
+int xFirstClick, yFirstClick, xSecondCLick, ySecondClick;
+
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
 
-boolean clicked = true;
-
-int screenSizeX = 840, screenSizeY = 640,
-    menuSize = 200, topBarSize = 20;
+boolean clicked;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -37,10 +36,11 @@ MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
 
 String path;
+File selectOne;
 
 public void settings()
 {
-  size(3*displayWidth>>2, 3*displayHeight>>2);//screenSizeX + menuSize, screenSizeY + topBarSize);
+  size(3*displayWidth>>2, 3*displayHeight>>2);
 }
 
 public void setup()
@@ -50,13 +50,15 @@ public void setup()
   colorMode(HSB);
   background(255);
 
-  background = createGraphics(width - 245, height - 60);//800, 600);
-  layer = createGraphics(width - 245, height - 60);//800, 600);
+  background = createGraphics(width - 245, height - 60);
+  layer = createGraphics(width - 245, height - 60);
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
   messageQueue = new MessageQueue();
   graphicsFunctions = new GraphicsFunctions();
+  path = "";
+  selectOne = new File(sketchPath("") + "/*.png");
 }
 
 public void mousePressed()
@@ -68,6 +70,24 @@ public void mousePressed()
 public void mouseDragged()
 {
 
+}
+
+public void mouseClicked()
+{
+  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
+  {
+    if (clicked)
+    {
+      xSecondCLick = mouseX;
+      ySecondClick = mouseY;
+      clicked = false;
+      return;
+    }
+
+    xFirstClick = mouseX;
+    yFirstClick = mouseY;
+    clicked = true;
+  }
 }
 
 
@@ -92,7 +112,12 @@ public void draw()
     }
     if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Line(layer, clicked);
+      graphicsFunctions.Line(layer, clicked, xFirstClick, xSecondCLick,
+                             yFirstClick, ySecondClick, colourPicker);
+    }
+    if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.ClearLayer(layer, menu.illustratorMenu[i]);
     }
 
   }
@@ -107,15 +132,30 @@ public void draw()
       }
       if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path);
+        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path, selectOne);
       }
     }
   }
+
 
   //tint(255);
   background(200);
   image(background, 20, 40);
   image(layer, 20, 40);
+
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+    {
+      if (clicked)
+      {
+        //strokeWeight(10);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        line(xFirstClick, yFirstClick, mouseX, mouseY);
+        println("X1 = " + xFirstClick + " Y1 = " + yFirstClick);
+      }
+    }
+  }
 
   menu.DrawMenu();
   menu.DisplayMenu();
@@ -124,8 +164,16 @@ public void draw()
 
 public void fileSelected(File selection)
 {
-  messageQueue.put(selection);
-  path = selection.getAbsolutePath();
+  if (selection == null)
+  {
+    println("Window was closed or the user hit cancel.");
+  }
+  else
+  {
+    messageQueue.put(selection);
+    path = selection.getAbsolutePath();
+    println(path);
+  }
 }
 class ColourPicker
 {
@@ -208,9 +256,9 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  public void Save(PGraphics layer, Button button, String newPath)
+  public void Save(PGraphics layer, Button button, String newPath, File newFile)
   {
-    selectOutput("Select Output", "fileSelected");
+    selectOutput("Select Output", "fileSelected", newFile);
     layer.save(newPath);
     button.localState = false;
   }
@@ -283,31 +331,29 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
-  public void Line(PGraphics layer, boolean firstClick)
+  public void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
+            int yFirst, int ySecond, ColourPicker colour)
   {
-    int pmX = 0;
-    int pmY = 0;
+    if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
+    {
+      return;
+    }
+    else if (clicked)
+    {
+      //strokeWeight(10);
+      stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+      line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
+      println("X1 = " + xFirst + " Y1 = " + yFirst);
+      return;
+    }
 
     layer.beginDraw();
     layer.colorMode(HSB);
-    if (mousePressed)
-    {
-      if (firstClick)
-      {
-        pmX = mouseX;
-        pmY = mouseY;
-
-        firstClick = false;
-      }
-      else if (!firstClick)
-      {
-        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-        strokeWeight(10);
-        line(mouseX, mouseY, pmX, pmY);
-
-        firstClick = true;
-      }
-    }
+    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+    layer.strokeWeight(10);
+    layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
+    layer.endDraw();
+    println("X2 = " + xSecond + " Y2 = " + ySecond);
   }
 
   public void Rectangle()
@@ -340,9 +386,10 @@ class GraphicsFunctions
 
   }
 
-  public void ClearLayer()
+  public void ClearLayer(PGraphics layer, Button button)
   {
-
+    layer.clear();
+    button.localState = false;
   }
 
   public void Resize()
@@ -979,15 +1026,24 @@ class Menu
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[0][0]);
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[1][0]);
 
-    topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
+    if (topBarButtons[0][0].localState = true)
+    {
+      topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
+      topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
+      topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
+    }
 
-    topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
-    topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
+    if (topBarButtons[1][0].localState = true)
+    {
+      topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
+      topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
+    }
 
-    topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
-    topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+    if (topBarButtons[2][0].localState = true)
+    {
+      topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
+      topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+    }
 
     for (int i = 0; i < topBarButtons.length; i++)
     {

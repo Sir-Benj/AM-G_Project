@@ -10,9 +10,9 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Save(PGraphics layer, Button button, String newPath)
+  void Save(PGraphics layer, Button button, String newPath, File newFile)
   {
-    selectOutput("Select Output", "fileSelected");
+    selectOutput("Select Output", "fileSelected", newFile);
     layer.save(newPath);
     button.localState = false;
   }
@@ -85,31 +85,29 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
-  void Line(PGraphics layer, boolean firstClick)
+  void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
+            int yFirst, int ySecond, ColourPicker colour)
   {
-    int pmX = 0;
-    int pmY = 0;
+    if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
+    {
+      return;
+    }
+    else if (clicked)
+    {
+      //strokeWeight(10);
+      stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+      line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
+      println("X1 = " + xFirst + " Y1 = " + yFirst);
+      return;
+    }
 
     layer.beginDraw();
     layer.colorMode(HSB);
-    if (mousePressed)
-    {
-      if (firstClick)
-      {
-        pmX = mouseX;
-        pmY = mouseY;
-
-        firstClick = false;
-      }
-      else if (!firstClick)
-      {
-        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-        strokeWeight(10);
-        line(mouseX, mouseY, pmX, pmY);
-
-        firstClick = true;
-      }
-    }
+    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+    layer.strokeWeight(10);
+    layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
+    layer.endDraw();
+    println("X2 = " + xSecond + " Y2 = " + ySecond);
   }
 
   void Rectangle()
@@ -142,9 +140,10 @@ class GraphicsFunctions
 
   }
 
-  void ClearLayer()
+  void ClearLayer(PGraphics layer, Button button)
   {
-
+    layer.clear();
+    button.localState = false;
   }
 
   void Resize()
