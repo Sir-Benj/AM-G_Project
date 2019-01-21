@@ -12,8 +12,7 @@ class GraphicsFunctions
 
   void Save(PGraphics layer, Button button, String newPath, File newFile)
   {
-    selectOutput("Select Output", "fileSelected", newFile);
-    layer.save(newPath);
+    selectOutput("Select Output", "fileSelected", selectOne);
     button.localState = false;
   }
 
@@ -94,10 +93,8 @@ class GraphicsFunctions
     }
     else if (clicked)
     {
-      //strokeWeight(10);
       stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
       line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
-      println("X1 = " + xFirst + " Y1 = " + yFirst);
       return;
     }
 
@@ -106,8 +103,6 @@ class GraphicsFunctions
     layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
     layer.strokeWeight(10);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
-    layer.endDraw();
-    println("X2 = " + xSecond + " Y2 = " + ySecond);
   }
 
   void Rectangle()

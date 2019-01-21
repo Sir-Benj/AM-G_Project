@@ -41,6 +41,16 @@ void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  background.beginDraw();
+  background.colorMode(HSB);
+  background.background(255);
+  background.endDraw();
+
+  layer.beginDraw();
+  layer.colorMode(HSB);
+  layer.background(255);
+  layer.endDraw();
 }
 
 void mousePressed()
@@ -75,9 +85,6 @@ void mouseClicked()
 
 void draw()
 {
-  background.beginDraw();
-  background.background(255);
-  background.endDraw();
 
   layer.beginDraw();
   layer.endDraw();
@@ -134,8 +141,21 @@ void draw()
         //strokeWeight(10);
         stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
         line(xFirstClick, yFirstClick, mouseX, mouseY);
-        println("X1 = " + xFirstClick + " Y1 = " + yFirstClick);
       }
+      else if (!clicked)
+      {
+        xFirstClick = -1;
+        yFirstClick = -1;
+        xSecondCLick = -1;
+        ySecondClick = -1;
+      }
+    }
+    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
+    {
+      xFirstClick = -1;
+      yFirstClick = -1;
+      xSecondCLick = -1;
+      ySecondClick = -1;
     }
   }
 
@@ -154,6 +174,6 @@ void fileSelected(File selection)
   {
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
-    println(path);
+    layer.save(path);
   }
 }

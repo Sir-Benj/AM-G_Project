@@ -59,6 +59,16 @@ public void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  background.beginDraw();
+  background.colorMode(HSB);
+  background.background(255);
+  background.endDraw();
+
+  layer.beginDraw();
+  layer.colorMode(HSB);
+  layer.background(255);
+  layer.endDraw();
 }
 
 public void mousePressed()
@@ -93,13 +103,10 @@ public void mouseClicked()
 
 public void draw()
 {
-  background.beginDraw();
-  background.background(255);
-  background.endDraw();
 
   layer.beginDraw();
   layer.endDraw();
-
+  
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
@@ -152,8 +159,21 @@ public void draw()
         //strokeWeight(10);
         stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
         line(xFirstClick, yFirstClick, mouseX, mouseY);
-        println("X1 = " + xFirstClick + " Y1 = " + yFirstClick);
       }
+      else if (!clicked)
+      {
+        xFirstClick = -1;
+        yFirstClick = -1;
+        xSecondCLick = -1;
+        ySecondClick = -1;
+      }
+    }
+    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
+    {
+      xFirstClick = -1;
+      yFirstClick = -1;
+      xSecondCLick = -1;
+      ySecondClick = -1;
     }
   }
 
@@ -172,7 +192,7 @@ public void fileSelected(File selection)
   {
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
-    println(path);
+    layer.save(path);
   }
 }
 class ColourPicker
@@ -258,8 +278,7 @@ class GraphicsFunctions
 
   public void Save(PGraphics layer, Button button, String newPath, File newFile)
   {
-    selectOutput("Select Output", "fileSelected", newFile);
-    layer.save(newPath);
+    selectOutput("Select Output", "fileSelected", selectOne);
     button.localState = false;
   }
 
@@ -340,10 +359,8 @@ class GraphicsFunctions
     }
     else if (clicked)
     {
-      //strokeWeight(10);
       stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
       line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
-      println("X1 = " + xFirst + " Y1 = " + yFirst);
       return;
     }
 
@@ -352,8 +369,6 @@ class GraphicsFunctions
     layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
     layer.strokeWeight(10);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
-    layer.endDraw();
-    println("X2 = " + xSecond + " Y2 = " + ySecond);
   }
 
   public void Rectangle()
@@ -1026,24 +1041,15 @@ class Menu
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[0][0]);
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[1][0]);
 
-    if (topBarButtons[0][0].localState = true)
-    {
-      topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
-      topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
-      topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
-    }
+    topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
+    topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
 
-    if (topBarButtons[1][0].localState = true)
-    {
-      topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
-      topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
-    }
+    topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
+    topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
 
-    if (topBarButtons[2][0].localState = true)
-    {
-      topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
-      topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
-    }
+    topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
+    topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
 
     for (int i = 0; i < topBarButtons.length; i++)
     {
