@@ -98,7 +98,6 @@ class Menu
     fill(160);
     rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
 
-
     for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
     {
       for (int subMenu = 0; subMenu < topBarButtons[topMenu].length; subMenu++)

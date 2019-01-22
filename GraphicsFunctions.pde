@@ -1,7 +1,12 @@
 class GraphicsFunctions
 {
+  // Slider sliderOne, sliderTwo, sliderThree;
+
   GraphicsFunctions()
   {
+    // sliderOne = new Slider(width - 180.0, height / 4.0 , 150.0, 10.0, 1.0, 100.0);
+    // sliderTwo = new Slider(width - 180, height / 3, 150, 10, 1, 100);
+    // sliderThree = new Slider(width - 180, height / 2, 150, 10, 1, 100);
   }
 
   void New(PGraphics layer, Button button)
@@ -52,17 +57,16 @@ class GraphicsFunctions
 
   }
 
-  void Pencil(PGraphics layer, ColourPicker colourPicker)
+  void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
-
     layer.beginDraw();
     layer.colorMode(HSB);
     if (mousePressed)
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
-        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-        layer.strokeWeight(5);
+        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }

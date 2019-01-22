@@ -2,9 +2,15 @@ import java.util.LinkedList;
 
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick;
 
+int sliderOneValue = 5;
+int sliderTwoValue = 255;
+
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
+
+Slider sliderOne;
+Slider sliderTwo;
 
 boolean clicked;
 
@@ -29,13 +35,14 @@ public void settings()
 
 void setup()
 {
-  frameRate(100);
-  noSmooth();
+  frameRate(60);
+  smooth();
   colorMode(HSB);
   background(255);
 
   background = createGraphics(width - 245, height - 60);
   layer = createGraphics(width - 245, height - 60);
+
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
@@ -43,6 +50,12 @@ void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
+                         140, 10, 1, 400, "Size", "px");
+
+  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 85,
+                         140, 10, 0.0, 255, "Opacity", "%");
 
   background.beginDraw();
   background.colorMode(HSB);
@@ -87,7 +100,6 @@ void mouseClicked()
 
 void draw()
 {
-
   layer.beginDraw();
   layer.endDraw();
 
@@ -95,7 +107,7 @@ void draw()
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Pencil(layer, colourPicker);
+      graphicsFunctions.Pencil(layer, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
@@ -156,7 +168,7 @@ void draw()
         ySecondClick = -1;
       }
     }
-    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
+    else if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
     {
       xFirstClick = -1;
       yFirstClick = -1;
@@ -168,6 +180,20 @@ void draw()
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
+
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName != "Eraser")
+    {
+      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+      sliderTwoValue = sliderTwo.DrawSlider(sliderTwoValue);
+    }
+    else if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName == "Eraser")
+    {
+      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+    }
+  }
+
 }
 
 void fileSelected(File selection)

@@ -20,9 +20,15 @@ public class main extends PApplet {
 
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick;
 
+int sliderOneValue = 5;
+int sliderTwoValue = 255;
+
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
+
+Slider sliderOne;
+Slider sliderTwo;
 
 boolean clicked;
 
@@ -47,13 +53,14 @@ public void settings()
 
 public void setup()
 {
-  frameRate(100);
+  frameRate(60);
   
   colorMode(HSB);
   background(255);
 
   background = createGraphics(width - 245, height - 60);
   layer = createGraphics(width - 245, height - 60);
+
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
@@ -61,6 +68,12 @@ public void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
+                         140, 10, 1, 400, "Size", "px");
+
+  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 85,
+                         140, 10, 0.0f, 255, "Opacity", "%");
 
   background.beginDraw();
   background.colorMode(HSB);
@@ -105,7 +118,6 @@ public void mouseClicked()
 
 public void draw()
 {
-
   layer.beginDraw();
   layer.endDraw();
 
@@ -113,7 +125,7 @@ public void draw()
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Pencil(layer, colourPicker);
+      graphicsFunctions.Pencil(layer, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
@@ -174,7 +186,7 @@ public void draw()
         ySecondClick = -1;
       }
     }
-    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
+    else if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
     {
       xFirstClick = -1;
       yFirstClick = -1;
@@ -186,6 +198,20 @@ public void draw()
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
+
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName != "Eraser")
+    {
+      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+      sliderTwoValue = sliderTwo.DrawSlider(sliderTwoValue);
+    }
+    else if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName == "Eraser")
+    {
+      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+    }
+  }
+
 }
 
 public void fileSelected(File selection)
@@ -231,7 +257,7 @@ class ColourPicker
   public void DrawPicker(float colourMenuXInset, float colourMenuYInset)
   {
     _hueVal= DrawSlider(colourMenuXInset, colourMenuYInset + 215, barWidth, 40.0f, _hueVal, _hueVal, "hue");
-    _satVal= DrawSlider(colourMenuXInset, colourMenuYInset + 275, barWidth,20.0f, _satVal, _hueVal, "sat");
+    _satVal= DrawSlider(colourMenuXInset, colourMenuYInset + 275, barWidth, 20.0f, _satVal, _hueVal, "sat");
     _briVal= DrawSlider(colourMenuXInset, colourMenuYInset + 315, barWidth, 20.0f, _briVal, _hueVal, "bri");
     fill(_hueVal, _satVal, _briVal);
     rect(colourMenuXInset, colourMenuYInset, 150, 200);
@@ -289,8 +315,13 @@ class ColourPicker
 }
 class GraphicsFunctions
 {
+  // Slider sliderOne, sliderTwo, sliderThree;
+
   GraphicsFunctions()
   {
+    // sliderOne = new Slider(width - 180.0, height / 4.0 , 150.0, 10.0, 1.0, 100.0);
+    // sliderTwo = new Slider(width - 180, height / 3, 150, 10, 1, 100);
+    // sliderThree = new Slider(width - 180, height / 2, 150, 10, 1, 100);
   }
 
   public void New(PGraphics layer, Button button)
@@ -341,17 +372,16 @@ class GraphicsFunctions
 
   }
 
-  public void Pencil(PGraphics layer, ColourPicker colourPicker)
+  public void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
-
     layer.beginDraw();
     layer.colorMode(HSB);
     if (mousePressed)
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
-        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-        layer.strokeWeight(5);
+        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
@@ -496,61 +526,57 @@ class MessageQueue
 }
 class Slider
 {
-  int sliderWidth, sliderHeight;
-  float xBarPos, yBarPos,
-        xSliderPos, newSliderPos,
-        sliderMinPos, sliderMaxPos,
-        ratio;
-  boolean over, locked;
+  float xBarPos, yBarPos, barWidth, barHeight, mapValueLow, mapValueHigh,
+        retValue;
+  String sliderName, sNameValue;
 
-  Slider(float xPos, float yPos, int sWidth, int sHeight)
+  Slider(float xPos, float yPos, float barW, float barH, float mVL, float mVH,
+         String sName, String sNValue)
   {
-    sliderWidth = sWidth;
-    sliderHeight = sHeight;
-    int widthToHeight = sWidth - sHeight;
-    ratio = (float)sWidth / (float)widthToHeight;
     xBarPos = xPos;
-    yBarPos = yPos - sliderHeight / 2;
-    xSliderPos = xBarPos + sWidth / 2 - sHeight / 2;
-    newSliderPos = xSliderPos;
-    sliderMinPos = xBarPos;
-    sliderMaxPos = xBarPos + sWidth - sHeight;
+    yBarPos = yPos;
+    barWidth = barW;
+    barHeight = barH;
+    mapValueLow = mVL;
+    mapValueHigh = mVH;
+    sliderName = sName;
+    sNameValue = sNValue;
   }
 
-  public boolean OverSlider()
+  public int DrawSlider(float retValue)
   {
-    if (mouseX > xBarPos && mouseX < xBarPos + sliderWidth &&
-        mouseY > yBarPos && mouseY < yBarPos + sliderHeight)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
 
-  public void DisplaySlider()
-  {
-    noStroke();
-    fill(200);
-    rect(xBarPos, yBarPos, sliderWidth, sliderHeight);
-    if (over || locked)
-    {
-      fill(0, 0, 0);
-    }
-    else
-    {
-      fill(102, 102, 102);
-    }
-    rect(xSliderPos, yBarPos, sliderHeight, sliderHeight);
-  }
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth, barHeight);
 
-  public float getPos()
-  {
-    return xBarPos * ratio;
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseX - xBarPos;
+      retValue = map(sliderPos, 0.0f, barWidth, mapValueLow, mapValueHigh);
+    }
+
+    if (sliderName == "Size")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Opacity")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)((retValue / mapValueHigh) * 100) + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(sliderPos + xBarPos - 3, yBarPos - 5, 6, barHeight + 10);
+
+    return (int)retValue;
   }
-  
 }
 // class TopBarManager
 // {
@@ -1036,7 +1062,6 @@ class Menu
     stroke(150);
     fill(160);
     rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
-
 
     for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
     {

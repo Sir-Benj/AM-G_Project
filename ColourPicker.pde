@@ -11,7 +11,7 @@ class ColourPicker
   void DrawPicker(float colourMenuXInset, float colourMenuYInset)
   {
     _hueVal= DrawSlider(colourMenuXInset, colourMenuYInset + 215, barWidth, 40.0, _hueVal, _hueVal, "hue");
-    _satVal= DrawSlider(colourMenuXInset, colourMenuYInset + 275, barWidth,20.0, _satVal, _hueVal, "sat");
+    _satVal= DrawSlider(colourMenuXInset, colourMenuYInset + 275, barWidth, 20.0, _satVal, _hueVal, "sat");
     _briVal= DrawSlider(colourMenuXInset, colourMenuYInset + 315, barWidth, 20.0, _briVal, _hueVal, "bri");
     fill(_hueVal, _satVal, _briVal);
     rect(colourMenuXInset, colourMenuYInset, 150, 200);
