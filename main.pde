@@ -14,6 +14,8 @@ ColourPicker colourPicker;
 PGraphics background;
 PGraphics layer;
 
+PImage imageToLoad;
+
 MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
 
@@ -121,7 +123,11 @@ void draw()
       }
       if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path, selectOne);
+        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], selectOne);
+      }
+      if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
+      {
+        graphicsFunctions.Load(layer, menu.topBarButtons[i][y], selectOne);
       }
     }
   }
@@ -175,5 +181,22 @@ void fileSelected(File selection)
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
     layer.save(path);
+  }
+}
+
+void fileChosen(File selection)
+{
+  if (selection == null)
+  {
+    println("Window was closed or the user hit cancel.");
+  }
+  else
+  {
+    messageQueue.put(selection);
+    path = selection.getAbsolutePath();
+    imageToLoad = loadImage(path);
+    layer.beginDraw();
+    layer.image(imageToLoad, 0, 0);
+    layer.endDraw();
   }
 }

@@ -10,15 +10,16 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Save(PGraphics layer, Button button, String newPath, File newFile)
+  void Save(PGraphics layer, Button button, File newFile)
   {
-    selectOutput("Select Output", "fileSelected", selectOne);
+    selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
-  void Load()
+  void Load(PGraphics layer, Button button, File newFile)
   {
-
+    selectInput("Select An Image To Edit", "fileChosen", newFile);
+    button.localState = false;
   }
 
   void Undo()

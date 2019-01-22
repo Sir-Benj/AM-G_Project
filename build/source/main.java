@@ -32,6 +32,8 @@ ColourPicker colourPicker;
 PGraphics background;
 PGraphics layer;
 
+PImage imageToLoad;
+
 MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
 
@@ -106,7 +108,7 @@ public void draw()
 
   layer.beginDraw();
   layer.endDraw();
-  
+
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
@@ -139,7 +141,11 @@ public void draw()
       }
       if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], path, selectOne);
+        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], selectOne);
+      }
+      if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
+      {
+        graphicsFunctions.Load(layer, menu.topBarButtons[i][y], selectOne);
       }
     }
   }
@@ -193,6 +199,23 @@ public void fileSelected(File selection)
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
     layer.save(path);
+  }
+}
+
+public void fileChosen(File selection)
+{
+  if (selection == null)
+  {
+    println("Window was closed or the user hit cancel.");
+  }
+  else
+  {
+    messageQueue.put(selection);
+    path = selection.getAbsolutePath();
+    imageToLoad = loadImage(path);
+    layer.beginDraw();
+    layer.image(imageToLoad, 0, 0);
+    layer.endDraw();
   }
 }
 class ColourPicker
@@ -276,15 +299,16 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  public void Save(PGraphics layer, Button button, String newPath, File newFile)
+  public void Save(PGraphics layer, Button button, File newFile)
   {
-    selectOutput("Select Output", "fileSelected", selectOne);
+    selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
-  public void Load()
+  public void Load(PGraphics layer, Button button, File newFile)
   {
-
+    selectInput("Select An Image To Edit", "fileChosen", newFile);
+    button.localState = false;
   }
 
   public void Undo()
