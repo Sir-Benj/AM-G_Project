@@ -1,6 +1,5 @@
 class GraphicsFunctions
 {
-  ArrayList<PVector> polyline;
 
   GraphicsFunctions()
   {
@@ -12,13 +11,13 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Save(PGraphics layer, Button button, File newFile)
+  void Save(Button button, File newFile)
   {
     selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
-  void Load(PGraphics layer, Button button, File newFile)
+  void Load(Button button, File newFile)
   {
     selectInput("Select An Image To Edit", "fileChosen", newFile);
     button.localState = false;
@@ -56,7 +55,6 @@ class GraphicsFunctions
 
   void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
-    ArrayList<PVector> polyline = new ArrayList<PVector>();
 
     layer.beginDraw();
     layer.colorMode(HSB);
@@ -64,24 +62,10 @@ class GraphicsFunctions
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
-        polyline.add(new PVector(mouseX - 20, mouseY - 40));
-
-        // styles
-        layer.noFill();
-        layer.strokeJoin(ROUND);
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        layer.strokeJoin(ROUND);
         layer.strokeWeight(sVOne);
-
-        //finally draw the polyline
-        layer.beginShape();
-          for(PVector p : polyline){
-            layer.vertex(p.x, p.y);
-          }
-        layer.endShape();
-        // layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-        // layer.strokeJoin(ROUND);
-        // layer.strokeWeight(sVOne);
-        // layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
     layer.endDraw();

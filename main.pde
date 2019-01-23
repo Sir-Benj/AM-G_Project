@@ -18,9 +18,14 @@ Menu menu;
 ColourPicker colourPicker;
 
 PGraphics background;
-PGraphics layer;
+PGraphics photoLayer;
+PGraphics paintLayer;
+PGraphics combineLayers;
 
 PImage imageToLoad;
+PImage imageToSaveOne;
+PImage imageToSaveTwo;
+PImage imageToSaveCombined;
 
 MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
@@ -36,12 +41,16 @@ public void settings()
 void setup()
 {
   frameRate(60);
-  smooth();
   colorMode(HSB);
   background(255);
 
   background = createGraphics(width - 245, height - 60);
-  layer = createGraphics(width - 245, height - 60);
+  photoLayer = createGraphics(width - 245, height - 60);
+  paintLayer = createGraphics(width - 245, height - 60);
+  combineLayers = createGraphics(width - 245, height - 60);
+  imageToSaveOne = createImage(width - 245, height - 60, HSB);
+  imageToSaveTwo = createImage(width - 245, height - 60, HSB);
+  imageToSaveCombined = createImage(width - 245, height - 60, HSB);
 
   menu = new Menu();
   menu.InitialiseMenu();
@@ -62,10 +71,17 @@ void setup()
   background.background(255);
   background.endDraw();
 
-  layer.beginDraw();
-  layer.colorMode(HSB);
-  layer.background(255);
-  layer.endDraw();
+  paintLayer.beginDraw();
+  paintLayer.colorMode(HSB);
+  paintLayer.endDraw();
+
+  photoLayer.beginDraw();
+  photoLayer.colorMode(HSB);
+  photoLayer.endDraw();
+
+  combineLayers.beginDraw();
+  combineLayers.colorMode(HSB);
+  combineLayers.endDraw();
 }
 
 void mousePressed()
@@ -100,27 +116,31 @@ void mouseClicked()
 
 void draw()
 {
-  layer.beginDraw();
-  layer.endDraw();
+  paintLayer.beginDraw();
+  paintLayer.endDraw();
+  photoLayer.beginDraw();
+  photoLayer.endDraw();
+  combineLayers.beginDraw();
+  combineLayers.endDraw();
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
     {
-      graphicsFunctions.Pencil(layer, colourPicker, sliderOneValue, sliderTwoValue);
+      graphicsFunctions.Pencil(paintLayer, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Eraser(layer, sliderOneValue);
+      graphicsFunctions.Eraser(paintLayer, sliderOneValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Line(layer, clicked, xFirstClick, xSecondCLick,
+      graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
                              yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.ClearLayer(layer, menu.illustratorMenu[i]);
+      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
     }
 
   }
@@ -131,15 +151,15 @@ void draw()
     {
       if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.New(layer, menu.topBarButtons[i][y]);
+        graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
       }
       if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Save(layer, menu.topBarButtons[i][y], selectOne);
+        graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
       }
       if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
       {
-        graphicsFunctions.Load(layer, menu.topBarButtons[i][y], selectOne);
+        graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
       }
     }
   }
@@ -148,7 +168,18 @@ void draw()
   //tint(255);
   background(200);
   image(background, 20, 40);
-  image(layer, 20, 40);
+  image(photoLayer, 20, 40);
+  image(paintLayer, 20, 40);
+
+  imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
+  imageToSaveTwo = paintLayer.get(0, 0, width - 245, height - 60);
+
+  combineLayers.beginDraw();
+  combineLayers.image(imageToSaveOne, 0, 0);
+  combineLayers.image(imageToSaveTwo, 0, 0);
+  combineLayers.endDraw();
+
+  imageToSaveCombined = combineLayers.get(0, 0, width - 245, height - 60);
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
@@ -206,7 +237,7 @@ void fileSelected(File selection)
   {
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
-    layer.save(path);
+    imageToSaveCombined.save(path);
   }
 }
 
@@ -218,12 +249,13 @@ void fileChosen(File selection)
   }
   else
   {
+    photoLayer.clear();
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
     imageToLoad = loadImage(path);
-    layer.beginDraw();
-    layer.image(imageToLoad, 0, 0);
-    layer.endDraw();
+    photoLayer.beginDraw();
+    photoLayer.image(imageToLoad, 0, 0);
+    photoLayer.endDraw();
   }
 }
 
