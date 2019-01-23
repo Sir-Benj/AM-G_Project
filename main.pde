@@ -105,18 +105,18 @@ void draw()
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
+    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
     {
       graphicsFunctions.Pencil(layer, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Eraser(layer);
+      graphicsFunctions.Eraser(layer, sliderOneValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.Line(layer, clicked, xFirstClick, xSecondCLick,
-                             yFirstClick, ySecondClick, colourPicker);
+                             yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -185,12 +185,12 @@ void draw()
   {
     if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName != "Eraser")
     {
-      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
-      sliderTwoValue = sliderTwo.DrawSlider(sliderTwoValue);
+      sliderOneValue = sliderOne.DrawSliderMenu(sliderOneValue);
+      sliderTwoValue = sliderTwo.DrawSliderMenu(sliderTwoValue);
     }
     else if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName == "Eraser")
     {
-      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+      sliderOneValue = sliderOne.DrawSliderMenu(sliderOneValue);
     }
   }
 
@@ -225,4 +225,9 @@ void fileChosen(File selection)
     layer.image(imageToLoad, 0, 0);
     layer.endDraw();
   }
+}
+
+boolean OverMenu()
+{
+  return (mousePressed && mouseX >= 0 && mouseX <= width - menu.sideMenuInset);
 }

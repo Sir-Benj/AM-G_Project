@@ -123,18 +123,18 @@ public void draw()
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
+    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
     {
       graphicsFunctions.Pencil(layer, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.Eraser(layer);
+      graphicsFunctions.Eraser(layer, sliderOneValue);
     }
     if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.Line(layer, clicked, xFirstClick, xSecondCLick,
-                             yFirstClick, ySecondClick, colourPicker);
+                             yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -203,12 +203,12 @@ public void draw()
   {
     if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName != "Eraser")
     {
-      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
-      sliderTwoValue = sliderTwo.DrawSlider(sliderTwoValue);
+      sliderOneValue = sliderOne.DrawSliderMenu(sliderOneValue);
+      sliderTwoValue = sliderTwo.DrawSliderMenu(sliderTwoValue);
     }
     else if (menu.illustratorMenu[i].localState == true && menu.illustratorMenu[i].buttonName == "Eraser")
     {
-      sliderOneValue = sliderOne.DrawSlider(sliderOneValue);
+      sliderOneValue = sliderOne.DrawSliderMenu(sliderOneValue);
     }
   }
 
@@ -243,6 +243,11 @@ public void fileChosen(File selection)
     layer.image(imageToLoad, 0, 0);
     layer.endDraw();
   }
+}
+
+public boolean OverMenu()
+{
+  return (mousePressed && mouseX >= 0 && mouseX <= width - menu.sideMenuInset);
 }
 class ColourPicker
 {
@@ -315,13 +320,10 @@ class ColourPicker
 }
 class GraphicsFunctions
 {
-  // Slider sliderOne, sliderTwo, sliderThree;
+  ArrayList<PVector> polyline;
 
   GraphicsFunctions()
   {
-    // sliderOne = new Slider(width - 180.0, height / 4.0 , 150.0, 10.0, 1.0, 100.0);
-    // sliderTwo = new Slider(width - 180, height / 3, 150, 10, 1, 100);
-    // sliderThree = new Slider(width - 180, height / 2, 150, 10, 1, 100);
   }
 
   public void New(PGraphics layer, Button button)
@@ -374,21 +376,38 @@ class GraphicsFunctions
 
   public void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
+    ArrayList<PVector> polyline = new ArrayList<PVector>();
+
     layer.beginDraw();
     layer.colorMode(HSB);
     if (mousePressed)
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
+        polyline.add(new PVector(mouseX - 20, mouseY - 40));
+
+        // styles
+        layer.noFill();
+        layer.strokeJoin(ROUND);
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+
+        //finally draw the polyline
+        layer.beginShape();
+          for(PVector p : polyline){
+            layer.vertex(p.x, p.y);
+          }
+        layer.endShape();
+        // layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        // layer.strokeJoin(ROUND);
+        // layer.strokeWeight(sVOne);
+        // layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
     layer.endDraw();
   }
 
-  public void Eraser(PGraphics layer)
+  public void Eraser(PGraphics layer, float sVOne)
   {
     layer.beginDraw();
     layer.colorMode(HSB);
@@ -397,7 +416,7 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(255);
-        layer.strokeWeight(10);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
@@ -405,7 +424,7 @@ class GraphicsFunctions
   }
 
   public void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
-            int yFirst, int ySecond, ColourPicker colour)
+            int yFirst, int ySecond, ColourPicker colour, float sVOne, float sVTwo)
   {
     if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
     {
@@ -420,8 +439,8 @@ class GraphicsFunctions
 
     layer.beginDraw();
     layer.colorMode(HSB);
-    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-    layer.strokeWeight(10);
+    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+    layer.strokeWeight(sVOne);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
   }
 
@@ -543,7 +562,7 @@ class Slider
     sNameValue = sNValue;
   }
 
-  public int DrawSlider(float retValue)
+  public int DrawSliderMenu(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
 

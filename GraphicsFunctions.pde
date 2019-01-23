@@ -1,12 +1,9 @@
 class GraphicsFunctions
 {
-  // Slider sliderOne, sliderTwo, sliderThree;
+  ArrayList<PVector> polyline;
 
   GraphicsFunctions()
   {
-    // sliderOne = new Slider(width - 180.0, height / 4.0 , 150.0, 10.0, 1.0, 100.0);
-    // sliderTwo = new Slider(width - 180, height / 3, 150, 10, 1, 100);
-    // sliderThree = new Slider(width - 180, height / 2, 150, 10, 1, 100);
   }
 
   void New(PGraphics layer, Button button)
@@ -59,21 +56,38 @@ class GraphicsFunctions
 
   void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
+    ArrayList<PVector> polyline = new ArrayList<PVector>();
+
     layer.beginDraw();
     layer.colorMode(HSB);
     if (mousePressed)
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
+        polyline.add(new PVector(mouseX - 20, mouseY - 40));
+
+        // styles
+        layer.noFill();
+        layer.strokeJoin(ROUND);
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+
+        //finally draw the polyline
+        layer.beginShape();
+          for(PVector p : polyline){
+            layer.vertex(p.x, p.y);
+          }
+        layer.endShape();
+        // layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        // layer.strokeJoin(ROUND);
+        // layer.strokeWeight(sVOne);
+        // layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
     layer.endDraw();
   }
 
-  void Eraser(PGraphics layer)
+  void Eraser(PGraphics layer, float sVOne)
   {
     layer.beginDraw();
     layer.colorMode(HSB);
@@ -82,7 +96,7 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(255);
-        layer.strokeWeight(10);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
@@ -90,7 +104,7 @@ class GraphicsFunctions
   }
 
   void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
-            int yFirst, int ySecond, ColourPicker colour)
+            int yFirst, int ySecond, ColourPicker colour, float sVOne, float sVTwo)
   {
     if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
     {
@@ -105,8 +119,8 @@ class GraphicsFunctions
 
     layer.beginDraw();
     layer.colorMode(HSB);
-    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-    layer.strokeWeight(10);
+    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+    layer.strokeWeight(sVOne);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
   }
 
