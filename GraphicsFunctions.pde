@@ -96,8 +96,6 @@ class GraphicsFunctions
     }
     else if (clicked)
     {
-      stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-      line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
       return;
     }
 
@@ -106,6 +104,7 @@ class GraphicsFunctions
     layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
     layer.strokeWeight(sVOne);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
+
   }
 
   void Rectangle()

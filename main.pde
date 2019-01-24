@@ -1,6 +1,7 @@
 import java.util.LinkedList;
 
-int xFirstClick, yFirstClick, xSecondCLick, ySecondClick;
+int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
+    xOnPress, yOnPress, xOffset, yOffset;
 
 int sliderOneValue = 5;
 int sliderTwoValue = 255;
@@ -12,7 +13,7 @@ Button[][] buttonMenu;
 Slider sliderOne;
 Slider sliderTwo;
 
-boolean clicked;
+boolean clicked, pressed, left;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -86,31 +87,76 @@ void setup()
 
 void mousePressed()
 {
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && !pressed)
+    {
+      xOnPress = mouseX;
+      yOnPress = mouseY;
+      xFirstClick = mouseX;
+      yFirstClick = mouseY;
+      pressed = true;
+    }
+  }
+
+  if (mousePressed && (mouseButton == LEFT))
+  {
+    left = true;
+  }
+  else
+  {
+    left = false;
+  }
+
+  if (mousePressed && (mouseButton == RIGHT))
+  {
+    xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
+  }
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 }
 
 void mouseDragged()
 {
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    {
+      xOffset = mouseX - xOnPress;
+      yOffset = mouseY - yOnPress;
+    }
+  }
+}
 
+void mouseReleased()
+{
+  xSecondCLick = mouseX;
+  ySecondClick = mouseY;
+  pressed = false;
 }
 
 void mouseClicked()
 {
   if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
   {
-    if (clicked)
+    if (left)
     {
-      xSecondCLick = mouseX;
-      ySecondClick = mouseY;
-      clicked = false;
-      return;
+      if (clicked)
+      {
+        xSecondCLick = mouseX;
+        ySecondClick = mouseY;
+        clicked = false;
+        return;
+      }
+      xFirstClick = mouseX;
+      yFirstClick = mouseY;
+      clicked = true;
+      }
     }
-
-    xFirstClick = mouseX;
-    yFirstClick = mouseY;
-    clicked = true;
-  }
+    else
+    {
+      xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
+    }
 }
 
 
@@ -191,7 +237,7 @@ void draw()
         stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
         line(xFirstClick, yFirstClick, mouseX, mouseY);
       }
-      else if (!clicked)
+      if (!clicked)
       {
         xFirstClick = -1;
         yFirstClick = -1;
@@ -224,7 +270,6 @@ void draw()
       sliderOneValue = sliderOne.DrawSliderMenu(sliderOneValue);
     }
   }
-
 }
 
 void fileSelected(File selection)
