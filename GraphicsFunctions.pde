@@ -1,5 +1,6 @@
 class GraphicsFunctions
 {
+
   GraphicsFunctions()
   {
   }
@@ -10,15 +11,16 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Save(PGraphics layer, Button button, String newPath, File newFile)
+  void Save(Button button, File newFile)
   {
-    selectOutput("Select Output", "fileSelected", selectOne);
+    selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
-  void Load()
+  void Load(Button button, File newFile)
   {
-
+    selectInput("Select An Image To Edit", "fileChosen", newFile);
+    button.localState = false;
   }
 
   void Undo()
@@ -51,7 +53,7 @@ class GraphicsFunctions
 
   }
 
-  void Pencil(PGraphics layer, ColourPicker colourPicker)
+  void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
 
     layer.beginDraw();
@@ -60,15 +62,16 @@ class GraphicsFunctions
     {
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
-        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-        layer.strokeWeight(5);
+        layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+        layer.strokeJoin(ROUND);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
     layer.endDraw();
   }
 
-  void Eraser(PGraphics layer)
+  void Eraser(PGraphics layer, float sVOne)
   {
     layer.beginDraw();
     layer.colorMode(HSB);
@@ -77,7 +80,7 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(255);
-        layer.strokeWeight(10);
+        layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
     }
@@ -85,7 +88,7 @@ class GraphicsFunctions
   }
 
   void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
-            int yFirst, int ySecond, ColourPicker colour)
+            int yFirst, int ySecond, ColourPicker colour, float sVOne, float sVTwo)
   {
     if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
     {
@@ -93,16 +96,15 @@ class GraphicsFunctions
     }
     else if (clicked)
     {
-      stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-      line(xFirst - 20, yFirst - 40, mouseX - 20, mouseY - 40);
       return;
     }
 
     layer.beginDraw();
     layer.colorMode(HSB);
-    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
-    layer.strokeWeight(10);
+    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+    layer.strokeWeight(sVOne);
     layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
+
   }
 
   void Rectangle()

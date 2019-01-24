@@ -1,58 +1,54 @@
 class Slider
 {
-  int sliderWidth, sliderHeight;
-  float xBarPos, yBarPos,
-        xSliderPos, newSliderPos,
-        sliderMinPos, sliderMaxPos,
-        ratio;
-  boolean over, locked;
+  float xBarPos, yBarPos, barWidth, barHeight, mapValueLow, mapValueHigh,
+        retValue;
+  String sliderName, sNameValue;
 
-  Slider(float xPos, float yPos, int sWidth, int sHeight)
+  Slider(float xPos, float yPos, float barW, float barH, float mVL, float mVH,
+         String sName, String sNValue)
   {
-    sliderWidth = sWidth;
-    sliderHeight = sHeight;
-    int widthToHeight = sWidth - sHeight;
-    ratio = (float)sWidth / (float)widthToHeight;
     xBarPos = xPos;
-    yBarPos = yPos - sliderHeight / 2;
-    xSliderPos = xBarPos + sWidth / 2 - sHeight / 2;
-    newSliderPos = xSliderPos;
-    sliderMinPos = xBarPos;
-    sliderMaxPos = xBarPos + sWidth - sHeight;
+    yBarPos = yPos;
+    barWidth = barW;
+    barHeight = barH;
+    mapValueLow = mVL;
+    mapValueHigh = mVH;
+    sliderName = sName;
+    sNameValue = sNValue;
   }
 
-  boolean OverSlider()
+  int DrawSliderMenu(float retValue)
   {
-    if (mouseX > xBarPos && mouseX < xBarPos + sliderWidth &&
-        mouseY > yBarPos && mouseY < yBarPos + sliderHeight)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barWidth);
 
-  void DisplaySlider()
-  {
-    noStroke();
-    fill(200);
-    rect(xBarPos, yBarPos, sliderWidth, sliderHeight);
-    if (over || locked)
-    {
-      fill(0, 0, 0);
-    }
-    else
-    {
-      fill(102, 102, 102);
-    }
-    rect(xSliderPos, yBarPos, sliderHeight, sliderHeight);
-  }
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth, barHeight);
 
-  float getPos()
-  {
-    return xBarPos * ratio;
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseX - xBarPos;
+      retValue = map(sliderPos, 0.0, barWidth, mapValueLow, mapValueHigh);
+    }
+
+    if (sliderName == "Size")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Opacity")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)((retValue / mapValueHigh) * 100) + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(sliderPos + xBarPos - 3, yBarPos - 5, 6, barHeight + 10);
+
+    return (int)retValue;
   }
-  
 }
