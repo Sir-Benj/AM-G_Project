@@ -106,7 +106,7 @@ public void draw()
 
   layer.beginDraw();
   layer.endDraw();
-  
+
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true)
