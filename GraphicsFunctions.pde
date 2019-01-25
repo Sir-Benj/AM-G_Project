@@ -137,9 +137,10 @@ class GraphicsFunctions
 
   }
 
-  void ClearLayer(PGraphics layer, Button button)
+  void ClearLayer(PGraphics layer, Button button, Document doc)
   {
     layer.clear();
+    doc.shapeList = new ArrayList<DrawShape>();
     button.localState = false;
   }
 

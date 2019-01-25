@@ -1,18 +1,18 @@
 import processing.core.*; 
-import processing.data.*;
-import processing.event.*;
-import processing.opengl.*;
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
 
-import java.util.LinkedList;
+import java.util.LinkedList; 
 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
 
 public class main extends PApplet {
 
@@ -214,9 +214,6 @@ public void draw()
   combineLayers.beginDraw();
   combineLayers.endDraw();
 
-  layer.beginDraw();
-  layer.endDraw();
-
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
     if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
@@ -234,9 +231,8 @@ public void draw()
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
+      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i], doc);
     }
-
   }
 
   for (int i = 0; i < menu.topBarButtons.length; i++)
@@ -456,6 +452,7 @@ class Document
 
     newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer);
     shapeList.add(newShape);
+    println(shapeList.size());
     currentlyDrawnShape = newShape;
   }
 
@@ -475,7 +472,7 @@ class Document
       selectionFound = s.SelectThis(p);
       if(selectionFound) break;
     }
-  }  
+  }
 }
 class DrawShape
 {
@@ -539,11 +536,11 @@ class DrawShape
   public void drawThisShape()
   {
     this.layer.beginDraw();
-    this.layer.strokeWeight(4);
+    this.layer.strokeWeight(1);
     this.layer.noFill();
     if (isDrawing)
     {
-      strokeWeight(4);
+      strokeWeight(1);
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float wid = this.mouseDrag.x - x1;
@@ -709,9 +706,10 @@ class GraphicsFunctions
 
   }
 
-  public void ClearLayer(PGraphics layer, Button button)
+  public void ClearLayer(PGraphics layer, Button button, Document doc)
   {
     layer.clear();
+    doc.shapeList = new ArrayList<DrawShape>();
     button.localState = false;
   }
 

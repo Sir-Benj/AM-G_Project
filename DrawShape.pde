@@ -60,11 +60,11 @@ class DrawShape
   void drawThisShape()
   {
     this.layer.beginDraw();
-    this.layer.strokeWeight(4);
+    this.layer.strokeWeight(1);
     this.layer.noFill();
     if (isDrawing)
     {
-      strokeWeight(4);
+      strokeWeight(1);
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float wid = this.mouseDrag.x - x1;

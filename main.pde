@@ -213,7 +213,7 @@ void draw()
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
+      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i], doc);
     }
   }
 

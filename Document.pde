@@ -17,6 +17,7 @@ class Document
 
     newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer);
     shapeList.add(newShape);
+    println(shapeList.size());
     currentlyDrawnShape = newShape;
   }
 
@@ -36,5 +37,5 @@ class Document
       selectionFound = s.SelectThis(p);
       if(selectionFound) break;
     }
-  }  
+  }
 }
