@@ -215,7 +215,6 @@ void draw()
     {
       graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
     }
-
   }
 
   for (int i = 0; i < menu.topBarButtons.length; i++)

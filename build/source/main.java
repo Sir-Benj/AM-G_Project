@@ -1,18 +1,18 @@
 import processing.core.*; 
-import processing.data.*; 
-import processing.event.*; 
-import processing.opengl.*; 
+import processing.data.*;
+import processing.event.*;
+import processing.opengl.*;
 
-import java.util.LinkedList; 
+import java.util.LinkedList;
 
-import java.util.HashMap; 
-import java.util.ArrayList; 
-import java.io.File; 
-import java.io.BufferedReader; 
-import java.io.PrintWriter; 
-import java.io.InputStream; 
-import java.io.OutputStream; 
-import java.io.IOException; 
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.IOException;
 
 public class main extends PApplet {
 
@@ -213,6 +213,9 @@ public void draw()
   photoLayer.endDraw();
   combineLayers.beginDraw();
   combineLayers.endDraw();
+
+  layer.beginDraw();
+  layer.endDraw();
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
