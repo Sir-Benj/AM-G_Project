@@ -13,7 +13,7 @@ Button[][] buttonMenu;
 Slider sliderOne;
 Slider sliderTwo;
 
-boolean clicked, pressed, left;
+boolean clicked, left;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -33,6 +33,13 @@ GraphicsFunctions graphicsFunctions;
 
 String path;
 File selectOne;
+
+PVector mouseStart, mouseDrag, mouseFinal;
+
+boolean pressed = false;
+boolean released = true;
+
+Document doc;
 
 public void settings()
 {
@@ -60,6 +67,11 @@ void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  doc = new Document();
+  mouseStart = new PVector();
+  mouseDrag = new PVector();
+  mouseFinal = new PVector();
 
   sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
                          140, 10, 1, 400, "Size", "px");
@@ -89,11 +101,18 @@ void mousePressed()
 {
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && !pressed)
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && released)
     {
+<<<<<<< HEAD
       xOnPress = mouseX;
       yOnPress = mouseY;
+=======
+      mouseStart.x = mouseX;
+      mouseStart.y = mouseY;
+>>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
       pressed = true;
+      released = false;
+      doc.StartNewShape("rectangle", mouseStart, paintLayer);
     }
   }
 
@@ -114,17 +133,42 @@ void mouseDragged()
 {
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed && !released)
     {
-      xOffset = mouseX - xOnPress;
-      yOffset = mouseY - yOnPress;
-    }
+      mouseDrag.x = mouseX;
+      mouseDrag.y = mouseY;
+
+      if (doc.currentlyDrawnShape == null)
+      {
+        return;
+      }
+      doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
+      }
   }
 }
 
 void mouseReleased()
 {
+<<<<<<< HEAD
   pressed = false;
+=======
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    {
+      mouseFinal.x = mouseX;
+      mouseFinal.y = mouseY;
+      pressed = false;
+      released = true;
+      if (doc.currentlyDrawnShape == null)
+      {
+        return;
+      }
+      doc.currentlyDrawnShape.FinishDrawingShape(mouseFinal);
+      doc.currentlyDrawnShape = null;
+    }
+  }
+>>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
 }
 
 void mouseClicked()
@@ -183,7 +227,7 @@ void draw()
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
-      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
+      graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i], doc);
     }
   }
 
@@ -211,6 +255,7 @@ void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
+  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
