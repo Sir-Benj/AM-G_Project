@@ -1,18 +1,18 @@
 import processing.core.*; 
-import processing.data.*;
-import processing.event.*;
-import processing.opengl.*;
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
 
-import java.util.LinkedList;
+import java.util.LinkedList; 
 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
 
 public class main extends PApplet {
 
@@ -111,9 +111,6 @@ public void mousePressed()
     {
       xOnPress = mouseX;
       yOnPress = mouseY;
-      xFirstClick = mouseX;
-      yFirstClick = mouseY;
-      clicked = true;
       pressed = true;
     }
   }
@@ -127,10 +124,6 @@ public void mousePressed()
     left = false;
   }
 
-  if (mousePressed && (mouseButton == RIGHT))
-  {
-    xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-  }
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 }
@@ -149,34 +142,31 @@ public void mouseDragged()
 
 public void mouseReleased()
 {
-  xSecondCLick = mouseX;
-  ySecondClick = mouseY;
   pressed = false;
-  clicked = false;
 }
 
 public void mouseClicked()
 {
-  // if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
-  // {
-  //   if (left)
-  //   {
-  //     if (clicked)
-  //     {
-  //       xSecondCLick = mouseX;
-  //       ySecondClick = mouseY;
-  //       clicked = false;
-  //       return;
-  //     }
-  //     xFirstClick = mouseX;
-  //     yFirstClick = mouseY;
-  //     clicked = true;
-  //     }
-  //   }
-  //   else
-  //   {
-  //     xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-  //   }
+  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
+  {
+    if (left)
+    {
+      if (clicked)
+      {
+        xSecondCLick = mouseX;
+        ySecondClick = mouseY;
+        clicked = false;
+        return;
+      }
+      xFirstClick = mouseX;
+      yFirstClick = mouseY;
+      clicked = true;
+      }
+    }
+    else
+    {
+      xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
+    }
 }
 
 
@@ -188,9 +178,6 @@ public void draw()
   photoLayer.endDraw();
   combineLayers.beginDraw();
   combineLayers.endDraw();
-
-  layer.beginDraw();
-  layer.endDraw();
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
@@ -207,11 +194,15 @@ public void draw()
       graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
                              yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.Rectangle(paintLayer, pressed, xOnPress, xOffset,
+                             yOnPress, yOffset, colourPicker, sliderOneValue, sliderTwoValue);
+    }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
     }
-
   }
 
   for (int i = 0; i < menu.topBarButtons.length; i++)
@@ -256,11 +247,11 @@ public void draw()
     {
       if (clicked)
       {
-        //strokeWeight(10);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        strokeWeight(sliderOneValue);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
         line(xFirstClick, yFirstClick, mouseX, mouseY);
       }
-      if (!clicked)
+      else if (!clicked)
       {
         xFirstClick = -1;
         yFirstClick = -1;
@@ -277,6 +268,32 @@ public void draw()
     }
   }
 
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if  (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+    {
+      if (pressed)
+      {
+        if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
+        {
+          return;
+        }
+        strokeWeight(sliderOneValue);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
+        noFill();
+        rect(xOnPress, yOnPress, xOffset, yOffset);
+      }
+      else if (!pressed)
+      {
+        xOnPress = -1;
+        yOnPress = -1;
+        xOffset = -1;
+        yOffset = -1;
+      }
+    }
+  }
+
+  strokeWeight(1);
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
@@ -520,9 +537,22 @@ class GraphicsFunctions
 
   }
 
-  public void Rectangle()
+  public void Rectangle(PGraphics layer, boolean pressed, float xOnPress, float xOffset, float yOnPress,
+                 float yOffset, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
-
+    if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
+    {
+      return;
+    }
+    if (!pressed)
+    {
+      layer.beginDraw();
+      layer.noFill();
+      layer.strokeWeight(sVOne);
+      layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+      layer.rect(xOnPress - 20, yOnPress - 40, xOffset, yOffset);
+      layer.endDraw();
+    }
   }
 
   public void Circle()

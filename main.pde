@@ -93,8 +93,6 @@ void mousePressed()
     {
       xOnPress = mouseX;
       yOnPress = mouseY;
-      xFirstClick = mouseX;
-      yFirstClick = mouseY;
       pressed = true;
     }
   }
@@ -108,10 +106,6 @@ void mousePressed()
     left = false;
   }
 
-  if (mousePressed && (mouseButton == RIGHT))
-  {
-    xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-  }
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 }
@@ -130,8 +124,6 @@ void mouseDragged()
 
 void mouseReleased()
 {
-  xSecondCLick = mouseX;
-  ySecondClick = mouseY;
   pressed = false;
 }
 
@@ -184,6 +176,11 @@ void draw()
       graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
                              yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+    {
+      graphicsFunctions.Rectangle(paintLayer, pressed, xOnPress, xOffset,
+                             yOnPress, yOffset, colourPicker, sliderOneValue, sliderTwoValue);
+    }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.ClearLayer(paintLayer, menu.illustratorMenu[i]);
@@ -232,11 +229,11 @@ void draw()
     {
       if (clicked)
       {
-        //strokeWeight(10);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal);
+        strokeWeight(sliderOneValue);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
         line(xFirstClick, yFirstClick, mouseX, mouseY);
       }
-      if (!clicked)
+      else if (!clicked)
       {
         xFirstClick = -1;
         yFirstClick = -1;
@@ -253,6 +250,32 @@ void draw()
     }
   }
 
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if  (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+    {
+      if (pressed)
+      {
+        if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
+        {
+          return;
+        }
+        strokeWeight(sliderOneValue);
+        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
+        noFill();
+        rect(xOnPress, yOnPress, xOffset, yOffset);
+      }
+      else if (!pressed)
+      {
+        xOnPress = -1;
+        yOnPress = -1;
+        xOffset = -1;
+        yOffset = -1;
+      }
+    }
+  }
+
+  strokeWeight(1);
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);

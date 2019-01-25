@@ -107,9 +107,22 @@ class GraphicsFunctions
 
   }
 
-  void Rectangle()
+  void Rectangle(PGraphics layer, boolean pressed, float xOnPress, float xOffset, float yOnPress,
+                 float yOffset, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
-
+    if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
+    {
+      return;
+    }
+    if (!pressed)
+    {
+      layer.beginDraw();
+      layer.noFill();
+      layer.strokeWeight(sVOne);
+      layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
+      layer.rect(xOnPress - 20, yOnPress - 40, xOffset, yOffset);
+      layer.endDraw();
+    }
   }
 
   void Circle()
