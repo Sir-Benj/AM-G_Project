@@ -31,7 +31,7 @@ Button[][] buttonMenu;
 Slider sliderOne;
 Slider sliderTwo;
 
-boolean clicked, pressed, left;
+boolean clicked, left;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -51,6 +51,13 @@ GraphicsFunctions graphicsFunctions;
 
 String path;
 File selectOne;
+
+PVector mouseStart, mouseDrag, mouseFinal;
+
+boolean pressed = false;
+boolean released = true;
+
+Document doc;
 
 public void settings()
 {
@@ -78,6 +85,11 @@ public void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
+
+  doc = new Document();
+  mouseStart = new PVector();
+  mouseDrag = new PVector();
+  mouseFinal = new PVector();
 
   sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
                          140, 10, 1, 400, "Size", "px");
@@ -107,14 +119,13 @@ public void mousePressed()
 {
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && !pressed)
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && released)
     {
-      xOnPress = mouseX;
-      yOnPress = mouseY;
-      xFirstClick = mouseX;
-      yFirstClick = mouseY;
-      clicked = true;
+      mouseStart.x = mouseX;
+      mouseStart.y = mouseY;
       pressed = true;
+      released = false;
+      doc.StartNewShape("rectangle", mouseStart, paintLayer);
     }
   }
 
@@ -127,10 +138,6 @@ public void mousePressed()
     left = false;
   }
 
-  if (mousePressed && (mouseButton == RIGHT))
-  {
-    xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-  }
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 }
@@ -139,44 +146,62 @@ public void mouseDragged()
 {
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed && !released)
     {
-      xOffset = mouseX - xOnPress;
-      yOffset = mouseY - yOnPress;
-    }
+      mouseDrag.x = mouseX;
+      mouseDrag.y = mouseY;
+
+      if (doc.currentlyDrawnShape == null)
+      {
+        return;
+      }
+      doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
+      }
   }
 }
 
 public void mouseReleased()
 {
-  xSecondCLick = mouseX;
-  ySecondClick = mouseY;
-  pressed = false;
-  clicked = false;
+  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  {
+    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    {
+      mouseFinal.x = mouseX;
+      mouseFinal.y = mouseY;
+      pressed = false;
+      released = true;
+      if (doc.currentlyDrawnShape == null)
+      {
+        return;
+      }
+      doc.currentlyDrawnShape.FinishDrawingShape(mouseFinal);
+      doc.currentlyDrawnShape = null;
+    }
+  }
 }
 
 public void mouseClicked()
 {
-  // if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
-  // {
-  //   if (left)
-  //   {
-  //     if (clicked)
-  //     {
-  //       xSecondCLick = mouseX;
-  //       ySecondClick = mouseY;
-  //       clicked = false;
-  //       return;
-  //     }
-  //     xFirstClick = mouseX;
-  //     yFirstClick = mouseY;
-  //     clicked = true;
-  //     }
-  //   }
-  //   else
-  //   {
-  //     xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-  //   }
+  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
+  {
+    if (left)
+    {
+      if (clicked)
+      {
+        xSecondCLick = mouseX;
+        ySecondClick = mouseY;
+        clicked = false;
+        return;
+      }
+      xFirstClick = mouseX;
+      yFirstClick = mouseY;
+      clicked = true;
+      }
+    }
+    else
+    {
+      xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
+    }
 }
 
 
@@ -235,6 +260,7 @@ public void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
+  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
@@ -406,6 +432,139 @@ class ColourPicker
     }
 
     return hueVal;
+  }
+}
+class Document
+{
+
+  ArrayList<DrawShape> shapeList = new ArrayList<DrawShape>();
+
+  // this references the currently drawn shape. It is set to null
+  // if no shape is currently being drawn
+  public DrawShape currentlyDrawnShape = null;
+
+  public Document()
+  {
+  }
+
+  public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer)
+  {
+    DrawShape newShape = new DrawShape();
+
+    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer);
+    shapeList.add(newShape);
+    currentlyDrawnShape = newShape;
+  }
+
+  public void DrawMe()
+  {
+    for(DrawShape s : shapeList)
+    {
+        s.drawThisShape();
+    }
+  }
+
+  public void TrySelect(PVector p)
+  {
+    boolean selectionFound = false;
+    for(DrawShape s : shapeList)
+    {
+      selectionFound = s.SelectThis(p);
+      if(selectionFound) break;
+    }
+  }  
+}
+class DrawShape
+{
+  String shapeToDraw;
+
+  PVector mouseStart, mouseDrag, mouseEnd;
+  float radius;
+
+  boolean isSelected = false;
+  boolean isDrawing = false;
+
+  int sWeight = 10;
+
+  Rect bounds;
+
+  PGraphics layer;
+
+  DrawShape()
+  {
+  }
+
+  public void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer)
+  {
+    this.isDrawing = true;
+    this.shapeToDraw = shapeToDraw;
+    this.mouseStart = startPoint;
+    this.mouseDrag = startPoint;
+    this.layer = layer;
+  }
+
+  public void WhileDrawingShape(PVector dragPoint)
+  {
+    this.mouseDrag = dragPoint;
+  }
+
+  public void FinishDrawingShape(PVector endPoint)
+  {
+    this.mouseEnd = endPoint;
+    setShapeBounds(this.mouseStart, this.mouseEnd);
+    this.isDrawing = false;
+  }
+
+  public void setShapeBounds(PVector vecOne, PVector vecTwo)
+  {
+    bounds = new Rect(vecOne, vecTwo);
+  }
+
+  public boolean SelectThis(PVector vec)
+  {
+    if (bounds.isInsideThis(vec))
+    {
+      this.isSelected = !this.isSelected;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    this.layer.strokeWeight(4);
+    this.layer.noFill();
+    if (isDrawing)
+    {
+      strokeWeight(4);
+      float x1 = this.mouseStart.x;
+      float y1 = this.mouseStart.y;
+      float wid = this.mouseDrag.x - x1;
+      float hgt = this.mouseDrag.y - y1;
+      rect(x1, y1,wid,hgt);
+    }
+    else
+    {
+      float x1 = this.bounds.left;
+      float y1 = this.bounds.top;
+      float wid = this.bounds.getWidth();
+      float hgt = this.bounds.getHeight();
+      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+
+      if (this.isSelected)
+      {
+        this.layer.noFill();
+        this.layer.strokeWeight(1);
+        this.layer.stroke(255,50,50);
+        this.layer.rect(x1-1,y1-1,wid+2,hgt+2);
+      }
+    }
+    this.layer.endDraw();
+
   }
 }
 class GraphicsFunctions
@@ -615,6 +774,56 @@ class MessageQueue
     }
     return queue.removeFirst();
   }
+}
+class Rect
+{
+  float left, top, right, bottom;
+
+  Rect(float xOne, float yOne, float xTwo, float yTwo)
+  {
+    setRect(xOne, yOne, xTwo, yTwo);
+  }
+
+  Rect(PVector vecOne, PVector vecTwo)
+  {
+    setRect(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
+  }
+
+  public void setRect(float xOne, float yOne, float xTwo, float yTwo)
+  {
+    this.left = min(xOne, xTwo);
+    this.top = min(yOne, yTwo);
+    this.right = max(xOne, xTwo);
+    this.bottom = max(yOne, yTwo);
+  }
+
+  public PVector getCentre()
+  {
+    PVector centre = new PVector();
+    centre.x = (this.right - this.left) / 2.0f;
+    centre.y = (this.bottom - this.top) / 2.0f;
+    return centre;
+  }
+
+  public boolean isInsideThis(PVector vec)
+  {
+    return (isBetween(vec.x, this.left, this.right) && isBetween(vec.y, this.top, this.bottom));
+  }
+
+  public float getWidth()
+  {
+    return (this.right - this.left);
+  }
+
+  public float getHeight()
+  {
+    return (this.bottom - this.top);
+  }
+}
+
+public boolean isBetween(float value, float low, float high)
+{
+  return (value >= low && value <= high);
 }
 class Slider
 {
