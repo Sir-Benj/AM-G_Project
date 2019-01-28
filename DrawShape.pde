@@ -3,12 +3,12 @@ class DrawShape
   String shapeToDraw;
 
   PVector mouseStart, mouseDrag, mouseEnd;
-  float radius;
+
+  float hue, sat, bri, opacity, sWeight;
 
   boolean isSelected = false;
   boolean isDrawing = false;
-
-  int sWeight = 10;
+  boolean isDrawn = false;
 
   Rect bounds;
 
@@ -18,13 +18,20 @@ class DrawShape
   {
   }
 
-  void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer)
+  void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer,
+    float hue, float sat, float bri, float sWeight, float opacity)
   {
     this.isDrawing = true;
+    this.isDrawn = false;
     this.shapeToDraw = shapeToDraw;
     this.mouseStart = startPoint;
     this.mouseDrag = startPoint;
     this.layer = layer;
+    this.hue = hue;
+    this.sat = sat;
+    this.bri = bri;
+    this.opacity = opacity;
+    this.sWeight = sWeight;
   }
 
   void WhileDrawingShape(PVector dragPoint)
@@ -60,16 +67,15 @@ class DrawShape
   void drawThisShape()
   {
     this.layer.beginDraw();
-    this.layer.strokeWeight(1);
-    this.layer.noFill();
+    this.layer.colorMode(HSB);
+    DrawSettings();
     if (isDrawing)
     {
-      strokeWeight(1);
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float wid = this.mouseDrag.x - x1;
       float hgt = this.mouseDrag.y - y1;
-      rect(x1, y1,wid,hgt);
+      rect(x1, y1, wid, hgt);
     }
     else
     {
@@ -78,16 +84,59 @@ class DrawShape
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
       this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+      this.isDrawn = true;
 
       if (this.isSelected)
       {
-        this.layer.noFill();
-        this.layer.strokeWeight(1);
-        this.layer.stroke(255,50,50);
         this.layer.rect(x1-1,y1-1,wid+2,hgt+2);
       }
     }
     this.layer.endDraw();
-
+    DefaultDrawSettings();
   }
+
+  void DrawSettings()
+  {
+    if (isDrawing)
+    {
+      strokeWeight(sWeight);
+      stroke(this.hue,
+             this.sat,
+             this.bri,
+             this.opacity);
+      fill(this.hue,
+           this.sat,
+           this.bri,
+           this.opacity);
+    }
+    else
+    {
+      this.layer.strokeWeight(sWeight);
+      this.layer.stroke(this.hue,
+                        this.sat,
+                        this.bri,
+                        this.opacity);
+      this.layer.fill(this.hue,
+                      this.sat,
+                      this.bri,
+                      this.opacity);
+    }
+
+    if (this.isSelected)
+    {
+      this.layer.noFill();
+      this.layer.strokeWeight(1);
+      this.layer.stroke(255 - this.hue,
+                        255 - this.sat,
+                        255 - this.bri);
+    }
+  }
+
+  void DefaultDrawSettings()
+  {
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+  }
+
 }

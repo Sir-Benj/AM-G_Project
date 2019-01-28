@@ -11,11 +11,12 @@ class Document
   {
   }
 
-  public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer)
+  public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
+                            float hue, float sat, float bri, float sWeight, float opacity)
   {
     DrawShape newShape = new DrawShape();
 
-    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer);
+    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
     shapeList.add(newShape);
     println(shapeList.size());
     currentlyDrawnShape = newShape;
@@ -25,7 +26,7 @@ class Document
   {
     for(DrawShape s : shapeList)
     {
-        s.drawThisShape();
+      s.drawThisShape();
     }
   }
 

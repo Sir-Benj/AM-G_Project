@@ -21,8 +21,8 @@ public class main extends PApplet {
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
-int sliderOneValue = 5;
-int sliderTwoValue = 255;
+float sliderOneValue = 5;
+float sliderTwoValue = 255;
 
 Button control;
 Button[] btns;
@@ -117,20 +117,23 @@ public void setup()
 
 public void mousePressed()
 {
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  menu.TopMenuPressed();
+  menu.SideMenuPressed();
+
+  if (OverCanvas() && released)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && released)
+    mouseStart.x = mouseX;
+    mouseStart.y = mouseY;
+    pressed = true;
+    released = false;
+
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-<<<<<<< HEAD
-      xOnPress = mouseX;
-      yOnPress = mouseY;
-=======
-      mouseStart.x = mouseX;
-      mouseStart.y = mouseY;
->>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
-      pressed = true;
-      released = false;
-      doc.StartNewShape("rectangle", mouseStart, paintLayer);
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.RectangleStart("rectangle", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
     }
   }
 
@@ -142,51 +145,41 @@ public void mousePressed()
   {
     left = false;
   }
-
-  menu.TopMenuPressed();
-  menu.SideMenuPressed();
 }
 
 public void mouseDragged()
 {
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  if (pressed && !released)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed && !released)
+    mouseDrag.x = mouseX;
+    mouseDrag.y = mouseY;
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-      mouseDrag.x = mouseX;
-      mouseDrag.y = mouseY;
-
-      if (doc.currentlyDrawnShape == null)
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        return;
+        graphicsFunctions.RectangleDrag(doc, mouseDrag);
       }
-      doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
-      }
+    }
   }
 }
 
 public void mouseReleased()
 {
-<<<<<<< HEAD
-  pressed = false;
-=======
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  if (pressed)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    mouseFinal.x = mouseX;
+    mouseFinal.y = mouseY;
+    pressed = false;
+    released = true;
+
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-      mouseFinal.x = mouseX;
-      mouseFinal.y = mouseY;
-      pressed = false;
-      released = true;
-      if (doc.currentlyDrawnShape == null)
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        return;
+        graphicsFunctions.RectangleFinal(doc, mouseFinal);
       }
-      doc.currentlyDrawnShape.FinishDrawingShape(mouseFinal);
-      doc.currentlyDrawnShape = null;
     }
   }
->>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
 }
 
 public void mouseClicked()
@@ -217,6 +210,7 @@ public void mouseClicked()
 public void draw()
 {
   paintLayer.beginDraw();
+  paintLayer.clear();
   paintLayer.endDraw();
   photoLayer.beginDraw();
   photoLayer.endDraw();
@@ -225,7 +219,7 @@ public void draw()
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
+    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverCanvas())
     {
       graphicsFunctions.Pencil(paintLayer, colourPicker, sliderOneValue, sliderTwoValue);
     }
@@ -237,11 +231,6 @@ public void draw()
     {
       graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
                              yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
-    }
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
-    {
-      graphicsFunctions.Rectangle(paintLayer, pressed, xOnPress, xOffset,
-                             yOnPress, yOffset, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -273,7 +262,6 @@ public void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
-  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
@@ -313,32 +301,7 @@ public void draw()
     }
   }
 
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
-  {
-    if  (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
-    {
-      if (pressed)
-      {
-        if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
-        {
-          return;
-        }
-        strokeWeight(sliderOneValue);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
-        noFill();
-        rect(xOnPress, yOnPress, xOffset, yOffset);
-      }
-      else if (!pressed)
-      {
-        xOnPress = -1;
-        yOnPress = -1;
-        xOffset = -1;
-        yOffset = -1;
-      }
-    }
-  }
-
-  strokeWeight(1);
+  doc.DrawMe();
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
@@ -389,9 +352,10 @@ public void fileChosen(File selection)
   }
 }
 
-public boolean OverMenu()
+public boolean OverCanvas()
 {
-  return (mousePressed && mouseX >= 0 && mouseX <= width - menu.sideMenuInset);
+  return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
+          && mouseY >= 40 && mouseY <= height - 20);
 }
 class ColourPicker
 {
@@ -486,11 +450,12 @@ class Document
   {
   }
 
-  public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer)
+  public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
+                            float hue, float sat, float bri, float sWeight, float opacity)
   {
     DrawShape newShape = new DrawShape();
 
-    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer);
+    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
     shapeList.add(newShape);
     println(shapeList.size());
     currentlyDrawnShape = newShape;
@@ -500,7 +465,10 @@ class Document
   {
     for(DrawShape s : shapeList)
     {
+      if (!s.isDrawn)
+      {
         s.drawThisShape();
+      }
     }
   }
 
@@ -519,12 +487,12 @@ class DrawShape
   String shapeToDraw;
 
   PVector mouseStart, mouseDrag, mouseEnd;
-  float radius;
+
+  float hue, sat, bri, opacity, sWeight;
 
   boolean isSelected = false;
   boolean isDrawing = false;
-
-  int sWeight = 10;
+  boolean isDrawn = false;
 
   Rect bounds;
 
@@ -534,13 +502,20 @@ class DrawShape
   {
   }
 
-  public void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer)
+  public void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer,
+    float hue, float sat, float bri, float sWeight, float opacity)
   {
     this.isDrawing = true;
+    this.isDrawn = false;
     this.shapeToDraw = shapeToDraw;
     this.mouseStart = startPoint;
     this.mouseDrag = startPoint;
     this.layer = layer;
+    this.hue = hue;
+    this.sat = sat;
+    this.bri = bri;
+    this.opacity = opacity;
+    this.sWeight = sWeight;
   }
 
   public void WhileDrawingShape(PVector dragPoint)
@@ -576,16 +551,15 @@ class DrawShape
   public void drawThisShape()
   {
     this.layer.beginDraw();
-    this.layer.strokeWeight(1);
-    this.layer.noFill();
+    this.layer.colorMode(HSB);
+    DrawSettings();
     if (isDrawing)
     {
-      strokeWeight(1);
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float wid = this.mouseDrag.x - x1;
       float hgt = this.mouseDrag.y - y1;
-      rect(x1, y1,wid,hgt);
+      rect(x1, y1, wid, hgt);
     }
     else
     {
@@ -594,18 +568,61 @@ class DrawShape
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
       this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+      this.isDrawn = true;
 
       if (this.isSelected)
       {
-        this.layer.noFill();
-        this.layer.strokeWeight(1);
-        this.layer.stroke(255,50,50);
         this.layer.rect(x1-1,y1-1,wid+2,hgt+2);
       }
     }
     this.layer.endDraw();
-
+    DefaultDrawSettings();
   }
+
+  public void DrawSettings()
+  {
+    if (isDrawing)
+    {
+      strokeWeight(sWeight);
+      stroke(this.hue,
+             this.sat,
+             this.bri,
+             this.opacity);
+      fill(this.hue,
+           this.sat,
+           this.bri,
+           this.opacity);
+    }
+    else
+    {
+      this.layer.strokeWeight(sWeight);
+      this.layer.stroke(this.hue,
+                        this.sat,
+                        this.bri,
+                        this.opacity);
+      this.layer.fill(this.hue,
+                      this.sat,
+                      this.bri,
+                      this.opacity);
+    }
+
+    if (this.isSelected)
+    {
+      this.layer.noFill();
+      this.layer.strokeWeight(1);
+      this.layer.stroke(255 - this.hue,
+                        255 - this.sat,
+                        255 - this.bri);
+    }
+  }
+
+  public void DefaultDrawSettings()
+  {
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+  }
+
 }
 class GraphicsFunctions
 {
@@ -716,22 +733,33 @@ class GraphicsFunctions
 
   }
 
-  public void Rectangle(PGraphics layer, boolean pressed, float xOnPress, float xOffset, float yOnPress,
-                 float yOffset, ColourPicker colourPicker, float sVOne, float sVTwo)
+  public void RectangleStart(String name, PVector mouseStart, PGraphics layer, Document doc,
+                      ColourPicker colourPicker, float sWeight, float opacity)
   {
-    if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
+     doc.StartNewShape(name, mouseStart, layer,
+                       colourPicker._hueVal,
+                       colourPicker._satVal,
+                       colourPicker._briVal,
+                       sWeight, opacity);
+  }
+
+  public void RectangleDrag(Document doc, PVector mouseDrag)
+  {
+    if (doc.currentlyDrawnShape == null)
     {
       return;
     }
-    if (!pressed)
+    doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
+  }
+
+  public void RectangleFinal(Document doc, PVector mouseFinal)
+  {
+    if (doc.currentlyDrawnShape == null)
     {
-      layer.beginDraw();
-      layer.noFill();
-      layer.strokeWeight(sVOne);
-      layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-      layer.rect(xOnPress - 20, yOnPress - 40, xOffset, yOffset);
-      layer.endDraw();
+      return;
     }
+    doc.currentlyDrawnShape.FinishDrawingShape(mouseFinal);
+    doc.currentlyDrawnShape = null;
   }
 
   public void Circle()
@@ -898,7 +926,7 @@ class Slider
     sNameValue = sNValue;
   }
 
-  public int DrawSliderMenu(float retValue)
+  public float DrawSliderMenu(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
 
@@ -930,7 +958,7 @@ class Slider
     fill(50);
     rect(sliderPos + xBarPos - 3, yBarPos - 5, 6, barHeight + 10);
 
-    return (int)retValue;
+    return retValue;
   }
 }
 // class TopBarManager

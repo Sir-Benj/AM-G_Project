@@ -3,8 +3,8 @@ import java.util.LinkedList;
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
-int sliderOneValue = 5;
-int sliderTwoValue = 255;
+float sliderOneValue = 5;
+float sliderTwoValue = 255;
 
 Button control;
 Button[] btns;
@@ -99,20 +99,23 @@ void setup()
 
 void mousePressed()
 {
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  menu.TopMenuPressed();
+  menu.SideMenuPressed();
+
+  if (OverCanvas() && released)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && released)
+    mouseStart.x = mouseX;
+    mouseStart.y = mouseY;
+    pressed = true;
+    released = false;
+
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-<<<<<<< HEAD
-      xOnPress = mouseX;
-      yOnPress = mouseY;
-=======
-      mouseStart.x = mouseX;
-      mouseStart.y = mouseY;
->>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
-      pressed = true;
-      released = false;
-      doc.StartNewShape("rectangle", mouseStart, paintLayer);
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.RectangleStart("rectangle", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
     }
   }
 
@@ -124,51 +127,41 @@ void mousePressed()
   {
     left = false;
   }
-
-  menu.TopMenuPressed();
-  menu.SideMenuPressed();
 }
 
 void mouseDragged()
 {
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  if (pressed && !released)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed && !released)
+    mouseDrag.x = mouseX;
+    mouseDrag.y = mouseY;
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-      mouseDrag.x = mouseX;
-      mouseDrag.y = mouseY;
-
-      if (doc.currentlyDrawnShape == null)
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        return;
+        graphicsFunctions.RectangleDrag(doc, mouseDrag);
       }
-      doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
-      }
+    }
   }
 }
 
 void mouseReleased()
 {
-<<<<<<< HEAD
-  pressed = false;
-=======
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
+  if (pressed)
   {
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true && pressed)
+    mouseFinal.x = mouseX;
+    mouseFinal.y = mouseY;
+    pressed = false;
+    released = true;
+
+    for (int i = 0; i < menu.illustratorMenu.length; i++)
     {
-      mouseFinal.x = mouseX;
-      mouseFinal.y = mouseY;
-      pressed = false;
-      released = true;
-      if (doc.currentlyDrawnShape == null)
+      if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        return;
+        graphicsFunctions.RectangleFinal(doc, mouseFinal);
       }
-      doc.currentlyDrawnShape.FinishDrawingShape(mouseFinal);
-      doc.currentlyDrawnShape = null;
     }
   }
->>>>>>> a5e698916424d18aa66790516cf9d9dc614cc931
 }
 
 void mouseClicked()
@@ -199,6 +192,7 @@ void mouseClicked()
 void draw()
 {
   paintLayer.beginDraw();
+  paintLayer.clear();
   paintLayer.endDraw();
   photoLayer.beginDraw();
   photoLayer.endDraw();
@@ -207,7 +201,7 @@ void draw()
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
-    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverMenu())
+    if (menu.illustratorMenu[i].buttonName == "Pencil" && menu.illustratorMenu[i].localState == true && OverCanvas())
     {
       graphicsFunctions.Pencil(paintLayer, colourPicker, sliderOneValue, sliderTwoValue);
     }
@@ -219,11 +213,6 @@ void draw()
     {
       graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
                              yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
-    }
-    if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
-    {
-      graphicsFunctions.Rectangle(paintLayer, pressed, xOnPress, xOffset,
-                             yOnPress, yOffset, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -255,7 +244,6 @@ void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
-  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
@@ -295,32 +283,7 @@ void draw()
     }
   }
 
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
-  {
-    if  (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
-    {
-      if (pressed)
-      {
-        if (xOnPress < 10 || yOnPress < 30 || xOffset > width - 200 || yOffset > height - 10)
-        {
-          return;
-        }
-        strokeWeight(sliderOneValue);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
-        noFill();
-        rect(xOnPress, yOnPress, xOffset, yOffset);
-      }
-      else if (!pressed)
-      {
-        xOnPress = -1;
-        yOnPress = -1;
-        xOffset = -1;
-        yOffset = -1;
-      }
-    }
-  }
-
-  strokeWeight(1);
+  doc.DrawMe();
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
@@ -371,7 +334,8 @@ void fileChosen(File selection)
   }
 }
 
-boolean OverMenu()
+boolean OverCanvas()
 {
-  return (mousePressed && mouseX >= 0 && mouseX <= width - menu.sideMenuInset);
+  return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
+          && mouseY >= 40 && mouseY <= height - 20);
 }

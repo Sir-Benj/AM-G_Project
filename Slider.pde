@@ -17,7 +17,7 @@ class Slider
     sNameValue = sNValue;
   }
 
-  int DrawSliderMenu(float retValue)
+  float DrawSliderMenu(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barWidth);
 
@@ -49,6 +49,6 @@ class Slider
     fill(50);
     rect(sliderPos + xBarPos - 3, yBarPos - 5, 6, barHeight + 10);
 
-    return (int)retValue;
+    return retValue;
   }
 }
