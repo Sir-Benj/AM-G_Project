@@ -31,7 +31,7 @@ Button[][] buttonMenu;
 Slider sliderOne;
 Slider sliderTwo;
 
-boolean clicked, left;
+boolean clicked, left, right, newPoly = false, isFinished = true;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -120,8 +120,29 @@ public void mousePressed()
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 
+  mouseStart = new PVector();
+
   if (OverCanvas() && released)
   {
+    if (mousePressed && (mouseButton == LEFT))
+    {
+      left = true;
+    }
+    else
+    {
+      left = false;
+    }
+
+    if (mousePressed && (mouseButton == RIGHT))
+    {
+      right = true;
+      isFinished = true;
+    }
+    else
+    {
+      right = false;
+    }
+
     mouseStart.x = mouseX;
     mouseStart.y = mouseY;
     pressed = true;
@@ -131,19 +152,34 @@ public void mousePressed()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleStart("rectangle", mouseStart, paintLayer,
+        graphicsFunctions.ShapeStart("Rectangle", mouseStart, paintLayer,
                                          doc ,colourPicker, sliderOneValue, sliderTwoValue);
       }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeStart("Circle", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeStart("Line", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Polygon" && menu.illustratorMenu[i].localState == true)
+      {
+        if (!newPoly)
+        {
+          graphicsFunctions.ShapeStart("Polygon", mouseStart, paintLayer,
+                                       doc ,colourPicker, sliderOneValue, sliderTwoValue);
+          isFinished = false;
+          newPoly = true;
+        }
+        if (doc.currentlyDrawnShape != null && newPoly && !isFinished)
+        {
+          doc.currentlyDrawnShape.AddToPoints(mouseStart);
+        }
+      }
     }
-  }
-
-  if (mousePressed && (mouseButton == LEFT))
-  {
-    left = true;
-  }
-  else
-  {
-    left = false;
   }
 }
 
@@ -157,7 +193,15 @@ public void mouseDragged()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleDrag(doc, mouseDrag);
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
       }
     }
   }
@@ -176,41 +220,32 @@ public void mouseReleased()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleFinal(doc, mouseFinal);
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Polygon" && menu.illustratorMenu[i].localState == true)
+      {
+        if (isFinished)
+        {
+          graphicsFunctions.ShapeFinal(doc, mouseFinal);
+          newPoly = false;
+          isFinished = false;
+        }
       }
     }
   }
 }
 
-public void mouseClicked()
-{
-  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
-  {
-    if (left)
-    {
-      if (clicked)
-      {
-        xSecondCLick = mouseX;
-        ySecondClick = mouseY;
-        clicked = false;
-        return;
-      }
-      xFirstClick = mouseX;
-      yFirstClick = mouseY;
-      clicked = true;
-      }
-    }
-    else
-    {
-      xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-    }
-}
-
-
 public void draw()
 {
   paintLayer.beginDraw();
-  paintLayer.clear();
   paintLayer.endDraw();
   photoLayer.beginDraw();
   photoLayer.endDraw();
@@ -226,11 +261,6 @@ public void draw()
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.Eraser(paintLayer, sliderOneValue);
-    }
-    if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
-    {
-      graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
-                             yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -262,6 +292,7 @@ public void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
+  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
@@ -274,34 +305,6 @@ public void draw()
 
   imageToSaveCombined = combineLayers.get(0, 0, width - 245, height - 60);
 
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
-  {
-    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
-    {
-      if (clicked)
-      {
-        strokeWeight(sliderOneValue);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
-        line(xFirstClick, yFirstClick, mouseX, mouseY);
-      }
-      else if (!clicked)
-      {
-        xFirstClick = -1;
-        yFirstClick = -1;
-        xSecondCLick = -1;
-        ySecondClick = -1;
-      }
-    }
-    else if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
-    {
-      xFirstClick = -1;
-      yFirstClick = -1;
-      xSecondCLick = -1;
-      ySecondClick = -1;
-    }
-  }
-
-  doc.DrawMe();
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
@@ -356,6 +359,47 @@ public boolean OverCanvas()
 {
   return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
           && mouseY >= 40 && mouseY <= height - 20);
+}
+class Circle extends DrawShape
+{
+  Circle(String shapeType, PVector mouseStartLoc, PGraphics layer,
+            float hue, float sat, float bri, float sWeight, float opacity)
+  {
+    super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    this.layer.colorMode(HSB);
+    DrawSettings();
+    if (isDrawing)
+    {
+      ellipseMode(CORNER);
+      float x1 = this.mouseStart.x;
+      float y1 = this.mouseStart.y;
+      float wid = this.mouseDrag.x - x1;
+      float hgt = this.mouseDrag.y - y1;
+      ellipse(x1,y1,wid,hgt);
+    }
+    else
+    {
+      this.layer.ellipseMode(CORNER);
+      float x1 = this.bounds.left;
+      float y1 = this.bounds.top;
+      float wid = this.bounds.getWidth();
+      float hgt = this.bounds.getHeight();
+      this.layer.ellipse(x1 - 20, y1 - 40, wid, hgt);
+
+      if (this.isSelected)
+      {
+        this.layer.ellipseMode(CORNER);
+        this.layer.ellipse(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+      }
+    }
+    this.layer.endDraw();
+    DefaultDrawSettings();
+  }
 }
 class ColourPicker
 {
@@ -453,22 +497,35 @@ class Document
   public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
                             float hue, float sat, float bri, float sWeight, float opacity)
   {
-    DrawShape newShape = new DrawShape();
+    switch (shapeType)
+    {
+      case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newRectangle);
+                        currentlyDrawnShape = newRectangle;
+                        break;
 
-    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
-    shapeList.add(newShape);
-    println(shapeList.size());
-    currentlyDrawnShape = newShape;
+      case "Circle":    DrawShape newCircle = new Circle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newCircle);
+                        currentlyDrawnShape = newCircle;
+                        break;
+
+      case "Line":      DrawShape newLine = new Line(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newLine);
+                        currentlyDrawnShape = newLine;
+                        break;
+
+      case "Polygon":   DrawShape newPoly = new Polygon(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newPoly);
+                        currentlyDrawnShape = newPoly;
+                        break;
+    }
   }
 
   public void DrawMe()
   {
     for(DrawShape s : shapeList)
     {
-      if (!s.isDrawn)
-      {
-        s.drawThisShape();
-      }
+      s.drawThisShape();
     }
   }
 
@@ -492,21 +549,15 @@ class DrawShape
 
   boolean isSelected = false;
   boolean isDrawing = false;
-  boolean isDrawn = false;
 
   Rect bounds;
 
   PGraphics layer;
 
-  DrawShape()
-  {
-  }
-
-  public void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer,
+  DrawShape(String shapeToDraw, PVector startPoint, PGraphics layer,
     float hue, float sat, float bri, float sWeight, float opacity)
   {
     this.isDrawing = true;
-    this.isDrawn = false;
     this.shapeToDraw = shapeToDraw;
     this.mouseStart = startPoint;
     this.mouseDrag = startPoint;
@@ -535,6 +586,8 @@ class DrawShape
     bounds = new Rect(vecOne, vecTwo);
   }
 
+  public void AddToPoints(PVector mouseStart) {}
+
   public boolean SelectThis(PVector vec)
   {
     if (bounds.isInsideThis(vec))
@@ -550,33 +603,7 @@ class DrawShape
 
   public void drawThisShape()
   {
-    this.layer.beginDraw();
-    this.layer.colorMode(HSB);
-    DrawSettings();
-    if (isDrawing)
-    {
-      float x1 = this.mouseStart.x;
-      float y1 = this.mouseStart.y;
-      float wid = this.mouseDrag.x - x1;
-      float hgt = this.mouseDrag.y - y1;
-      rect(x1, y1, wid, hgt);
-    }
-    else
-    {
-      float x1 = this.bounds.left;
-      float y1 = this.bounds.top;
-      float wid = this.bounds.getWidth();
-      float hgt = this.bounds.getHeight();
-      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
-      this.isDrawn = true;
-
-      if (this.isSelected)
-      {
-        this.layer.rect(x1-1,y1-1,wid+2,hgt+2);
-      }
-    }
-    this.layer.endDraw();
-    DefaultDrawSettings();
+    point(this.mouseStart.x, this.mouseStart.y);
   }
 
   public void DrawSettings()
@@ -584,10 +611,7 @@ class DrawShape
     if (isDrawing)
     {
       strokeWeight(sWeight);
-      stroke(this.hue,
-             this.sat,
-             this.bri,
-             this.opacity);
+      noStroke();
       fill(this.hue,
            this.sat,
            this.bri,
@@ -596,10 +620,7 @@ class DrawShape
     else
     {
       this.layer.strokeWeight(sWeight);
-      this.layer.stroke(this.hue,
-                        this.sat,
-                        this.bri,
-                        this.opacity);
+      this.layer.noStroke();
       this.layer.fill(this.hue,
                       this.sat,
                       this.bri,
@@ -609,7 +630,7 @@ class DrawShape
     if (this.isSelected)
     {
       this.layer.noFill();
-      this.layer.strokeWeight(1);
+      this.layer.strokeWeight(2);
       this.layer.stroke(255 - this.hue,
                         255 - this.sat,
                         255 - this.bri);
@@ -689,7 +710,6 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-        layer.strokeJoin(ROUND);
         layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
@@ -713,27 +733,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
-  public void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
-            int yFirst, int ySecond, ColourPicker colour, float sVOne, float sVTwo)
-  {
-    if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
-    {
-      return;
-    }
-    else if (clicked)
-    {
-      return;
-    }
-
-    layer.beginDraw();
-    layer.colorMode(HSB);
-    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-    layer.strokeWeight(sVOne);
-    layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
-
-  }
-
-  public void RectangleStart(String name, PVector mouseStart, PGraphics layer, Document doc,
+  public void ShapeStart(String name, PVector mouseStart, PGraphics layer, Document doc,
                       ColourPicker colourPicker, float sWeight, float opacity)
   {
      doc.StartNewShape(name, mouseStart, layer,
@@ -743,7 +743,7 @@ class GraphicsFunctions
                        sWeight, opacity);
   }
 
-  public void RectangleDrag(Document doc, PVector mouseDrag)
+  public void ShapeDrag(Document doc, PVector mouseDrag)
   {
     if (doc.currentlyDrawnShape == null)
     {
@@ -752,7 +752,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
   }
 
-  public void RectangleFinal(Document doc, PVector mouseFinal)
+  public void ShapeFinal(Document doc, PVector mouseFinal)
   {
     if (doc.currentlyDrawnShape == null)
     {
@@ -830,6 +830,52 @@ class GraphicsFunctions
   }
 
 }
+class Line extends DrawShape
+{
+  Line(String shapeType, PVector mouseStartLoc, PGraphics layer,
+       float hue, float sat, float bri, float sWeight, float opacity)
+  {
+    super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    this.layer.colorMode(HSB);
+    DrawSettings();
+    if (isDrawing)
+    {
+      stroke(this.hue,
+             this.sat,
+             this.bri,
+             this.opacity);
+      float x1 = this.mouseStart.x;
+      float y1 = this.mouseStart.y;
+      float x2 = this.mouseDrag.x;
+      float y2 = this.mouseDrag.y;
+      line(x1, y1, x2, y2);
+    }
+    else
+    {
+      this.layer.stroke(this.hue,
+                        this.sat,
+                        this.bri,
+                        this.opacity);
+      float x1 = this.bounds.x1;
+      float y1 = this.bounds.y1;
+      float wid = this.bounds.x2;
+      float hgt = this.bounds.y2;
+      this.layer.line(x1 - 20, y1 - 40, wid - 20, hgt - 40);
+
+      if (this.isSelected)
+      {
+        this.layer.line(x1 - 21, y1 - 21, wid - 18, hgt + 38);
+      }
+    }
+    this.layer.endDraw();
+    DefaultDrawSettings();
+  }
+}
 class MessageQueue
 {
   public LinkedList queue;
@@ -857,18 +903,155 @@ class MessageQueue
     return queue.removeFirst();
   }
 }
+class Polygon extends DrawShape
+{
+  ArrayList<PVector> polyPoints;
+  PVector newMousePos;
+  PShape poly;
+  Boolean pickFinished;
+
+  Polygon(String shapeType, PVector mouseStartLoc, PGraphics layer,
+          float hue, float sat, float bri, float sWeight, float opacity)
+  {
+    super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+    this.polyPoints = new ArrayList<PVector>();
+  }
+
+  public void AddToPoints(PVector mousePos)
+  {
+    this.polyPoints.add(mousePos);
+    for (PVector v : this.polyPoints)
+    {
+      println(v);
+    }
+  }
+
+  public void FinishDrawingShape()
+  {
+    PVector xyMin, xyMax;
+    xyMin = new PVector();
+    xyMax = new PVector();
+
+    float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+    for (PVector v : polyPoints)
+    {
+      if (v.x > xMax)
+      {
+        xMax = v.x;
+      }
+      else if (v.x < xMin)
+      {
+        xMin = v.x;
+      }
+
+      if (v.y > yMax)
+      {
+        yMax = v.y;
+      }
+      else if (v.y < yMin)
+      {
+        yMin = v.y;
+      }
+    }
+
+    xyMin.x = xMin;
+    xyMin.y = yMin;
+
+    xyMax.x = xMax;
+    xyMax.y = yMax;
+
+    setShapeBounds(xyMin, xyMax);
+
+    this.isDrawing = false;
+
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    smooth();
+    this.layer.colorMode(HSB);
+    if (isDrawing)
+    {
+      this.poly = createShape();
+      this.poly.beginShape();
+      this.poly.strokeWeight(this.sWeight);
+      this.poly.stroke(this.hue,
+                       this.sat,
+                       this.bri,
+                       this.opacity);
+      this.poly.noFill();
+      for (PVector v : this.polyPoints)
+      {
+        this.poly.vertex(v.x, v.y);
+      }
+      this.poly.endShape();
+      shape(poly);
+    }
+    else
+    {
+      this.poly = createShape();
+      this.poly.beginShape();
+      this.poly.strokeWeight(this.sWeight);
+      this.poly.noStroke();
+      this.poly.fill(this.hue,
+                     this.sat,
+                     this.bri,
+                     this.opacity);
+      for (PVector v : this.polyPoints)
+      {
+        this.poly.vertex(v.x - 20, v.y - 40);
+      }
+      this.poly.endShape(CLOSE);
+      this.layer.smooth();
+      this.layer.shape(poly);
+
+      if (this.isSelected)
+      {
+        this.poly = createShape();
+        this.poly.beginShape();
+        this.poly.strokeWeight(this.sWeight);
+        this.poly.stroke(255 - this.hue,
+                         255 - this.sat,
+                         255 - this.hue);
+        this.poly.noFill();
+        for (PVector v : this.polyPoints)
+        {
+          this.poly.vertex(v.x - 21, v.y - 38);
+        }
+        this.poly.endShape(CLOSE);
+        this.layer.shape(poly);
+
+      }
+    }
+    this.layer.endDraw();
+    DefaultDrawSettings();
+  }
+}
 class Rect
 {
   float left, top, right, bottom;
+  float x1, y1, x2, y2;
 
   Rect(float xOne, float yOne, float xTwo, float yTwo)
   {
     setRect(xOne, yOne, xTwo, yTwo);
+    OriginalMousePos(xOne, yOne, xTwo, yTwo);
   }
 
   Rect(PVector vecOne, PVector vecTwo)
   {
     setRect(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
+    OriginalMousePos(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
+  }
+
+  public void OriginalMousePos(float xOne, float yOne, float xTwo, float yTwo)
+  {
+    this.x1 = xOne;
+    this.y1 = yOne;
+    this.x2 = xTwo;
+    this.y2 = yTwo;
   }
 
   public void setRect(float xOne, float yOne, float xTwo, float yTwo)
@@ -906,6 +1089,44 @@ class Rect
 public boolean isBetween(float value, float low, float high)
 {
   return (value >= low && value <= high);
+}
+class Rectangle extends DrawShape
+{
+  Rectangle(String shapeType, PVector mouseStartLoc, PGraphics layer,
+            float hue, float sat, float bri, float sWeight, float opacity)
+  {
+    super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    this.layer.colorMode(HSB);
+    DrawSettings();
+    if (isDrawing)
+    {
+      float x1 = this.mouseStart.x;
+      float y1 = this.mouseStart.y;
+      float wid = this.mouseDrag.x - x1;
+      float hgt = this.mouseDrag.y - y1;
+      rect(x1,y1,wid,hgt);
+    }
+    else
+    {
+      float x1 = this.bounds.left;
+      float y1 = this.bounds.top;
+      float wid = this.bounds.getWidth();
+      float hgt = this.bounds.getHeight();
+      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+
+      if (this.isSelected)
+      {
+        this.layer.rect(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+      }
+    }
+    this.layer.endDraw();
+    DefaultDrawSettings();
+  }
 }
 class Slider
 {
@@ -961,99 +1182,6 @@ class Slider
     return retValue;
   }
 }
-// class TopBarManager
-// {
-//   String[][] topBar;
-//   Button[][] menuButtons;
-//   Button[] sub1;
-//   Button[] sub2;
-//   Button[] sub3;
-//
-//   PFont font;
-//   //int topBheight;
-//   //int topBwidth
-//
-//   TopBarManager()
-//   {
-//     topBar = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen"} };
-//     font = createFont("arial.ttf", 16);
-//
-//     menuButtons = new Button[topBar.length][];
-//     sub1 = new Button[topBar[0].length];
-//     sub2 = new Button[topBar[1].length];
-//     sub3 = new Button[topBar[2].length];
-//
-//     menuButtons[0] = sub1;
-//     menuButtons[1] = sub2;
-//     menuButtons[2] = sub3;
-//   }
-//
-//   Button[][] InitialiseMenu()
-//   {
-//     noStroke();
-//     fill(180);
-//     rect(0, 0, width, 20);
-//     textFont(font, 14);
-//
-//     int topXstart = 0;
-//     int topYstart = 0;
-//     int topBwidth = 50;
-//     int topBheight = 20;
-//     int subXstart = 0;
-//     int subYstart = 20;
-//     int subBwidth = 80;
-//     int subBheight = 20;
-//
-//     for (int topMenu = 0; topMenu < menuButtons.length; topMenu++)
-//     {
-//       menuButtons[topMenu][0] = new Button(topXstart, topYstart, topBwidth, topBheight, false, false, topBar[topMenu][0]);
-//       //menuButtons[topMenu][0].displayButton();
-//       topXstart += 50;
-//
-//       for (int subMenu = 1; subMenu < menuButtons[topMenu].length; subMenu++)
-//       {
-//         menuButtons[topMenu][subMenu] = new Button(subXstart, subYstart, subBwidth, subBheight, false, false, topBar[topMenu][subMenu]);
-//         subYstart += 20;
-//       }
-//       subXstart += 50;
-//       subYstart = 20;
-//     }
-//
-//     return menuButtons;
-//   }
-//
-//   void DisplayMenu()
-//   {
-//     noStroke();
-//     fill(100);
-//     rect(0, 0, width, 20);
-//     textFont(font, 14);
-//
-//     for (int i = 0; i < menuButtons.length; i++)
-//     {
-//       for (int y = 0; y < menuButtons[i].length; y++)
-//       {
-//         menuButtons[i][0].DisplayButton();
-//         if (menuButtons[i][0].localState)
-//         {
-//           menuButtons[i][y].DisplayButton();
-//         }
-//       }
-//     }
-//   }
-//
-//   void TopMenuPressed()
-//   {
-//     menuButtons[0][0].TopMenuButtonPressed(menuButtons[1][0]);
-//     menuButtons[0][0].TopMenuButtonPressed(menuButtons[2][0]);
-//     menuButtons[1][0].TopMenuButtonPressed(menuButtons[0][0]);
-//     menuButtons[1][0].TopMenuButtonPressed(menuButtons[2][0]);
-//     menuButtons[2][0].TopMenuButtonPressed(menuButtons[0][0]);
-//     menuButtons[2][0].TopMenuButtonPressed(menuButtons[1][0]);
-//   }
-//
-//
-// }
 class Button
 {
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
@@ -1517,35 +1645,6 @@ class Menu
     fill(180);
     rect(width - sideMenuInset, 0, sideMenuInset, height);
     textFont(btnFont, btnFontSize);
-  }
-}
-class PaintUI extends PApplet
-{
-  PaintUI()
-  {
-    super();
-    PaintUI.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-  }
-
-  public void settings()
-  {
-    size(500, 200);
-  }
-
-  public void setup()
-  {
-    surface.setTitle("Illustration Tools");
-    background(150);
-  }
-
-  public void mousePressed()
-  {
-    println("Mouse pressed in Paint UI");
-  }
-
-  public void exit()
-  {
-    dispose();
   }
 }
   static public void main(String[] passedArgs) {

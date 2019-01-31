@@ -63,7 +63,6 @@ class GraphicsFunctions
       if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)
       {
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-        layer.strokeJoin(ROUND);
         layer.strokeWeight(sVOne);
         layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
       }
@@ -87,27 +86,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
-  void Line(PGraphics layer, boolean clicked, int xFirst, int xSecond,
-            int yFirst, int ySecond, ColourPicker colour, float sVOne, float sVTwo)
-  {
-    if (xFirst < 10 || yFirst < 30 || xSecond > width - 200 || ySecond > height - 10)
-    {
-      return;
-    }
-    else if (clicked)
-    {
-      return;
-    }
-
-    layer.beginDraw();
-    layer.colorMode(HSB);
-    layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
-    layer.strokeWeight(sVOne);
-    layer.line(xFirst - 20, yFirst - 40, xSecond - 20, ySecond - 40);
-
-  }
-
-  void RectangleStart(String name, PVector mouseStart, PGraphics layer, Document doc,
+  void ShapeStart(String name, PVector mouseStart, PGraphics layer, Document doc,
                       ColourPicker colourPicker, float sWeight, float opacity)
   {
      doc.StartNewShape(name, mouseStart, layer,
@@ -117,7 +96,7 @@ class GraphicsFunctions
                        sWeight, opacity);
   }
 
-  void RectangleDrag(Document doc, PVector mouseDrag)
+  void ShapeDrag(Document doc, PVector mouseDrag)
   {
     if (doc.currentlyDrawnShape == null)
     {
@@ -126,7 +105,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
   }
 
-  void RectangleFinal(Document doc, PVector mouseFinal)
+  void ShapeFinal(Document doc, PVector mouseFinal)
   {
     if (doc.currentlyDrawnShape == null)
     {

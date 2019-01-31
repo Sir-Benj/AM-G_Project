@@ -13,7 +13,7 @@ Button[][] buttonMenu;
 Slider sliderOne;
 Slider sliderTwo;
 
-boolean clicked, left;
+boolean clicked, left, right, newPoly = false, isFinished = true;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -102,8 +102,29 @@ void mousePressed()
   menu.TopMenuPressed();
   menu.SideMenuPressed();
 
+  mouseStart = new PVector();
+
   if (OverCanvas() && released)
   {
+    if (mousePressed && (mouseButton == LEFT))
+    {
+      left = true;
+    }
+    else
+    {
+      left = false;
+    }
+
+    if (mousePressed && (mouseButton == RIGHT))
+    {
+      right = true;
+      isFinished = true;
+    }
+    else
+    {
+      right = false;
+    }
+
     mouseStart.x = mouseX;
     mouseStart.y = mouseY;
     pressed = true;
@@ -113,19 +134,34 @@ void mousePressed()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleStart("rectangle", mouseStart, paintLayer,
+        graphicsFunctions.ShapeStart("Rectangle", mouseStart, paintLayer,
                                          doc ,colourPicker, sliderOneValue, sliderTwoValue);
       }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeStart("Circle", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeStart("Line", mouseStart, paintLayer,
+                                         doc ,colourPicker, sliderOneValue, sliderTwoValue);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Polygon" && menu.illustratorMenu[i].localState == true)
+      {
+        if (!newPoly)
+        {
+          graphicsFunctions.ShapeStart("Polygon", mouseStart, paintLayer,
+                                       doc ,colourPicker, sliderOneValue, sliderTwoValue);
+          isFinished = false;
+          newPoly = true;
+        }
+        if (doc.currentlyDrawnShape != null && newPoly && !isFinished)
+        {
+          doc.currentlyDrawnShape.AddToPoints(mouseStart);
+        }
+      }
     }
-  }
-
-  if (mousePressed && (mouseButton == LEFT))
-  {
-    left = true;
-  }
-  else
-  {
-    left = false;
   }
 }
 
@@ -139,7 +175,15 @@ void mouseDragged()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleDrag(doc, mouseDrag);
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeDrag(doc, mouseDrag);
       }
     }
   }
@@ -158,41 +202,32 @@ void mouseReleased()
     {
       if (menu.illustratorMenu[i].buttonName == "Rectangle" && menu.illustratorMenu[i].localState == true)
       {
-        graphicsFunctions.RectangleFinal(doc, mouseFinal);
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Circle" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
+      {
+        graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      }
+      if (menu.illustratorMenu[i].buttonName == "Polygon" && menu.illustratorMenu[i].localState == true)
+      {
+        if (isFinished)
+        {
+          graphicsFunctions.ShapeFinal(doc, mouseFinal);
+          newPoly = false;
+          isFinished = false;
+        }
       }
     }
   }
 }
 
-void mouseClicked()
-{
-  if (mouseX >= 10 && mouseX <= width - 200 && mouseY >= 30 && mouseY <= height - 10)
-  {
-    if (left)
-    {
-      if (clicked)
-      {
-        xSecondCLick = mouseX;
-        ySecondClick = mouseY;
-        clicked = false;
-        return;
-      }
-      xFirstClick = mouseX;
-      yFirstClick = mouseY;
-      clicked = true;
-      }
-    }
-    else
-    {
-      xFirstClick = -1; xSecondCLick = -1; yFirstClick = -1; ySecondClick = -1;
-    }
-}
-
-
 void draw()
 {
   paintLayer.beginDraw();
-  paintLayer.clear();
   paintLayer.endDraw();
   photoLayer.beginDraw();
   photoLayer.endDraw();
@@ -208,11 +243,6 @@ void draw()
     if (menu.illustratorMenu[i].buttonName == "Eraser" && menu.illustratorMenu[i].localState == true)
     {
       graphicsFunctions.Eraser(paintLayer, sliderOneValue);
-    }
-    if (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
-    {
-      graphicsFunctions.Line(paintLayer, clicked, xFirstClick, xSecondCLick,
-                             yFirstClick, ySecondClick, colourPicker, sliderOneValue, sliderTwoValue);
     }
     if (menu.illustratorMenu[i].buttonName == "ClearLayer" && menu.illustratorMenu[i].localState == true)
     {
@@ -244,6 +274,7 @@ void draw()
   background(200);
   image(background, 20, 40);
   image(photoLayer, 20, 40);
+  doc.DrawMe();
   image(paintLayer, 20, 40);
 
   imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
@@ -256,34 +287,6 @@ void draw()
 
   imageToSaveCombined = combineLayers.get(0, 0, width - 245, height - 60);
 
-  for (int i = 0; i < menu.illustratorMenu.length; i++)
-  {
-    if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == true)
-    {
-      if (clicked)
-      {
-        strokeWeight(sliderOneValue);
-        stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sliderTwoValue);
-        line(xFirstClick, yFirstClick, mouseX, mouseY);
-      }
-      else if (!clicked)
-      {
-        xFirstClick = -1;
-        yFirstClick = -1;
-        xSecondCLick = -1;
-        ySecondClick = -1;
-      }
-    }
-    else if  (menu.illustratorMenu[i].buttonName == "Line" && menu.illustratorMenu[i].localState == false)
-    {
-      xFirstClick = -1;
-      yFirstClick = -1;
-      xSecondCLick = -1;
-      ySecondClick = -1;
-    }
-  }
-
-  doc.DrawMe();
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);

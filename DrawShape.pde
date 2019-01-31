@@ -8,21 +8,15 @@ class DrawShape
 
   boolean isSelected = false;
   boolean isDrawing = false;
-  boolean isDrawn = false;
 
   Rect bounds;
 
   PGraphics layer;
 
-  DrawShape()
-  {
-  }
-
-  void BeginDrawingShape(String shapeToDraw, PVector startPoint, PGraphics layer,
+  DrawShape(String shapeToDraw, PVector startPoint, PGraphics layer,
     float hue, float sat, float bri, float sWeight, float opacity)
   {
     this.isDrawing = true;
-    this.isDrawn = false;
     this.shapeToDraw = shapeToDraw;
     this.mouseStart = startPoint;
     this.mouseDrag = startPoint;
@@ -51,6 +45,8 @@ class DrawShape
     bounds = new Rect(vecOne, vecTwo);
   }
 
+  void AddToPoints(PVector mouseStart) {}
+
   boolean SelectThis(PVector vec)
   {
     if (bounds.isInsideThis(vec))
@@ -66,33 +62,7 @@ class DrawShape
 
   void drawThisShape()
   {
-    this.layer.beginDraw();
-    this.layer.colorMode(HSB);
-    DrawSettings();
-    if (isDrawing)
-    {
-      float x1 = this.mouseStart.x;
-      float y1 = this.mouseStart.y;
-      float wid = this.mouseDrag.x - x1;
-      float hgt = this.mouseDrag.y - y1;
-      rect(x1, y1, wid, hgt);
-    }
-    else
-    {
-      float x1 = this.bounds.left;
-      float y1 = this.bounds.top;
-      float wid = this.bounds.getWidth();
-      float hgt = this.bounds.getHeight();
-      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
-      this.isDrawn = true;
-
-      if (this.isSelected)
-      {
-        this.layer.rect(x1-1,y1-1,wid+2,hgt+2);
-      }
-    }
-    this.layer.endDraw();
-    DefaultDrawSettings();
+    point(this.mouseStart.x, this.mouseStart.y);
   }
 
   void DrawSettings()
@@ -100,10 +70,7 @@ class DrawShape
     if (isDrawing)
     {
       strokeWeight(sWeight);
-      stroke(this.hue,
-             this.sat,
-             this.bri,
-             this.opacity);
+      noStroke();
       fill(this.hue,
            this.sat,
            this.bri,
@@ -112,10 +79,7 @@ class DrawShape
     else
     {
       this.layer.strokeWeight(sWeight);
-      this.layer.stroke(this.hue,
-                        this.sat,
-                        this.bri,
-                        this.opacity);
+      this.layer.noStroke();
       this.layer.fill(this.hue,
                       this.sat,
                       this.bri,
@@ -125,7 +89,7 @@ class DrawShape
     if (this.isSelected)
     {
       this.layer.noFill();
-      this.layer.strokeWeight(1);
+      this.layer.strokeWeight(2);
       this.layer.stroke(255 - this.hue,
                         255 - this.sat,
                         255 - this.bri);

@@ -1,15 +1,26 @@
 class Rect
 {
   float left, top, right, bottom;
+  float x1, y1, x2, y2;
 
   Rect(float xOne, float yOne, float xTwo, float yTwo)
   {
     setRect(xOne, yOne, xTwo, yTwo);
+    OriginalMousePos(xOne, yOne, xTwo, yTwo);
   }
 
   Rect(PVector vecOne, PVector vecTwo)
   {
     setRect(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
+    OriginalMousePos(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
+  }
+
+  void OriginalMousePos(float xOne, float yOne, float xTwo, float yTwo)
+  {
+    this.x1 = xOne;
+    this.y1 = yOne;
+    this.x2 = xTwo;
+    this.y2 = yTwo;
   }
 
   void setRect(float xOne, float yOne, float xTwo, float yTwo)

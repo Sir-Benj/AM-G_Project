@@ -14,12 +14,28 @@ class Document
   public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
                             float hue, float sat, float bri, float sWeight, float opacity)
   {
-    DrawShape newShape = new DrawShape();
+    switch (shapeType)
+    {
+      case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newRectangle);
+                        currentlyDrawnShape = newRectangle;
+                        break;
 
-    newShape.BeginDrawingShape(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
-    shapeList.add(newShape);
-    println(shapeList.size());
-    currentlyDrawnShape = newShape;
+      case "Circle":    DrawShape newCircle = new Circle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newCircle);
+                        currentlyDrawnShape = newCircle;
+                        break;
+
+      case "Line":      DrawShape newLine = new Line(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newLine);
+                        currentlyDrawnShape = newLine;
+                        break;
+
+      case "Polygon":   DrawShape newPoly = new Polygon(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+                        shapeList.add(newPoly);
+                        currentlyDrawnShape = newPoly;
+                        break;
+    }
   }
 
   public void DrawMe()
