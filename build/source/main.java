@@ -23,6 +23,8 @@ int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
 
 float sliderOneValue = 5;
 float sliderTwoValue = 255;
+float sliderXValue = 0;
+float sliderYValue = 0;
 
 Button control;
 Button[] btns;
@@ -30,6 +32,8 @@ Button[][] buttonMenu;
 
 Slider sliderOne;
 Slider sliderTwo;
+Slider sliderX;
+Slider sliderY;
 
 boolean clicked, left, right, newPoly = false, isFinished = true;
 
@@ -52,7 +56,7 @@ GraphicsFunctions graphicsFunctions;
 String path;
 File selectOne;
 
-PVector mouseStart, mouseDrag, mouseFinal;
+PVector mouseStart, mouseDrag, mouseFinal, firstPoint;
 
 boolean pressed = false;
 boolean released = true;
@@ -90,12 +94,17 @@ public void setup()
   mouseStart = new PVector();
   mouseDrag = new PVector();
   mouseFinal = new PVector();
+  firstPoint = new PVector();
 
   sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
                          140, 10, 1, 400, "Size", "px");
 
   sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 85,
                          140, 10, 0.0f, 255, "Opacity", "%");
+
+  sliderX = new Slider(20, height - 20,  width - 265, 20, 0.0f, photoLayer.width - width, "xbar", "px");
+
+  sliderY = new Slider(width - 225, 40, 25, height - 85, 0.0f, photoLayer.height - height, "ybar", "px");
 
   background.beginDraw();
   background.colorMode(HSB);
@@ -173,10 +182,24 @@ public void mousePressed()
                                        doc ,colourPicker, sliderOneValue, sliderTwoValue);
           isFinished = false;
           newPoly = true;
+          firstPoint = mouseStart;
+          if (doc.currentlyDrawnShape != null)
+          {
+            doc.currentlyDrawnShape.AddToPoints(mouseStart);
+          }
         }
-        if (doc.currentlyDrawnShape != null && newPoly && !isFinished)
+        else if (doc.currentlyDrawnShape != null && newPoly && !isFinished)
         {
-          doc.currentlyDrawnShape.AddToPoints(mouseStart);
+          if (mouseStart.x > firstPoint.x - 10 && mouseStart.x < firstPoint.x + 10
+            && mouseStart.y > firstPoint.y - 10 && mouseStart.y < firstPoint.y + 10)
+            {
+              doc.currentlyDrawnShape.AddToPoints(firstPoint);
+              isFinished = true;
+            }
+            else
+            {
+              doc.currentlyDrawnShape.AddToPoints(mouseStart);
+            }
         }
       }
     }
@@ -291,12 +314,14 @@ public void draw()
   //tint(255);
   background(200);
   image(background, 20, 40);
-  image(photoLayer, 20, 40);
+  image(photoLayer, 20 - sliderXValue, 40 - sliderYValue);
   doc.DrawMe();
   image(paintLayer, 20, 40);
 
-  imageToSaveOne = photoLayer.get(0, 0, width - 245, height - 60);
-  imageToSaveTwo = paintLayer.get(0, 0, width - 245, height - 60);
+  println(photoLayer.width + " : " + photoLayer.height);
+
+  imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
+  imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);
 
   combineLayers.beginDraw();
   combineLayers.image(imageToSaveOne, 0, 0);
@@ -305,9 +330,25 @@ public void draw()
 
   imageToSaveCombined = combineLayers.get(0, 0, width - 245, height - 60);
 
+  noStroke();
+  fill(200);
+  rect(0, 20, width - 200, 20);
+  rect(0, 20, 20, height - 20);
+  rect(width - 225, height - 20, 30, 20);
+
   menu.DrawMenu();
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
+
+  if (photoLayer.width > width - 245)
+  {
+    sliderXValue = sliderX.DrawSliderHorizontal(sliderXValue);
+  }
+
+  if (photoLayer.height > height - 60)
+  {
+    sliderYValue = sliderY.DrawSliderVertical(sliderYValue);
+  }
 
   for (int i = 0; i < menu.illustratorMenu.length; i++)
   {
@@ -349,9 +390,13 @@ public void fileChosen(File selection)
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
     imageToLoad = loadImage(path);
+    photoLayer = createGraphics(imageToLoad.width, imageToLoad.height);
     photoLayer.beginDraw();
     photoLayer.image(imageToLoad, 0, 0);
     photoLayer.endDraw();
+
+    sliderX = new Slider(20, height - 20,  width - 266, 20, 0.0f, (photoLayer.width - width) + 240, "xbar", "px");
+    sliderY = new Slider(width - 221, 40, 20, height - 80, 0.0f, (photoLayer.height - height) + 60, "ybar", "px");
   }
 }
 
@@ -920,10 +965,6 @@ class Polygon extends DrawShape
   public void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
-    for (PVector v : this.polyPoints)
-    {
-      println(v);
-    }
   }
 
   public void FinishDrawingShape()
@@ -1178,6 +1219,50 @@ class Slider
     stroke(1);
     fill(50);
     rect(sliderPos + xBarPos - 3, yBarPos - 5, 6, barHeight + 10);
+
+    return retValue;
+  }
+
+  public float DrawSliderHorizontal(float retValue)
+  {
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
+
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth + barHeight, barHeight);
+
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseX - xBarPos;
+      retValue = map(sliderPos, 0.0f, barWidth, mapValueLow, mapValueHigh);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(sliderPos + xBarPos, yBarPos, barHeight, barHeight);
+
+    return retValue;
+  }
+
+  public float DrawSliderVertical(float retValue)
+  {
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barHeight);
+
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth, barHeight + barWidth);
+
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseY - yBarPos;
+      retValue = map(sliderPos, 0.0f, barHeight, mapValueLow, mapValueHigh);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(xBarPos, yBarPos + sliderPos, barWidth, barWidth);
 
     return retValue;
   }

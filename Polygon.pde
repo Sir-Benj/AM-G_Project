@@ -15,10 +15,6 @@ class Polygon extends DrawShape
   void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
-    for (PVector v : this.polyPoints)
-    {
-      println(v);
-    }
   }
 
   void FinishDrawingShape()

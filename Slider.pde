@@ -51,4 +51,48 @@ class Slider
 
     return retValue;
   }
+
+  float DrawSliderHorizontal(float retValue)
+  {
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barWidth);
+
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth + barHeight, barHeight);
+
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseX - xBarPos;
+      retValue = map(sliderPos, 0.0, barWidth, mapValueLow, mapValueHigh);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(sliderPos + xBarPos, yBarPos, barHeight, barHeight);
+
+    return retValue;
+  }
+
+  float DrawSliderVertical(float retValue)
+  {
+    float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barHeight);
+
+    stroke(80);
+    fill(100);
+    rect(xBarPos, yBarPos, barWidth, barHeight + barWidth);
+
+    if(mousePressed && mouseX >=  xBarPos && mouseX <= (xBarPos + barWidth)
+       && mouseY >= yBarPos && mouseY <= yBarPos + barHeight)
+    {
+      sliderPos = mouseY - yBarPos;
+      retValue = map(sliderPos, 0.0, barHeight, mapValueLow, mapValueHigh);
+    }
+
+    stroke(1);
+    fill(50);
+    rect(xBarPos, yBarPos + sliderPos, barWidth, barWidth);
+
+    return retValue;
+  }
 }
