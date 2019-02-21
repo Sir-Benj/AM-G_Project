@@ -1271,7 +1271,7 @@ class Button
 {
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
-  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted;
+  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted, menuDisplayed;
   protected int buttonColour = color(180), buttonHighlight = color(210);
   protected PImage iconImage, iconImageInverted;
 
@@ -1291,6 +1291,7 @@ class Button
     inverted = false;
     smoothing = 8;
     localState = false;
+    menuDisplayed = false;
 
     if (hasIcon)
     {
@@ -1666,6 +1667,7 @@ class Menu
         topBarButtons[topMenu][0].DisplayButton();
         if (topBarButtons[topMenu][0].localState)
         {
+          topBarButtons[topMenu][0].menuDisplayed = true;
           topBarButtons[topMenu][subMenu].DisplayButton();
         }
       }
@@ -1686,15 +1688,35 @@ class Menu
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[0][0]);
     topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[1][0]);
 
-    topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
+    if (topBarButtons[0][0].menuDisplayed)
+    {
+      topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
+      topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
+      topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
+      if (topBarButtons[0][1].localState || topBarButtons[0][2].localState || topBarButtons[0][3].localState)
+      {
+        topBarButtons[0][0].menuDisplayed = false;
+      }
+    }
+    else if (topBarButtons[1][0].menuDisplayed)
+    {
+      topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
+      topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
+      if (topBarButtons[1][1].localState || topBarButtons[1][2].localState)
+      {
+        topBarButtons[1][0].menuDisplayed = false;
+      }
+    }
+    else if (topBarButtons[2][0].menuDisplayed)
+    {
+      topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
+      topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
+      if (topBarButtons[2][1].localState || topBarButtons[2][2].localState)
+      {
+        topBarButtons[2][0].menuDisplayed = false;
+      }
+    }
 
-    topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
-    topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
-
-    topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
-    topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
 
     for (int i = 0; i < topBarButtons.length; i++)
     {

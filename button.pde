@@ -2,7 +2,7 @@ class Button
 {
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
-  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted;
+  protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted, menuDisplayed;
   protected color buttonColour = color(180), buttonHighlight = color(210);
   protected PImage iconImage, iconImageInverted;
 
@@ -22,6 +22,7 @@ class Button
     inverted = false;
     smoothing = 8;
     localState = false;
+    menuDisplayed = false;
 
     if (hasIcon)
     {
