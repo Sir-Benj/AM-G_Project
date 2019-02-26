@@ -151,25 +151,53 @@ class Button
     }
   }
 
-  void TopMenuButtonPressed(Button btn)
+  void TopMenuButtonPressed(Button[] btns)
+  {
+    for (int i = 1; i < btns.length; i++)
+    {
+      if (btns[i].OverButton() && !btns[i].LocalState())
+      {
+        btns[i].localState = true;
+        btns[0].localState = false;
+        for (int j = 1; j < btns.length; j++ )
+        {
+          if (j != i)
+          {
+            btns[j].localState = false;
+          }
+        }
+      }
+      else if (btns[i].OverButton() && btns[i].LocalState())
+      {
+        btns[i].localState = false;
+      }
+    }
+  }
+
+  void SingleButtonPress()
   {
     if (OverButton() && !localState)
     {
-      //Button on
       localState = true;
-      btn.localState = false;
     }
-    else if (!OverButton() && localState && btn.OverButton())
+    else if (!OverButton() && localState)
     {
-      //Button off
-      localState = false;
+      //localState = false;
     }
-    else if (!OverButton() && !btn.OverButton())
+    else if (OverButton() && localState)
     {
       localState = false;
-      btn.localState = false;
     }
   }
+
+  void NotOverButton()
+  {
+    if (!OverButton() && localState)
+    {
+      localState = false;
+    }
+  }
+
 
   public int ButtonX()
   {

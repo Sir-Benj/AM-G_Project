@@ -273,24 +273,39 @@ void draw()
     }
   }
 
-  for (int i = 0; i < menu.topBarButtons.length; i++)
+  for (int i = 1; i < menu.topBarFileBtns.length; i++)
   {
-    for (int y = 0; y < menu.topBarButtons[i].length; y++)
-    {
-      if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
-      }
-      if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
-      }
-      if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
-      }
-    }
+    if (menu.topBarFileBtns[i].buttonName == "New" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.New(photoLayer, menu.topBarFileBtns[i]);
+        }
+        if (menu.topBarFileBtns[i].buttonName == "Save" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.Save(menu.topBarFileBtns[i], selectOne);
+        }
+        if (menu.topBarFileBtns[i].buttonName == "Load" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
+        }
   }
+  // for (int i = 0; i < menu.topBarButtons.length; i++)
+  // {
+  //   for (int y = 0; y < menu.topBarButtons[i].length; y++)
+  //   {
+  //     if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
+  //     }
+  //     if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
+  //     }
+  //     if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
+  //     }
+  //   }
+
 
 
   //tint(255);
@@ -299,8 +314,6 @@ void draw()
   image(photoLayer, 20 - sliderXValue, 40 - sliderYValue);
   doc.DrawMe();
   image(paintLayer, 20, 40);
-
-  println(photoLayer.width + " : " + photoLayer.height);
 
   imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
   imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);

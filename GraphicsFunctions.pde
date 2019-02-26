@@ -25,7 +25,6 @@ class GraphicsFunctions
 
   void Undo()
   {
-
   }
 
   void Redo()

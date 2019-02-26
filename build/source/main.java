@@ -291,24 +291,39 @@ public void draw()
     }
   }
 
-  for (int i = 0; i < menu.topBarButtons.length; i++)
+  for (int i = 1; i < menu.topBarFileBtns.length; i++)
   {
-    for (int y = 0; y < menu.topBarButtons[i].length; y++)
-    {
-      if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
-      }
-      if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
-      }
-      if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
-      {
-        graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
-      }
-    }
+    if (menu.topBarFileBtns[i].buttonName == "New" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.New(photoLayer, menu.topBarFileBtns[i]);
+        }
+        if (menu.topBarFileBtns[i].buttonName == "Save" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.Save(menu.topBarFileBtns[i], selectOne);
+        }
+        if (menu.topBarFileBtns[i].buttonName == "Load" && menu.topBarFileBtns[i].localState == true)
+        {
+          graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
+        }
   }
+  // for (int i = 0; i < menu.topBarButtons.length; i++)
+  // {
+  //   for (int y = 0; y < menu.topBarButtons[i].length; y++)
+  //   {
+  //     if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
+  //     }
+  //     if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
+  //     }
+  //     if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
+  //     {
+  //       graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
+  //     }
+  //   }
+
 
 
   //tint(255);
@@ -317,8 +332,6 @@ public void draw()
   image(photoLayer, 20 - sliderXValue, 40 - sliderYValue);
   doc.DrawMe();
   image(paintLayer, 20, 40);
-
-  println(photoLayer.width + " : " + photoLayer.height);
 
   imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
   imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);
@@ -717,7 +730,6 @@ class GraphicsFunctions
 
   public void Undo()
   {
-
   }
 
   public void Redo()
@@ -1420,25 +1432,53 @@ class Button
     }
   }
 
-  public void TopMenuButtonPressed(Button btn)
+  public void TopMenuButtonPressed(Button[] btns)
+  {
+    for (int i = 1; i < btns.length; i++)
+    {
+      if (btns[i].OverButton() && !btns[i].LocalState())
+      {
+        btns[i].localState = true;
+        btns[0].localState = false;
+        for (int j = 1; j < btns.length; j++ )
+        {
+          if (j != i)
+          {
+            btns[j].localState = false;
+          }
+        }
+      }
+      else if (btns[i].OverButton() && btns[i].LocalState())
+      {
+        btns[i].localState = false;
+      }
+    }
+  }
+
+  public void SingleButtonPress()
   {
     if (OverButton() && !localState)
     {
-      //Button on
       localState = true;
-      btn.localState = false;
     }
-    else if (!OverButton() && localState && btn.OverButton())
+    else if (!OverButton() && localState)
     {
-      //Button off
-      localState = false;
+      //localState = false;
     }
-    else if (!OverButton() && !btn.OverButton())
+    else if (OverButton() && localState)
     {
       localState = false;
-      btn.localState = false;
     }
   }
+
+  public void NotOverButton()
+  {
+    if (!OverButton() && localState)
+    {
+      localState = false;
+    }
+  }
+
 
   public int ButtonX()
   {
@@ -1563,11 +1603,13 @@ class Button
 class Menu
 {
   // Arrays for holding button string names and buttons
-  String[][] topBarNames;
-  Button[][] topBarButtons;
-  Button[] topBarSubFirst;
-  Button[] topBarSubSecond;
-  Button[] topBarSubThird;
+  String[] topBarFile;
+  String[] topBarEdit;
+  String[] topBarFilter;
+
+  Button[] topBarFileBtns;
+  Button[] topBarEditBtns;
+  Button[] topBarFilterBtns;
 
   String[] illustratorNames;
   Button[] illustratorMenu;
@@ -1576,7 +1618,7 @@ class Menu
   Button[] photoEditMenu;
 
   int btnFontSize = 16, sideMenuInset = 200,
-      topBarXStart = 0, topBarYStart = 0, topBarWidth = 60, topBarHeight = 20,
+      topBarXStart = 0, topBarYStart = 0, topBarWidth = 100, topBarHeight = 20,
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
       topBarXIncrease = 60, topBarYIncrease = 20,
       sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 350,
@@ -1588,38 +1630,28 @@ class Menu
   {
     // String arrays - first string in each list is the head of the array, this becomes the name
     // shown on the top bar menu, the rest become sub buttons of this name.
-    topBarNames = new String[][] { {"File", "New", "Save", "Load"}, {"Edit", "Undo", "Redo"}, {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"} };
+    topBarFile = new String[] {"File", "New", "Save", "Load"};
+    topBarEdit = new String[] {"Edit", "Undo", "Redo"};
+    topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"};
+
     illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
     photoEditNames = new String[] {"Resize", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
+
     // Button arrays for top menu
-    topBarButtons = new Button[topBarNames.length][];
-    topBarSubFirst = new Button[topBarNames[0].length];
-    topBarSubSecond = new Button[topBarNames[1].length];
-    topBarSubThird = new Button[topBarNames[2].length];
-    topBarButtons[0] = topBarSubFirst;
-    topBarButtons[1] = topBarSubSecond;
-    topBarButtons[2] = topBarSubThird;
-    // Button arrays for side menu
+    topBarFileBtns = new Button[topBarFile.length];
+    topBarEditBtns = new Button[topBarEdit.length];
+    topBarFilterBtns = new Button[topBarFilter.length];
+
     illustratorMenu = new Button[illustratorNames.length];
     photoEditMenu = new Button[photoEditNames.length];
   }
 
   public void InitialiseMenu()
   {
-    for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
-    {
-      topBarButtons[topMenu][0] = new Button(topBarXStart, topBarYStart, topBarWidth, topBarHeight, false, false, topBarNames[topMenu][0], true, false);
-      topBarXStart += topBarXIncrease;
-
-      for (int subMenu = 1; subMenu < topBarButtons[topMenu].length; subMenu++)
-      {
-        topBarButtons[topMenu][subMenu] = new Button(subXStart, subYStart, subBWidth, subBHeight, false, false, topBarNames[topMenu][subMenu], true, false);
-        subYStart += topBarYIncrease;
-      }
-      subXStart += topBarXIncrease;
-      subYStart = topBarYIncrease;
-    }
+    MenuButtonsInitialise(topBarFile, topBarFileBtns, topBarXStart, topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarEdit, topBarEditBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
 
     int step = 1, startX = width - sideMenuXInset - 5, startY = 550, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
@@ -1660,18 +1692,7 @@ class Menu
     fill(160);
     rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
 
-    for (int topMenu = 0; topMenu < topBarButtons.length; topMenu++)
-    {
-      for (int subMenu = 0; subMenu < topBarButtons[topMenu].length; subMenu++)
-      {
-        topBarButtons[topMenu][0].DisplayButton();
-        if (topBarButtons[topMenu][0].localState)
-        {
-          topBarButtons[topMenu][0].menuDisplayed = true;
-          topBarButtons[topMenu][subMenu].DisplayButton();
-        }
-      }
-    }
+    TopBarDisplay(topBarFileBtns, topBarEditBtns, topBarFilterBtns);
 
     for (int sideBarIll = 0; sideBarIll < illustratorMenu.length; sideBarIll++)
     {
@@ -1681,56 +1702,32 @@ class Menu
 
   public void TopMenuPressed()
   {
-    topBarButtons[0][0].TopMenuButtonPressed(topBarButtons[1][0]);
-    topBarButtons[0][0].TopMenuButtonPressed(topBarButtons[2][0]);
-    topBarButtons[1][0].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[1][0].TopMenuButtonPressed(topBarButtons[2][0]);
-    topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[0][0]);
-    topBarButtons[2][0].TopMenuButtonPressed(topBarButtons[1][0]);
+    topBarFileBtns[0].SingleButtonPress();
+    {
+      if (topBarFileBtns[0].localState)
+      {
+        topBarFileBtns[0].TopMenuButtonPressed(topBarFileBtns);
+      }
+    }
+    topBarFileBtns[0].NotOverButton();
 
-    if (topBarButtons[0][0].menuDisplayed)
+    topBarEditBtns[0].SingleButtonPress();
     {
-      topBarButtons[0][1].TopMenuButtonPressed(topBarButtons[0][0]);
-      topBarButtons[0][2].TopMenuButtonPressed(topBarButtons[0][0]);
-      topBarButtons[0][3].TopMenuButtonPressed(topBarButtons[0][0]);
-      if (topBarButtons[0][1].localState || topBarButtons[0][2].localState || topBarButtons[0][3].localState)
+      if (topBarEditBtns[0].localState)
       {
-        topBarButtons[0][0].menuDisplayed = false;
+        topBarEditBtns[0].TopMenuButtonPressed(topBarEditBtns);
       }
     }
-    else if (topBarButtons[1][0].menuDisplayed)
-    {
-      topBarButtons[1][1].TopMenuButtonPressed(topBarButtons[0][1]);
-      topBarButtons[1][2].TopMenuButtonPressed(topBarButtons[0][1]);
-      if (topBarButtons[1][1].localState || topBarButtons[1][2].localState)
-      {
-        topBarButtons[1][0].menuDisplayed = false;
-      }
-    }
-    else if (topBarButtons[2][0].menuDisplayed)
-    {
-      topBarButtons[2][1].TopMenuButtonPressed(topBarButtons[0][2]);
-      topBarButtons[2][2].TopMenuButtonPressed(topBarButtons[0][2]);
-      if (topBarButtons[2][1].localState || topBarButtons[2][2].localState)
-      {
-        topBarButtons[2][0].menuDisplayed = false;
-      }
-    }
+    topBarEditBtns[0].NotOverButton();
 
-
-    for (int i = 0; i < topBarButtons.length; i++)
+    topBarFilterBtns[0].SingleButtonPress();
     {
-      for (int y = 0; y < topBarButtons[i].length; y++)
+      if (topBarFilterBtns[0].localState)
       {
-        if (topBarButtons[i][y].localState)
-        {
-          for (int sideMenu = 0; sideMenu < illustratorMenu.length; sideMenu++)
-          {
-            illustratorMenu[sideMenu].localState = false;
-          }
-        }
+        topBarFilterBtns[0].TopMenuButtonPressed(topBarFilterBtns);
       }
     }
+    topBarFilterBtns[0].NotOverButton();
   }
 
   public void SideMenuPressed()
@@ -1752,6 +1749,43 @@ class Menu
     fill(180);
     rect(width - sideMenuInset, 0, sideMenuInset, height);
     textFont(btnFont, btnFontSize);
+  }
+
+  public void MenuButtonsInitialise(String[] names, Button[] buttons, int tXstart, int tYstart, int tWidth, int tHeight)
+  {
+    for (int topMenu = 0; topMenu < names.length; topMenu++)
+    {
+      buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], true, false);
+      tYstart += tHeight;
+    }
+  }
+
+  public void TopBarDisplay(Button[] topBarBtns1, Button[] topBarBtns2, Button[] topBarBtns3)
+  {
+    for (int topMenu = 0; topMenu < topBarBtns1.length; topMenu++)
+    {
+      topBarBtns1[0].DisplayButton();
+      if (topBarBtns1[0].localState && !topBarBtns2[0].localState && !topBarBtns3[0].localState)
+      {
+        topBarBtns1[topMenu].DisplayButton();
+      }
+    }
+    for (int topMenu = 0; topMenu < topBarBtns2.length; topMenu++)
+    {
+      topBarBtns2[0].DisplayButton();
+      if (!topBarBtns1[0].localState && topBarBtns2[0].localState && !topBarBtns3[0].localState)
+      {
+        topBarBtns2[topMenu].DisplayButton();
+      }
+    }
+    for (int topMenu = 0; topMenu < topBarBtns3.length; topMenu++)
+    {
+      topBarBtns3[0].DisplayButton();
+      if (!topBarBtns1[0].localState && !topBarBtns2[0].localState && topBarBtns3[0].localState)
+      {
+        topBarBtns3[topMenu].DisplayButton();
+      }
+    }
   }
 }
   static public void main(String[] passedArgs) {
