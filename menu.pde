@@ -9,6 +9,9 @@ class Menu
   Button[] topBarFilterBtns;
   Button[] topBarPhotoEditBtns;
 
+  Button drawShape;
+  Button selectShape;
+
   String[] illustratorNames;
   Button[] illustratorMenu;
 
@@ -17,15 +20,15 @@ class Menu
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
       topBarXIncrease = 60, topBarYIncrease = 20,
       sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 350,
-      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 150;
+      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 85;
 
   PFont btnFont;
   //
   Menu()
   {
     topBarFile = new String[] {"File", "New", "Save", "Load"};
-    topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"};
-    topBarPhotoEdit = new String[] {"Edit", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
+    topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
+    topBarPhotoEdit = new String[] {"Edit", "Hue", "Saturation", "Brightness", "Contrast"};
 
     illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
     btnFont = createFont("arial.ttf", 16);
@@ -35,6 +38,9 @@ class Menu
     topBarPhotoEditBtns = new Button[topBarPhotoEdit.length];
 
     illustratorMenu = new Button[illustratorNames.length];
+
+    drawShape = new Button(width - sideMenuInset + 45, 490, 50, 50, false, true, "drawShape", false, false);
+    selectShape = new Button(width - sideMenuInset + 105, 490, 50, 50, false, true, "drawShape", false, false);
   }
 
   void InitialiseMenu()
@@ -88,6 +94,9 @@ class Menu
     {
       illustratorMenu[sideBarIll].DisplayButton();
     }
+
+    drawShape.DisplayButton();
+    selectShape.DisplayButton();
   }
 
   void TopMenuPressed()

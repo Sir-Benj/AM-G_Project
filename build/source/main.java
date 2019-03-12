@@ -98,10 +98,10 @@ public void setup()
   mouseFinal = new PVector();
   firstPoint = new PVector();
 
-  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
+  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 25,
                          140, 10, 1, 400, "Size", "px");
 
-  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 85,
+  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 65,
                          140, 10, 0.0f, 255, "Opacity", "%");
 
   sliderX = new Slider(20, height - 20,  width - 265, 20, 0.0f, photoLayer.width - width, "xbar", "px");
@@ -1484,96 +1484,6 @@ class Button
     return buttonName;
   }
 }
-// boolean buttonOver = false;
-// boolean buttonPressed = false;
-// color buttonColour, highlight;
-// Button bOne;
-//
-// class ImageUI extends PApplet
-// {
-//   ImageUI()
-//   {
-//     super();
-//     ImageUI.runSketch(new String[] {this.getClass().getSimpleName()}, this);
-//   }
-//
-//   void settings()
-//   {
-//     size(500, 200);
-//   }
-//
-//   void setup()
-//   {
-//     surface.setTitle("Image Manipulation Tools");
-//     background(0);
-//     buttonColour = color(100);
-//     highlight = color(200);
-//     drawButton();
-//     bOne = new Button(70, 10, 50, 50);
-//   }
-//
-//   void draw()
-//   {
-//     background(0);
-//     bOne.displayButton();
-//     overButton();
-//   }
-//
-//   void mousePressed()
-//   {
-//     buttonPressed();
-//   }
-//
-//   void mouseClicked()
-//   {
-//     if (bOne.buttonPressed())
-//     {
-//       println("Button clicked");
-//     }
-//   }
-//
-//   void drawButton()
-//   {
-//     fill(buttonColour);
-//     rect(10, 10, 50, 50);
-//   }
-//
-//   void overButton()
-//   {
-//   if (mouseX > 10 && mouseX < 60
-//       && mouseY > 10 && mouseY < 60)
-//      {
-//        buttonOver = true;
-//        fill(highlight);
-//      }
-//   else
-//      {
-//        buttonOver = false;
-//        fill(buttonColour);
-//      }
-//      stroke(255);
-//      rect(10, 10, 50, 50);
-//   }
-//
-//   void buttonPressed()
-//   {
-//     if (buttonOver && !buttonPressed)
-//     {
-//       buttonPressed = true;
-//       buttonColour = highlight;
-//     }
-//     else if (buttonOver && buttonPressed)
-//     {
-//       buttonPressed = false;
-//       buttonColour = color(150);
-//     }
-//   }
-//
-//   void exit()
-//   {
-//     dispose();
-//   }
-// }
 class Menu
 {
   // Arrays for holding button string names and buttons
@@ -1585,6 +1495,9 @@ class Menu
   Button[] topBarFilterBtns;
   Button[] topBarPhotoEditBtns;
 
+  Button drawShape;
+  Button selectShape;
+
   String[] illustratorNames;
   Button[] illustratorMenu;
 
@@ -1593,15 +1506,15 @@ class Menu
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
       topBarXIncrease = 60, topBarYIncrease = 20,
       sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 350,
-      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 150;
+      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 85;
 
   PFont btnFont;
   //
   Menu()
   {
     topBarFile = new String[] {"File", "New", "Save", "Load"};
-    topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"};
-    topBarPhotoEdit = new String[] {"Edit", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
+    topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
+    topBarPhotoEdit = new String[] {"Edit", "Hue", "Saturation", "Brightness", "Contrast"};
 
     illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
     btnFont = createFont("arial.ttf", 16);
@@ -1611,6 +1524,9 @@ class Menu
     topBarPhotoEditBtns = new Button[topBarPhotoEdit.length];
 
     illustratorMenu = new Button[illustratorNames.length];
+
+    drawShape = new Button(width - sideMenuInset + 45, 490, 50, 50, false, true, "drawShape", false, false);
+    selectShape = new Button(width - sideMenuInset + 105, 490, 50, 50, false, true, "drawShape", false, false);
   }
 
   public void InitialiseMenu()
@@ -1664,6 +1580,9 @@ class Menu
     {
       illustratorMenu[sideBarIll].DisplayButton();
     }
+
+    drawShape.DisplayButton();
+    selectShape.DisplayButton();
   }
 
   public void TopMenuPressed()

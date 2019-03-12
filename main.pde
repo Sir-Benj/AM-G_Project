@@ -80,10 +80,10 @@ void setup()
   mouseFinal = new PVector();
   firstPoint = new PVector();
 
-  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 35,
+  sliderOne = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 25,
                          140, 10, 1, 400, "Size", "px");
 
-  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 85,
+  sliderTwo = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 65,
                          140, 10, 0.0, 255, "Opacity", "%");
 
   sliderX = new Slider(20, height - 20,  width - 265, 20, 0.0, photoLayer.width - width, "xbar", "px");
