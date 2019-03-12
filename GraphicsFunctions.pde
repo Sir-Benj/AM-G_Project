@@ -23,15 +23,6 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  void Undo()
-  {
-  }
-
-  void Redo()
-  {
-
-  }
-
   void Blur()
   {
 
@@ -63,7 +54,7 @@ class GraphicsFunctions
       {
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+        layer.line(mouseX - 20, mouseY - 100, pmouseX - 20, pmouseY - 100);
       }
     }
     layer.endDraw();
@@ -79,7 +70,7 @@ class GraphicsFunctions
       {
         layer.stroke(255);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+        layer.line(mouseX - 20, mouseY - 100, pmouseX - 20, pmouseY - 100);
       }
     }
     layer.endDraw();

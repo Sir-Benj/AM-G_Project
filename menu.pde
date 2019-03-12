@@ -2,18 +2,15 @@ class Menu
 {
   // Arrays for holding button string names and buttons
   String[] topBarFile;
-  String[] topBarEdit;
   String[] topBarFilter;
+  String[] topBarPhotoEdit;
 
   Button[] topBarFileBtns;
-  Button[] topBarEditBtns;
   Button[] topBarFilterBtns;
+  Button[] topBarPhotoEditBtns;
 
   String[] illustratorNames;
   Button[] illustratorMenu;
-
-  String[] photoEditNames;
-  Button[] photoEditMenu;
 
   int btnFontSize = 16, sideMenuInset = 200,
       topBarXStart = 0, topBarYStart = 0, topBarWidth = 100, topBarHeight = 20,
@@ -26,30 +23,25 @@ class Menu
   //
   Menu()
   {
-    // String arrays - first string in each list is the head of the array, this becomes the name
-    // shown on the top bar menu, the rest become sub buttons of this name.
     topBarFile = new String[] {"File", "New", "Save", "Load"};
-    topBarEdit = new String[] {"Edit", "Undo", "Redo"};
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"};
+    topBarPhotoEdit = new String[] {"Edit", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
 
     illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
-    photoEditNames = new String[] {"Resize", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
 
-    // Button arrays for top menu
     topBarFileBtns = new Button[topBarFile.length];
-    topBarEditBtns = new Button[topBarEdit.length];
     topBarFilterBtns = new Button[topBarFilter.length];
+    topBarPhotoEditBtns = new Button[topBarPhotoEdit.length];
 
     illustratorMenu = new Button[illustratorNames.length];
-    photoEditMenu = new Button[photoEditNames.length];
   }
 
   void InitialiseMenu()
   {
     MenuButtonsInitialise(topBarFile, topBarFileBtns, topBarXStart, topBarYStart, topBarWidth, topBarHeight);
-    MenuButtonsInitialise(topBarEdit, topBarEditBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
-    MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarPhotoEdit, topBarPhotoEditBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
 
     int step = 1, startX = width - sideMenuXInset - 5, startY = 550, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
@@ -90,7 +82,7 @@ class Menu
     fill(160);
     rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
 
-    TopBarDisplay(topBarFileBtns, topBarEditBtns, topBarFilterBtns);
+    TopBarDisplay(topBarFileBtns, topBarFilterBtns, topBarPhotoEditBtns);
 
     for (int sideBarIll = 0; sideBarIll < illustratorMenu.length; sideBarIll++)
     {
@@ -104,28 +96,62 @@ class Menu
     {
       if (topBarFileBtns[0].localState)
       {
+        topBarFilterBtns[0].localState = false;
+        topBarPhotoEditBtns[0].localState = false;
         topBarFileBtns[0].TopMenuButtonPressed(topBarFileBtns);
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          if (topBarFileBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
       }
     }
-    topBarFileBtns[0].NotOverButton();
-
-    topBarEditBtns[0].SingleButtonPress();
-    {
-      if (topBarEditBtns[0].localState)
-      {
-        topBarEditBtns[0].TopMenuButtonPressed(topBarEditBtns);
-      }
-    }
-    topBarEditBtns[0].NotOverButton();
 
     topBarFilterBtns[0].SingleButtonPress();
     {
       if (topBarFilterBtns[0].localState)
       {
+        topBarFileBtns[0].localState = false;
+        topBarPhotoEditBtns[0].localState = false;
         topBarFilterBtns[0].TopMenuButtonPressed(topBarFilterBtns);
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          if (topBarFilterBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
       }
     }
-    topBarFilterBtns[0].NotOverButton();
+
+    topBarPhotoEditBtns[0].SingleButtonPress();
+    {
+      if (topBarPhotoEditBtns[0].localState)
+      {
+        topBarFileBtns[0].localState = false;
+        topBarFilterBtns[0].localState = false;
+        topBarPhotoEditBtns[0].TopMenuButtonPressed(topBarPhotoEditBtns);
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          if (topBarPhotoEditBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
+      }
+    }
+
   }
 
   void SideMenuPressed()
@@ -153,8 +179,18 @@ class Menu
   {
     for (int topMenu = 0; topMenu < names.length; topMenu++)
     {
-      buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], true, false);
-      tYstart += tHeight;
+      if (topMenu == 0)
+      {
+        buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], true, false);
+        tYstart += tHeight;
+        tXstart = 0;
+        tHeight += 60;
+      }
+      else
+      {
+        buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], false, true);
+        tXstart += tWidth;
+      }
     }
   }
 

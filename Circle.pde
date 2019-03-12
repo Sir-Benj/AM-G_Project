@@ -27,12 +27,12 @@ class Circle extends DrawShape
       float y1 = this.bounds.top;
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
-      this.layer.ellipse(x1 - 20, y1 - 40, wid, hgt);
+      this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
 
       if (this.isSelected)
       {
         this.layer.ellipseMode(CORNER);
-        this.layer.ellipse(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+        this.layer.ellipse(x1 - 21, y1 - 101, wid + 2, hgt + 2);
       }
     }
     this.layer.endDraw();

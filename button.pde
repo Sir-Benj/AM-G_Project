@@ -158,7 +158,7 @@ class Button
       if (btns[i].OverButton() && !btns[i].LocalState())
       {
         btns[i].localState = true;
-        btns[0].localState = false;
+        //btns[0].localState = false;
         for (int j = 1; j < btns.length; j++ )
         {
           if (j != i)

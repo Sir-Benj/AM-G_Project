@@ -3,6 +3,8 @@ import java.util.LinkedList;
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
+int xInset = 245, yInset = 120;
+
 float sliderOneValue = 5;
 float sliderTwoValue = 255;
 float sliderXValue = 0;
@@ -56,13 +58,13 @@ void setup()
   colorMode(HSB);
   background(255);
 
-  background = createGraphics(width - 245, height - 60);
-  photoLayer = createGraphics(width - 245, height - 60);
-  paintLayer = createGraphics(width - 245, height - 60);
-  combineLayers = createGraphics(width - 245, height - 60);
-  imageToSaveOne = createImage(width - 245, height - 60, HSB);
-  imageToSaveTwo = createImage(width - 245, height - 60, HSB);
-  imageToSaveCombined = createImage(width - 245, height - 60, HSB);
+  background = createGraphics(width - xInset, height - yInset);
+  photoLayer = createGraphics(width - xInset, height - yInset);
+  paintLayer = createGraphics(width - xInset, height - yInset);
+  combineLayers = createGraphics(width - xInset, height - yInset);
+  imageToSaveOne = createImage(width - xInset, height - yInset, HSB);
+  imageToSaveTwo = createImage(width - xInset, height - yInset, HSB);
+  imageToSaveCombined = createImage(width - xInset, height - yInset, HSB);
 
   menu = new Menu();
   menu.InitialiseMenu();
@@ -288,32 +290,13 @@ void draw()
           graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
         }
   }
-  // for (int i = 0; i < menu.topBarButtons.length; i++)
-  // {
-  //   for (int y = 0; y < menu.topBarButtons[i].length; y++)
-  //   {
-  //     if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
-  //     }
-  //     if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
-  //     }
-  //     if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
-  //     }
-  //   }
 
 
-
-  //tint(255);
   background(200);
-  image(background, 20, 40);
-  image(photoLayer, 20 - sliderXValue, 40 - sliderYValue);
+  image(background, 20, 100);
+  image(photoLayer, 20 - sliderXValue, 100 - sliderYValue);
   doc.DrawMe();
-  image(paintLayer, 20, 40);
+  image(paintLayer, 20, 100);
 
   imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
   imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);
@@ -398,5 +381,5 @@ void fileChosen(File selection)
 boolean OverCanvas()
 {
   return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
-          && mouseY >= 40 && mouseY <= height - 20);
+          && mouseY >= 95 && mouseY <= height - 20);
 }

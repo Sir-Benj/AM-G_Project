@@ -25,11 +25,11 @@ class Rectangle extends DrawShape
       float y1 = this.bounds.top;
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
-      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+      this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
 
       if (this.isSelected)
       {
-        this.layer.rect(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+        this.layer.rect(x1 - 21, y1 - 101, wid + 2, hgt + 2);
       }
     }
     this.layer.endDraw();

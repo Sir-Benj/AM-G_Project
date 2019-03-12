@@ -33,11 +33,11 @@ class Line extends DrawShape
       float y1 = this.bounds.y1;
       float wid = this.bounds.x2;
       float hgt = this.bounds.y2;
-      this.layer.line(x1 - 20, y1 - 40, wid - 20, hgt - 40);
+      this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
 
       if (this.isSelected)
       {
-        this.layer.line(x1 - 21, y1 - 21, wid - 18, hgt + 38);
+        this.layer.line(x1 - 21, y1 - 101, wid - 18, hgt + 98);
       }
     }
     this.layer.endDraw();

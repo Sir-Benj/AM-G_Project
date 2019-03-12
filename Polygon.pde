@@ -92,7 +92,7 @@ class Polygon extends DrawShape
                      this.opacity);
       for (PVector v : this.polyPoints)
       {
-        this.poly.vertex(v.x - 20, v.y - 40);
+        this.poly.vertex(v.x - 20, v.y - 100);
       }
       this.poly.endShape(CLOSE);
       this.layer.smooth();
@@ -109,7 +109,7 @@ class Polygon extends DrawShape
         this.poly.noFill();
         for (PVector v : this.polyPoints)
         {
-          this.poly.vertex(v.x - 21, v.y - 38);
+          this.poly.vertex(v.x - 21, v.y - 98);
         }
         this.poly.endShape(CLOSE);
         this.layer.shape(poly);

@@ -21,6 +21,8 @@ public class main extends PApplet {
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
+int xInset = 245, yInset = 120;
+
 float sliderOneValue = 5;
 float sliderTwoValue = 255;
 float sliderXValue = 0;
@@ -74,13 +76,13 @@ public void setup()
   colorMode(HSB);
   background(255);
 
-  background = createGraphics(width - 245, height - 60);
-  photoLayer = createGraphics(width - 245, height - 60);
-  paintLayer = createGraphics(width - 245, height - 60);
-  combineLayers = createGraphics(width - 245, height - 60);
-  imageToSaveOne = createImage(width - 245, height - 60, HSB);
-  imageToSaveTwo = createImage(width - 245, height - 60, HSB);
-  imageToSaveCombined = createImage(width - 245, height - 60, HSB);
+  background = createGraphics(width - xInset, height - yInset);
+  photoLayer = createGraphics(width - xInset, height - yInset);
+  paintLayer = createGraphics(width - xInset, height - yInset);
+  combineLayers = createGraphics(width - xInset, height - yInset);
+  imageToSaveOne = createImage(width - xInset, height - yInset, HSB);
+  imageToSaveTwo = createImage(width - xInset, height - yInset, HSB);
+  imageToSaveCombined = createImage(width - xInset, height - yInset, HSB);
 
   menu = new Menu();
   menu.InitialiseMenu();
@@ -306,32 +308,13 @@ public void draw()
           graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
         }
   }
-  // for (int i = 0; i < menu.topBarButtons.length; i++)
-  // {
-  //   for (int y = 0; y < menu.topBarButtons[i].length; y++)
-  //   {
-  //     if (menu.topBarButtons[i][y].buttonName == "New" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.New(photoLayer, menu.topBarButtons[i][y]);
-  //     }
-  //     if (menu.topBarButtons[i][y].buttonName == "Save" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.Save(menu.topBarButtons[i][y], selectOne);
-  //     }
-  //     if (menu.topBarButtons[i][y].buttonName == "Load" && menu.topBarButtons[i][y].localState == true)
-  //     {
-  //       graphicsFunctions.Load(menu.topBarButtons[i][y], selectOne);
-  //     }
-  //   }
 
 
-
-  //tint(255);
   background(200);
-  image(background, 20, 40);
-  image(photoLayer, 20 - sliderXValue, 40 - sliderYValue);
+  image(background, 20, 100);
+  image(photoLayer, 20 - sliderXValue, 100 - sliderYValue);
   doc.DrawMe();
-  image(paintLayer, 20, 40);
+  image(paintLayer, 20, 100);
 
   imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
   imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);
@@ -416,7 +399,7 @@ public void fileChosen(File selection)
 public boolean OverCanvas()
 {
   return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
-          && mouseY >= 40 && mouseY <= height - 20);
+          && mouseY >= 95 && mouseY <= height - 20);
 }
 class Circle extends DrawShape
 {
@@ -447,12 +430,12 @@ class Circle extends DrawShape
       float y1 = this.bounds.top;
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
-      this.layer.ellipse(x1 - 20, y1 - 40, wid, hgt);
+      this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
 
       if (this.isSelected)
       {
         this.layer.ellipseMode(CORNER);
-        this.layer.ellipse(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+        this.layer.ellipse(x1 - 21, y1 - 101, wid + 2, hgt + 2);
       }
     }
     this.layer.endDraw();
@@ -728,15 +711,6 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  public void Undo()
-  {
-  }
-
-  public void Redo()
-  {
-
-  }
-
   public void Blur()
   {
 
@@ -768,7 +742,7 @@ class GraphicsFunctions
       {
         layer.stroke(colourPicker._hueVal, colourPicker._satVal, colourPicker._briVal, sVTwo);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+        layer.line(mouseX - 20, mouseY - 100, pmouseX - 20, pmouseY - 100);
       }
     }
     layer.endDraw();
@@ -784,7 +758,7 @@ class GraphicsFunctions
       {
         layer.stroke(255);
         layer.strokeWeight(sVOne);
-        layer.line(mouseX - 20, mouseY - 40, pmouseX - 20, pmouseY - 40);
+        layer.line(mouseX - 20, mouseY - 100, pmouseX - 20, pmouseY - 100);
       }
     }
     layer.endDraw();
@@ -922,11 +896,11 @@ class Line extends DrawShape
       float y1 = this.bounds.y1;
       float wid = this.bounds.x2;
       float hgt = this.bounds.y2;
-      this.layer.line(x1 - 20, y1 - 40, wid - 20, hgt - 40);
+      this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
 
       if (this.isSelected)
       {
-        this.layer.line(x1 - 21, y1 - 21, wid - 18, hgt + 38);
+        this.layer.line(x1 - 21, y1 - 101, wid - 18, hgt + 98);
       }
     }
     this.layer.endDraw();
@@ -1054,7 +1028,7 @@ class Polygon extends DrawShape
                      this.opacity);
       for (PVector v : this.polyPoints)
       {
-        this.poly.vertex(v.x - 20, v.y - 40);
+        this.poly.vertex(v.x - 20, v.y - 100);
       }
       this.poly.endShape(CLOSE);
       this.layer.smooth();
@@ -1071,7 +1045,7 @@ class Polygon extends DrawShape
         this.poly.noFill();
         for (PVector v : this.polyPoints)
         {
-          this.poly.vertex(v.x - 21, v.y - 38);
+          this.poly.vertex(v.x - 21, v.y - 98);
         }
         this.poly.endShape(CLOSE);
         this.layer.shape(poly);
@@ -1170,11 +1144,11 @@ class Rectangle extends DrawShape
       float y1 = this.bounds.top;
       float wid = this.bounds.getWidth();
       float hgt = this.bounds.getHeight();
-      this.layer.rect(x1 - 20, y1 - 40, wid, hgt);
+      this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
 
       if (this.isSelected)
       {
-        this.layer.rect(x1 - 21, y1 - 41, wid + 2, hgt + 2);
+        this.layer.rect(x1 - 21, y1 - 101, wid + 2, hgt + 2);
       }
     }
     this.layer.endDraw();
@@ -1439,7 +1413,7 @@ class Button
       if (btns[i].OverButton() && !btns[i].LocalState())
       {
         btns[i].localState = true;
-        btns[0].localState = false;
+        //btns[0].localState = false;
         for (int j = 1; j < btns.length; j++ )
         {
           if (j != i)
@@ -1604,18 +1578,15 @@ class Menu
 {
   // Arrays for holding button string names and buttons
   String[] topBarFile;
-  String[] topBarEdit;
   String[] topBarFilter;
+  String[] topBarPhotoEdit;
 
   Button[] topBarFileBtns;
-  Button[] topBarEditBtns;
   Button[] topBarFilterBtns;
+  Button[] topBarPhotoEditBtns;
 
   String[] illustratorNames;
   Button[] illustratorMenu;
-
-  String[] photoEditNames;
-  Button[] photoEditMenu;
 
   int btnFontSize = 16, sideMenuInset = 200,
       topBarXStart = 0, topBarYStart = 0, topBarWidth = 100, topBarHeight = 20,
@@ -1628,30 +1599,25 @@ class Menu
   //
   Menu()
   {
-    // String arrays - first string in each list is the head of the array, this becomes the name
-    // shown on the top bar menu, the rest become sub buttons of this name.
     topBarFile = new String[] {"File", "New", "Save", "Load"};
-    topBarEdit = new String[] {"Edit", "Undo", "Redo"};
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome"};
+    topBarPhotoEdit = new String[] {"Edit", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
 
     illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
-    photoEditNames = new String[] {"Resize", "Edge-Detect", "Rotate", "Hue", "Saturation", "Brightness", "Contrast"};
     btnFont = createFont("arial.ttf", 16);
 
-    // Button arrays for top menu
     topBarFileBtns = new Button[topBarFile.length];
-    topBarEditBtns = new Button[topBarEdit.length];
     topBarFilterBtns = new Button[topBarFilter.length];
+    topBarPhotoEditBtns = new Button[topBarPhotoEdit.length];
 
     illustratorMenu = new Button[illustratorNames.length];
-    photoEditMenu = new Button[photoEditNames.length];
   }
 
   public void InitialiseMenu()
   {
     MenuButtonsInitialise(topBarFile, topBarFileBtns, topBarXStart, topBarYStart, topBarWidth, topBarHeight);
-    MenuButtonsInitialise(topBarEdit, topBarEditBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
-    MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
+    MenuButtonsInitialise(topBarPhotoEdit, topBarPhotoEditBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
 
     int step = 1, startX = width - sideMenuXInset - 5, startY = 550, increaseX = 60, increaseY = 60;
     for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
@@ -1692,7 +1658,7 @@ class Menu
     fill(160);
     rect(width - sideMenuXInset, sideMenuSelYInset, sideMenuSelWidth, sideMenuSelHeight);
 
-    TopBarDisplay(topBarFileBtns, topBarEditBtns, topBarFilterBtns);
+    TopBarDisplay(topBarFileBtns, topBarFilterBtns, topBarPhotoEditBtns);
 
     for (int sideBarIll = 0; sideBarIll < illustratorMenu.length; sideBarIll++)
     {
@@ -1706,28 +1672,62 @@ class Menu
     {
       if (topBarFileBtns[0].localState)
       {
+        topBarFilterBtns[0].localState = false;
+        topBarPhotoEditBtns[0].localState = false;
         topBarFileBtns[0].TopMenuButtonPressed(topBarFileBtns);
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          if (topBarFileBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
       }
     }
-    topBarFileBtns[0].NotOverButton();
-
-    topBarEditBtns[0].SingleButtonPress();
-    {
-      if (topBarEditBtns[0].localState)
-      {
-        topBarEditBtns[0].TopMenuButtonPressed(topBarEditBtns);
-      }
-    }
-    topBarEditBtns[0].NotOverButton();
 
     topBarFilterBtns[0].SingleButtonPress();
     {
       if (topBarFilterBtns[0].localState)
       {
+        topBarFileBtns[0].localState = false;
+        topBarPhotoEditBtns[0].localState = false;
         topBarFilterBtns[0].TopMenuButtonPressed(topBarFilterBtns);
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          if (topBarFilterBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
       }
     }
-    topBarFilterBtns[0].NotOverButton();
+
+    topBarPhotoEditBtns[0].SingleButtonPress();
+    {
+      if (topBarPhotoEditBtns[0].localState)
+      {
+        topBarFileBtns[0].localState = false;
+        topBarFilterBtns[0].localState = false;
+        topBarPhotoEditBtns[0].TopMenuButtonPressed(topBarPhotoEditBtns);
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          if (topBarPhotoEditBtns[menu].localState)
+          {
+            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            {
+              illustratorMenu[illMenu].localState = false;
+            }
+          }
+        }
+      }
+    }
+
   }
 
   public void SideMenuPressed()
@@ -1755,8 +1755,18 @@ class Menu
   {
     for (int topMenu = 0; topMenu < names.length; topMenu++)
     {
-      buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], true, false);
-      tYstart += tHeight;
+      if (topMenu == 0)
+      {
+        buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], true, false);
+        tYstart += tHeight;
+        tXstart = 0;
+        tHeight += 60;
+      }
+      else
+      {
+        buttons[topMenu] = new Button(tXstart, tYstart, tWidth, tHeight, false, false, names[topMenu], false, true);
+        tXstart += tWidth;
+      }
     }
   }
 
