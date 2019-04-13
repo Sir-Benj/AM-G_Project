@@ -12,26 +12,26 @@ class Document
   }
 
   public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
-                            float hue, float sat, float bri, float sWeight, float opacity)
+                            float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     switch (shapeType)
     {
-      case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+      case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
                         shapeList.add(newRectangle);
                         currentlyDrawnShape = newRectangle;
                         break;
 
-      case "Circle":    DrawShape newCircle = new Circle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+      case "Circle":    DrawShape newCircle = new Circle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
                         shapeList.add(newCircle);
                         currentlyDrawnShape = newCircle;
                         break;
 
-      case "Line":      DrawShape newLine = new Line(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+      case "Line":      DrawShape newLine = new Line(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
                         shapeList.add(newLine);
                         currentlyDrawnShape = newLine;
                         break;
 
-      case "Polygon":   DrawShape newPoly = new Polygon(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity);
+      case "Polygon":   DrawShape newPoly = new Polygon(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
                         shapeList.add(newPoly);
                         currentlyDrawnShape = newPoly;
                         break;

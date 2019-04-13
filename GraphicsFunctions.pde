@@ -1,5 +1,6 @@
 class GraphicsFunctions
 {
+  float prevX, newChangeX, prevY, newChangeY;
 
   GraphicsFunctions()
   {
@@ -77,13 +78,13 @@ class GraphicsFunctions
   }
 
   void ShapeStart(String name, PVector mouseStart, PGraphics layer, Document doc,
-                      ColourPicker colourPicker, float sWeight, float opacity)
+                      ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
      doc.StartNewShape(name, mouseStart, layer,
                        colourPicker._hueVal,
                        colourPicker._satVal,
                        colourPicker._briVal,
-                       sWeight, opacity);
+                       sWeight, opacity, filled);
   }
 
   void ShapeDrag(Document doc, PVector mouseDrag)
@@ -105,14 +106,77 @@ class GraphicsFunctions
     doc.currentlyDrawnShape = null;
   }
 
-  void Circle()
+  void ChangeShapeHSB(Document doc, ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
-
+    for (DrawShape s : doc.shapeList)
+    {
+      if (s.isSelected)
+      {
+        s.hue = colourPicker._hueVal;
+        s.sat = colourPicker._satVal;
+        s.bri = colourPicker._briVal;
+        s.sWeight = sWeight;
+        s.opacity = opacity;
+        s.isFilled = filled;
+      }
+    }
   }
 
-  void Polygon()
+  void ChangeShapePosition(Document doc, float xPosChange, float yPosChange)
   {
+    prevX = newChangeX;
+    newChangeX = xPosChange;
 
+    prevY = newChangeY;
+    newChangeY = yPosChange;
+
+    if (newChangeX != prevX)
+    {
+      xPosChange -= prevX;
+    }
+
+    if (newChangeY != prevY)
+    {
+      yPosChange -= prevY;
+    }
+
+    for (DrawShape s : doc.shapeList)
+    {
+      if (s.isSelected)
+      {
+        if (newChangeX != prevX)
+        {
+          s.bounds.x1 += xPosChange;
+          s.bounds.x2 += xPosChange;
+          s.bounds.left += xPosChange;
+          s.bounds.right += xPosChange;
+        }
+
+        if (newChangeY != prevY)
+        {
+          s.bounds.y1 += yPosChange;
+          s.bounds.y2 += yPosChange;
+          s.bounds.top += yPosChange;
+          s.bounds.bottom += yPosChange;
+        }
+
+        if (s.polyPoints != null)
+        {
+          for (PVector v : s.polyPoints)
+          {
+            if (newChangeX != prevX)
+            {
+              v.x += xPosChange;
+            }
+
+            if (newChangeY != prevY)
+            {
+              v.y += yPosChange;
+            }
+          }
+        }
+      }
+    }
   }
 
   void Duplicate()

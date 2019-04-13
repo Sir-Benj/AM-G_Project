@@ -11,36 +11,50 @@ class Menu
 
   Button drawShape;
   Button selectShape;
+  Button filledShape;
 
-  String[] illustratorNames;
-  Button[] illustratorMenu;
+  String[] drawShapeNames;
+  String[] selectShapeNames;
+
+  Button[] drawShapeMenu;
+  Button[] selectShapeMenu;
+
+  Button[] shapeMenuBtns;
 
   int btnFontSize = 16, sideMenuInset = 200,
       topBarXStart = 0, topBarYStart = 0, topBarWidth = 100, topBarHeight = 20,
       subXStart = 0, subYStart = 20, subBWidth = 100, subBHeight = 20,
       topBarXIncrease = 60, topBarYIncrease = 20,
       sideMenuXInset = 180, sideMenuColYInset = 20, sideMenuColWidth = 160, sideMenuColHeight = 350,
-      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 85;
+      sideMenuSelYInset = 390, sideMenuSelWidth = 160, sideMenuSelHeight = 140;
 
   PFont btnFont;
-  //
+
   Menu()
   {
     topBarFile = new String[] {"File", "New", "Save", "Load"};
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
-    topBarPhotoEdit = new String[] {"Edit", "Hue", "Saturation", "Brightness", "Contrast"};
+    topBarPhotoEdit = new String[] {"Edit", "Resize", "Hue", "Saturation", "Brightness", "Contrast"};
 
-    illustratorNames = new String[] {"Pencil", "Eraser", "Line", "Rectangle", "Circle", "Polygon", "Duplicate", "ScaleShape", "RotateShape", "ClearLayer"};
+    drawShapeNames = new String[] {"Pencil", "Eraser", "Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
+    selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "Duplicate"};
+
     btnFont = createFont("arial.ttf", 16);
 
     topBarFileBtns = new Button[topBarFile.length];
     topBarFilterBtns = new Button[topBarFilter.length];
     topBarPhotoEditBtns = new Button[topBarPhotoEdit.length];
 
-    illustratorMenu = new Button[illustratorNames.length];
+    drawShapeMenu = new Button[drawShapeNames.length];
+    selectShapeMenu = new Button[selectShapeNames.length];
 
-    drawShape = new Button(width - sideMenuInset + 45, 490, 50, 50, false, true, "drawShape", false, false);
-    selectShape = new Button(width - sideMenuInset + 105, 490, 50, 50, false, true, "drawShape", false, false);
+    shapeMenuBtns = new Button[2];
+
+    drawShape = new Button(width - sideMenuInset + 45, 540, 50, 50, false, true, "DrawShape", false, true);
+    selectShape = new Button(width - sideMenuInset + 105, 540, 50, 50, false, true, "SelectShape", false, true);
+    filledShape = new Button(width - sideMenuInset + 80, 480, 40, 40, false, true, "FilledShape", false, true);
+
+
   }
 
   void InitialiseMenu()
@@ -49,10 +63,10 @@ class Menu
     MenuButtonsInitialise(topBarFilter, topBarFilterBtns, topBarXStart + topBarWidth, topBarYStart, topBarWidth, topBarHeight);
     MenuButtonsInitialise(topBarPhotoEdit, topBarPhotoEditBtns, topBarXStart + (topBarWidth * 2), topBarYStart, topBarWidth, topBarHeight);
 
-    int step = 1, startX = width - sideMenuXInset - 5, startY = 550, increaseX = 60, increaseY = 60;
-    for (int sideMenuIll = 0; sideMenuIll < illustratorMenu.length; sideMenuIll++)
+    int step = 1, startX = width - sideMenuXInset - 5, startY = 600, increaseX = 60, increaseY = 60;
+    for (int sideMenuIll = 0; sideMenuIll < drawShapeMenu.length; sideMenuIll++)
     {
-      illustratorMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, illustratorNames[sideMenuIll], false, true);
+      drawShapeMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, drawShapeNames[sideMenuIll], false, true);
 
       startX += 60;
       step++;
@@ -64,7 +78,23 @@ class Menu
       }
     }
 
+    step = 1; startX = width - sideMenuXInset - 5; startY = 600; increaseX = 60; increaseY = 60;
+    for (int sideMenuIll = 0; sideMenuIll < selectShapeMenu.length; sideMenuIll++)
+    {
+      selectShapeMenu[sideMenuIll] = new Button(startX, startY, 50, 50, false, true, selectShapeNames[sideMenuIll], false, true);
 
+      startX += 60;
+      step++;
+      if (step == 4)
+      {
+        startX = width - sideMenuXInset - 5;
+        startY += 60;
+        step = 1;
+      }
+    }
+
+    shapeMenuBtns[0] = drawShape;
+    shapeMenuBtns[1] = selectShape;
   }
 
   void DrawMenu()
@@ -90,9 +120,22 @@ class Menu
 
     TopBarDisplay(topBarFileBtns, topBarFilterBtns, topBarPhotoEditBtns);
 
-    for (int sideBarIll = 0; sideBarIll < illustratorMenu.length; sideBarIll++)
+    if (drawShape.localState)
     {
-      illustratorMenu[sideBarIll].DisplayButton();
+      for (int sideBarIll = 0; sideBarIll < drawShapeMenu.length; sideBarIll++)
+      {
+        drawShapeMenu[sideBarIll].DisplayButton();
+      }
+      filledShape.DisplayButton();
+    }
+
+    if (selectShape.localState)
+    {
+      for (int sideBarIll = 0; sideBarIll < selectShapeMenu.length; sideBarIll++)
+      {
+        selectShapeMenu[sideBarIll].DisplayButton();
+      }
+      filledShape.DisplayButton();
     }
 
     drawShape.DisplayButton();
@@ -112,9 +155,13 @@ class Menu
         {
           if (topBarFileBtns[menu].localState)
           {
-            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            for (int illMenu = 0; illMenu < drawShapeMenu.length; illMenu++)
             {
-              illustratorMenu[illMenu].localState = false;
+              drawShapeMenu[illMenu].localState = false;
+            }
+            for (int illMenu = 0; illMenu < selectShapeMenu.length; illMenu++)
+            {
+              selectShapeMenu[illMenu].localState = false;
             }
           }
         }
@@ -132,9 +179,13 @@ class Menu
         {
           if (topBarFilterBtns[menu].localState)
           {
-            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            for (int illMenu = 0; illMenu < drawShapeMenu.length; illMenu++)
             {
-              illustratorMenu[illMenu].localState = false;
+              drawShapeMenu[illMenu].localState = false;
+            }
+            for (int illMenu = 0; illMenu < selectShapeMenu.length; illMenu++)
+            {
+              selectShapeMenu[illMenu].localState = false;
             }
           }
         }
@@ -152,20 +203,43 @@ class Menu
         {
           if (topBarPhotoEditBtns[menu].localState)
           {
-            for (int illMenu = 0; illMenu < illustratorMenu.length; illMenu++)
+            for (int illMenu = 0; illMenu < drawShapeMenu.length; illMenu++)
             {
-              illustratorMenu[illMenu].localState = false;
+              drawShapeMenu[illMenu].localState = false;
+            }
+            for (int illMenu = 0; illMenu < selectShapeMenu.length; illMenu++)
+            {
+              selectShapeMenu[illMenu].localState = false;
             }
           }
         }
       }
     }
 
+    shapeMenuBtns[0].ButtonPressed(shapeMenuBtns);
   }
 
   void SideMenuPressed()
   {
-    illustratorMenu[0].ButtonPressed(illustratorMenu);
+    if (drawShape.localState)
+    {
+      drawShapeMenu[0].ButtonPressed(drawShapeMenu);
+      filledShape.SingleButtonPress();
+      for (Button b : selectShapeMenu)
+      {
+        b.localState = false;
+      }
+    }
+
+    if (selectShape.localState)
+    {
+      selectShapeMenu[0].ButtonPressed(selectShapeMenu);
+      filledShape.SingleButtonPress();
+      for (Button b : drawShapeMenu)
+      {
+        b.localState = false;
+      }
+    }
   }
 
   void DrawTopBar()

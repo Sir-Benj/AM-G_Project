@@ -32,7 +32,7 @@ class Slider
       retValue = map(sliderPos, 0.0, barWidth, mapValueLow, mapValueHigh);
     }
 
-    if (sliderName == "Size")
+    if (sliderName == "Stroke Weight")
     {
       textSize(14);
       fill(1);
@@ -44,6 +44,19 @@ class Slider
       fill(1);
       text(sliderName + ": " + (int)((retValue / mapValueHigh) * 100) + " " + sNameValue, xBarPos + 10, yBarPos - 10);
     }
+    else if (sliderName == "Offset X")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Offset Y")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    
 
     stroke(1);
     fill(50);

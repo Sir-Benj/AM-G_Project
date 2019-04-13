@@ -1,6 +1,6 @@
 class ColourPicker
 {
-  float barWidth = 150;
+  float barWidth = 128;
   public float _hueVal = barWidth;
   public float _satVal = barWidth;
   public float _briVal = barWidth;
