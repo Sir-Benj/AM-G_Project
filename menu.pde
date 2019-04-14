@@ -36,8 +36,8 @@ class Menu
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
     topBarPhotoEdit = new String[] {"Edit", "Resize", "Hue", "Saturation", "Brightness", "Contrast"};
 
-    drawShapeNames = new String[] {"Pencil", "Eraser", "Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
-    selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "Duplicate"};
+    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
+    selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "DeleteShape"};
 
     btnFont = createFont("arial.ttf", 16);
 
@@ -150,6 +150,16 @@ class Menu
       {
         topBarFilterBtns[0].localState = false;
         topBarPhotoEditBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          topBarFilterBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          topBarPhotoEditBtns[menu].localState = false;
+        }
+
         topBarFileBtns[0].TopMenuButtonPressed(topBarFileBtns);
         for (int menu = 1; menu < topBarFileBtns.length; menu++)
         {
@@ -174,6 +184,16 @@ class Menu
       {
         topBarFileBtns[0].localState = false;
         topBarPhotoEditBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          topBarFileBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          topBarPhotoEditBtns[menu].localState = false;
+        }
+
         topBarFilterBtns[0].TopMenuButtonPressed(topBarFilterBtns);
         for (int menu = 1; menu < topBarFilterBtns.length; menu++)
         {
@@ -198,6 +218,16 @@ class Menu
       {
         topBarFileBtns[0].localState = false;
         topBarFilterBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          topBarFileBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          topBarFilterBtns[menu].localState = false;
+        }
+
         topBarPhotoEditBtns[0].TopMenuButtonPressed(topBarPhotoEditBtns);
         for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
         {

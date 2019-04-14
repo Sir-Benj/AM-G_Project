@@ -4,13 +4,13 @@ class DrawShape
 
   PVector mouseStart, mouseDrag, mouseEnd;
 
-  float hue, sat, bri, opacity, sWeight;
+  float hue, sat, bri, opacity, sWeight, rotateValue, scaleValue;
 
   boolean isSelected = false;
   boolean isDrawing = false;
   boolean isFilled = false;
 
-  ArrayList<PVector> polyPoints; 
+  ArrayList<PVector> polyPoints;
   Rect bounds;
 
   PGraphics layer;
@@ -31,6 +31,8 @@ class DrawShape
     this.opacity = opacity;
     this.sWeight = sWeight;
     this.isFilled = filled;
+    this.rotateValue = 0;
+    this.scaleValue = 1;
   }
 
   void WhileDrawingShape(PVector dragPoint)

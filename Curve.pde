@@ -1,12 +1,12 @@
-class Polygon extends DrawShape
+class Curve extends DrawShape
 {
   //ArrayList<PVector> polyPoints;
   PVector newMousePos;
   PShape poly;
   Boolean pickFinished;
 
-  Polygon(String shapeType, PVector mouseStartLoc, PGraphics layer,
-          float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
+  Curve(String shapeType, PVector mouseStartLoc, PGraphics layer,
+        float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
     polyPoints = new ArrayList<PVector>();
@@ -69,103 +69,96 @@ class Polygon extends DrawShape
     //DrawSettings();
     if (isDrawing)
     {
-      this.poly = createShape();
-      this.poly.beginShape();
-      this.poly.strokeWeight(this.sWeight);
-      this.poly.stroke(this.hue,
+      this.layer.beginShape();
+      this.layer.strokeWeight(this.sWeight);
+      this.layer.stroke(this.hue,
                        this.sat,
                        this.bri,
                        this.opacity);
       if (isFilled)
       {
-        this.poly.fill(this.hue,
+        this.layer.fill(this.hue,
                        this.sat,
                        this.bri,
                        this.opacity);
       }
       else
       {
-        this.poly.noFill();
+        this.layer.noFill();
       }
 
       for (PVector v : this.polyPoints)
       {
-        this.poly.vertex(v.x - 20, v.y - 100);
+        this.layer.curveVertex(v.x - 20, v.y - 100);
+        println(v);
       }
 
       if (isFilled)
       {
-        this.poly.endShape(CLOSE);
+        this.layer.endShape(CLOSE);
       }
       else
       {
-        this.poly.endShape();
+        this.layer.endShape();
       }
-
-      this.layer.shape(poly);
     }
     else
     {
       if (this.isSelected)
       {
-        this.poly = createShape();
-        this.poly.beginShape();
-        this.poly.strokeWeight(this.sWeight + 5);
-        this.poly.stroke(255 - this.hue,
+        this.layer.beginShape();
+        this.layer.strokeWeight(this.sWeight + 5);
+        this.layer.stroke(255 - this.hue,
                          255 - this.sat,
                          255 - this.hue);
-        this.poly.noFill();
+        this.layer.noFill();
         for (PVector v : this.polyPoints)
         {
-          this.poly.vertex(v.x - 20, v.y - 100);
+          this.layer.curveVertex(v.x - 20, v.y - 100);
         }
-        this.poly.endShape();
         this.layer.pushMatrix();
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
-        this.layer.shape(poly);
+        this.layer.endShape();
         this.layer.popMatrix();
       }
     }
 
-    this.poly = createShape();
-    this.poly.beginShape();
-    this.poly.strokeWeight(this.sWeight);
-    this.poly.stroke(this.hue,
+    this.layer.beginShape();
+    this.layer.strokeWeight(this.sWeight);
+    this.layer.stroke(this.hue,
                      this.sat,
                      this.bri,
                      this.opacity);
 
     if (isFilled)
     {
-      this.poly.fill(this.hue,
+      this.layer.fill(this.hue,
                      this.sat,
                      this.bri,
                      this.opacity);
     }
     else
     {
-      this.poly.noFill();
+      this.layer.noFill();
     }
 
     for (PVector v : this.polyPoints)
     {
-      this.poly.vertex(v.x - 20, v.y - 100);
-    }
-
-    if (this.isFilled)
-    {
-      this.poly.endShape(CLOSE);
-    }
-    else
-    {
-      this.poly.endShape();
+      this.layer.curveVertex(v.x - 20, v.y - 100);
     }
 
     this.layer.pushMatrix();
     this.layer.scale(this.scaleValue);
     this.layer.rotate(this.rotateValue);
-    this.layer.shape(poly);
+    if (this.isFilled)
+    {
+      this.layer.endShape(CLOSE);
+    }
+    else
+    {
+      this.layer.endShape();
+    }
     this.layer.popMatrix();
     this.layer.endDraw();
   }

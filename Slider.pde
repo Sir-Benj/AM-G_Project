@@ -56,7 +56,36 @@ class Slider
       fill(1);
       text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
     }
-    
+    else if (sliderName == "Rotation Angle")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Scale")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Brightness/Contrast")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Width")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Height")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
 
     stroke(1);
     fill(50);

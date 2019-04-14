@@ -32,7 +32,11 @@ class Circle extends DrawShape
         this.layer.ellipseMode(CORNER);
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.popMatrix();
       }
 
       this.layer.ellipseMode(CORNER);
@@ -41,7 +45,11 @@ class Circle extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }

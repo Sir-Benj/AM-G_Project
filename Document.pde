@@ -35,6 +35,10 @@ class Document
                         shapeList.add(newPoly);
                         currentlyDrawnShape = newPoly;
                         break;
+      case "Curve":   DrawShape newCurve = new Curve(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
+                        shapeList.add(newCurve);
+                        currentlyDrawnShape = newCurve;
+                        break;
     }
   }
 

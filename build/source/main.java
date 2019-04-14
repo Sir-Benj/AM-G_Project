@@ -4,6 +4,7 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import java.util.LinkedList; 
+import java.util.Iterator; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -18,6 +19,7 @@ public class main extends PApplet {
 
 
 
+
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
@@ -29,6 +31,11 @@ float sliderXValue = 0;
 float sliderYValue = 0;
 float sliderChangeX = 0;
 float sliderChangeY = 0;
+float sliderRotateValue = 0;
+float sliderScaleValue = 1;
+float sliderPointInputvalue = 0.1f;
+float sliderNewXValue = 100;
+float sliderNewYValue = 100;
 
 Button control;
 Button[] btns;
@@ -40,8 +47,18 @@ Slider sliderX;
 Slider sliderY;
 Slider sliderChangeXPos;
 Slider sliderChangeYPos;
+Slider sliderRotation;
+Slider sliderScale;
+Slider sliderPointInput;
+Slider sliderNewX;
+Slider sliderNewY;
+
+Button confirm;
+Button cancel;
 
 boolean clicked, left, right, newPoly = false, isFinished = true;
+boolean isFilterBlur, isFilterSharpen, isFilterGreyscale, isFilterMonochrome, isFilterEdgeDetect;
+boolean isEditResize, isEditHue, isEditSaturation, isEditBrightness, isEditContrast;
 
 Menu menu;
 ColourPicker colourPicker;
@@ -55,6 +72,7 @@ PImage imageToLoad;
 PImage imageToSaveOne;
 PImage imageToSaveTwo;
 PImage imageToSaveCombined;
+PImage destination;
 
 MessageQueue messageQueue;
 GraphicsFunctions graphicsFunctions;
@@ -123,6 +141,20 @@ public void setup()
   sliderChangeYPos = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 65,
                          140, 10, -paintLayer.height, paintLayer.height, "Offset Y", "px");
 
+  sliderRotation = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 25,
+                         140, 10, 0, 360, "Rotation Angle", "Degrees");
+
+  sliderScale = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 65,
+                         140, 10, 0.1f, 5, "Scale", "Multiplier");
+
+  sliderPointInput = new Slider(600, 50, 140, 10, -1, 3, "Brightness/Contrast", "Value");
+
+  sliderNewX = new Slider(600, 40, 140, 10, 1, width, "Width", "px");
+
+  sliderNewY = new Slider(600, 60, 140, 10, 1, height, "Height", "px");
+
+  confirm = new Button(750, 50, 140, 40, false, true, "  Confirm Changes", true, false);
+
   background.beginDraw();
   background.colorMode(HSB);
   background.background(255);
@@ -145,6 +177,7 @@ public void mousePressed()
 {
   menu.TopMenuPressed();
   menu.SideMenuPressed();
+  confirm.SingleButtonPress();
 
   mouseStart = new PVector();
 
@@ -231,6 +264,34 @@ public void mousePressed()
           }
       }
     }
+    if (menu.drawShapeMenu[i].buttonName == "Curve" && menu.drawShapeMenu[i].localState == true && OverCanvas())
+    {
+      if (!newPoly)
+      {
+        graphicsFunctions.ShapeStart("Curve", mouseStart, paintLayer,
+                                     doc ,colourPicker, sliderOneValue, sliderTwoValue, menu.filledShape.localState);
+        isFinished = false;
+        newPoly = true;
+        firstPoint = mouseStart;
+        if (doc.currentlyDrawnShape != null)
+        {
+          doc.currentlyDrawnShape.AddToPoints(mouseStart);
+        }
+      }
+      else if (doc.currentlyDrawnShape != null && newPoly && !isFinished)
+      {
+        if (mouseStart.x > firstPoint.x - 10 && mouseStart.x < firstPoint.x + 10
+          && mouseStart.y > firstPoint.y - 10 && mouseStart.y < firstPoint.y + 10)
+          {
+            doc.currentlyDrawnShape.AddToPoints(firstPoint);
+            isFinished = true;
+          }
+          else
+          {
+            doc.currentlyDrawnShape.AddToPoints(mouseStart);
+          }
+      }
+    }
   }
 }
 
@@ -290,6 +351,15 @@ public void mouseReleased()
           isFinished = false;
         }
       }
+      if (menu.drawShapeMenu[i].buttonName == "Curve" && menu.drawShapeMenu[i].localState == true)
+      {
+        if (isFinished)
+        {
+          graphicsFunctions.ShapeFinal(doc, mouseFinal);
+          newPoly = false;
+          isFinished = false;
+        }
+      }
     }
   }
 }
@@ -297,7 +367,7 @@ public void mouseReleased()
 public void draw()
 {
   paintLayer.beginDraw();
-  paintLayer.background(255);
+  paintLayer.clear();
   paintLayer.endDraw();
   photoLayer.beginDraw();
   photoLayer.endDraw();
@@ -330,24 +400,141 @@ public void draw()
     {
       graphicsFunctions.ChangeShapePosition(doc, sliderChangeX, sliderChangeY);
     }
+    else if (menu.selectShapeMenu[i].buttonName == "RotateShape" && menu.selectShapeMenu[i].localState == true)
+    {
+      graphicsFunctions.RotateShape(doc, sliderRotateValue);
+    }
+    else if (menu.selectShapeMenu[i].buttonName == "ScaleShape" && menu.selectShapeMenu[i].localState == true)
+    {
+      graphicsFunctions.ScaleShape(doc, sliderScaleValue);
+    }
+    else if (menu.selectShapeMenu[i].buttonName == "DeleteShape" && menu.selectShapeMenu[i].localState == true)
+    {
+      if (doc.shapeList.size() > 0)
+      {
+        graphicsFunctions.DeleteShape(doc);
+      }
+      menu.selectShapeMenu[i].localState = false;
+    }
   }
 
   for (int i = 1; i < menu.topBarFileBtns.length; i++)
   {
     if (menu.topBarFileBtns[i].buttonName == "New" && menu.topBarFileBtns[i].localState == true)
-        {
-          graphicsFunctions.New(photoLayer, menu.topBarFileBtns[i]);
-        }
-        if (menu.topBarFileBtns[i].buttonName == "Save" && menu.topBarFileBtns[i].localState == true)
-        {
-          graphicsFunctions.Save(menu.topBarFileBtns[i], selectOne);
-        }
-        if (menu.topBarFileBtns[i].buttonName == "Load" && menu.topBarFileBtns[i].localState == true)
-        {
-          graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
-        }
+    {
+      graphicsFunctions.New(photoLayer, menu.topBarFileBtns[i]);
+    }
+    if (menu.topBarFileBtns[i].buttonName == "Save" && menu.topBarFileBtns[i].localState == true)
+    {
+      graphicsFunctions.Save(menu.topBarFileBtns[i], selectOne);
+    }
+    if (menu.topBarFileBtns[i].buttonName == "Load" && menu.topBarFileBtns[i].localState == true)
+    {
+      graphicsFunctions.Load(menu.topBarFileBtns[i], selectOne);
+    }
   }
 
+  for (int i = 1; i < menu.topBarFilterBtns.length; i++)
+  {
+    if (menu.topBarFilterBtns[i].buttonName == "Blur" && menu.topBarFilterBtns[i].localState == true)
+    {
+      graphicsFunctions.Blur(photoLayer);
+      menu.topBarFilterBtns[i].localState = false;
+    }
+    else if (menu.topBarFilterBtns[i].buttonName == "Sharpen" && menu.topBarFilterBtns[i].localState == true)
+    {
+      graphicsFunctions.Sharpen(photoLayer);
+      menu.topBarFilterBtns[i].localState = false;
+    }
+    else if (menu.topBarFilterBtns[i].buttonName == "Greyscale" && menu.topBarFilterBtns[i].localState == true)
+    {
+      graphicsFunctions.Greyscale(photoLayer);
+      menu.topBarFilterBtns[i].localState = false;
+    }
+    else if (menu.topBarFilterBtns[i].buttonName == "Monochrome" && menu.topBarFilterBtns[i].localState == true)
+    {
+      graphicsFunctions.Monochrome(photoLayer);
+      menu.topBarFilterBtns[i].localState = false;
+    }
+    else if (menu.topBarFilterBtns[i].buttonName == "Edge-Detect" && menu.topBarFilterBtns[i].localState == true)
+    {
+      graphicsFunctions.EdgeDetect(photoLayer);
+      menu.topBarFilterBtns[i].localState = false;
+    }
+  }
+
+  for (int i = 1; i < menu.topBarPhotoEditBtns.length; i++)
+  {
+    if (menu.topBarPhotoEditBtns[i].buttonName == "Resize" && menu.topBarPhotoEditBtns[i].localState == true)
+    {
+      if (confirm.localState)
+      {
+        colorMode(RGB);
+        destination = createImage((int)sliderNewXValue, (int)sliderNewYValue, RGB);
+        graphicsFunctions.Resize(photoLayer, destination);
+        photoLayer.clear();
+        photoLayer = createGraphics(destination.width, destination.height);
+        photoLayer.beginDraw();
+        photoLayer.image(destination, 0, 0);
+        photoLayer.endDraw();
+        menu.topBarPhotoEditBtns[i].localState = false;
+        confirm.localState = false;
+        colorMode(HSB);
+      }
+    }
+    else if (menu.topBarPhotoEditBtns[i].buttonName == "Hue" && menu.topBarPhotoEditBtns[i].localState == true)
+    {
+      if (confirm.localState)
+      {
+        menu.topBarPhotoEditBtns[i].localState = false;
+        graphicsFunctions.Hue(photoLayer, colourPicker, confirm.localState);
+        confirm.localState = false;
+      }
+      else
+      {
+        graphicsFunctions.Hue(photoLayer, colourPicker, confirm.localState);
+      }
+    }
+    else if (menu.topBarPhotoEditBtns[i].buttonName == "Saturation" && menu.topBarPhotoEditBtns[i].localState == true)
+    {
+      if (confirm.localState)
+      {
+        menu.topBarPhotoEditBtns[i].localState = false;
+        graphicsFunctions.Saturation(photoLayer, colourPicker, confirm.localState);
+        confirm.localState = false;
+      }
+      else
+      {
+        graphicsFunctions.Saturation(photoLayer, colourPicker, confirm.localState);
+      }
+    }
+    else if (menu.topBarPhotoEditBtns[i].buttonName == "Brightness" && menu.topBarPhotoEditBtns[i].localState == true)
+    {
+      if (confirm.localState)
+      {
+        menu.topBarPhotoEditBtns[i].localState = false;
+        graphicsFunctions.Brightness(photoLayer, sliderPointInputvalue, confirm.localState);
+        confirm.localState = false;
+      }
+      else
+      {
+        graphicsFunctions.Brightness(photoLayer, sliderPointInputvalue, confirm.localState);
+      }
+    }
+    else if (menu.topBarPhotoEditBtns[i].buttonName == "Contrast" && menu.topBarPhotoEditBtns[i].localState == true)
+    {
+      if (confirm.localState)
+      {
+        menu.topBarPhotoEditBtns[i].localState = false;
+        graphicsFunctions.Contrast(photoLayer, sliderPointInputvalue, confirm.localState);
+        confirm.localState = false;
+      }
+      else
+      {
+        graphicsFunctions.Contrast(photoLayer, sliderPointInputvalue, confirm.localState);
+      }
+    }
+  }
 
   background(200);
   image(background, 20, 100);
@@ -356,7 +543,7 @@ public void draw()
   image(paintLayer, 20, 100);
 
   imageToSaveOne = photoLayer.get(0, 0, photoLayer.width, photoLayer.height);
-  imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, photoLayer.height);
+  imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, paintLayer.height);
 
   combineLayers.beginDraw();
   combineLayers.image(imageToSaveOne, 0, 0);
@@ -385,6 +572,34 @@ public void draw()
     sliderYValue = sliderY.DrawSliderVertical(sliderYValue);
   }
 
+  for (int i = 1; i < menu.topBarPhotoEditBtns.length; i++)
+  {
+    if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Contrast")
+    {
+      sliderPointInputvalue = sliderPointInput.DrawSliderMenu(sliderPointInputvalue);
+      confirm.DisplayButton();
+    }
+    else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Brightness")
+    {
+      sliderPointInputvalue = sliderPointInput.DrawSliderMenu(sliderPointInputvalue);
+      confirm.DisplayButton();
+    }
+    else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Saturation")
+    {
+      confirm.DisplayButton();
+    }
+    else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Hue")
+    {
+      confirm.DisplayButton();
+    }
+    else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Resize")
+    {
+      sliderNewXValue = sliderNewX.DrawSliderMenu(sliderNewXValue);
+      sliderNewYValue = sliderNewY.DrawSliderMenu(sliderNewYValue);
+      confirm.DisplayButton();
+    }
+  }
+
   for (int i = 0; i < menu.drawShapeMenu.length; i++)
   {
     if (menu.drawShapeMenu[i].localState == true && menu.drawShapeMenu[i].buttonName != "Eraser")
@@ -410,6 +625,16 @@ public void draw()
     {
       sliderChangeX = sliderChangeXPos.DrawSliderMenu(sliderChangeX);
       sliderChangeY = sliderChangeYPos.DrawSliderMenu(sliderChangeY);
+    }
+
+    if (menu.selectShapeMenu[i].localState == true && menu.selectShapeMenu[i].buttonName == "RotateShape")
+    {
+      sliderRotateValue = sliderRotation.DrawSliderMenu(sliderRotateValue);
+    }
+
+    if (menu.selectShapeMenu[i].localState == true && menu.selectShapeMenu[i].buttonName == "ScaleShape")
+    {
+      sliderScaleValue = sliderScale.DrawSliderMenu(sliderScaleValue);
     }
   }
 }
@@ -489,7 +714,11 @@ class Circle extends DrawShape
         this.layer.ellipseMode(CORNER);
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.popMatrix();
       }
 
       this.layer.ellipseMode(CORNER);
@@ -498,7 +727,11 @@ class Circle extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
@@ -583,6 +816,171 @@ class ColourPicker
     return hueVal;
   }
 }
+class Curve extends DrawShape
+{
+  //ArrayList<PVector> polyPoints;
+  PVector newMousePos;
+  PShape poly;
+  Boolean pickFinished;
+
+  Curve(String shapeType, PVector mouseStartLoc, PGraphics layer,
+        float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
+  {
+    super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
+    polyPoints = new ArrayList<PVector>();
+  }
+
+  public void AddToPoints(PVector mousePos)
+  {
+    this.polyPoints.add(mousePos);
+  }
+
+  public void FinishDrawingShape(PVector endPoint)
+  {
+    PVector xyMin, xyMax;
+    xyMin = new PVector();
+    xyMax = new PVector();
+
+    float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+    for (PVector v : polyPoints)
+    {
+      if (v.x > xMax)
+      {
+        xMax = v.x;
+      }
+      else if (v.x < xMin)
+      {
+        xMin = v.x;
+      }
+
+      if (v.y > yMax)
+      {
+        yMax = v.y;
+      }
+      else if (v.y < yMin)
+      {
+        yMin = v.y;
+      }
+    }
+
+    xyMin.x = xMin;
+    xyMin.y = yMin;
+
+    xyMax.x = xMax;
+    xyMax.y = yMax;
+
+    println(xyMin);
+    println(xyMax);
+
+    setShapeBounds(xyMin, xyMax);
+
+    this.isDrawing = false;
+
+  }
+
+  public void drawThisShape()
+  {
+    this.layer.beginDraw();
+    //smooth();
+    this.layer.colorMode(HSB);
+    //DrawSettings();
+    if (isDrawing)
+    {
+      this.layer.beginShape();
+      this.layer.strokeWeight(this.sWeight);
+      this.layer.stroke(this.hue,
+                       this.sat,
+                       this.bri,
+                       this.opacity);
+      if (isFilled)
+      {
+        this.layer.fill(this.hue,
+                       this.sat,
+                       this.bri,
+                       this.opacity);
+      }
+      else
+      {
+        this.layer.noFill();
+      }
+
+      for (PVector v : this.polyPoints)
+      {
+        this.layer.curveVertex(v.x - 20, v.y - 100);
+        println(v);
+      }
+
+      if (isFilled)
+      {
+        this.layer.endShape(CLOSE);
+      }
+      else
+      {
+        this.layer.endShape();
+      }
+    }
+    else
+    {
+      if (this.isSelected)
+      {
+        this.layer.beginShape();
+        this.layer.strokeWeight(this.sWeight + 5);
+        this.layer.stroke(255 - this.hue,
+                         255 - this.sat,
+                         255 - this.hue);
+        this.layer.noFill();
+        for (PVector v : this.polyPoints)
+        {
+          this.layer.curveVertex(v.x - 20, v.y - 100);
+        }
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
+        this.layer.endShape();
+        this.layer.popMatrix();
+      }
+    }
+
+    this.layer.beginShape();
+    this.layer.strokeWeight(this.sWeight);
+    this.layer.stroke(this.hue,
+                     this.sat,
+                     this.bri,
+                     this.opacity);
+
+    if (isFilled)
+    {
+      this.layer.fill(this.hue,
+                     this.sat,
+                     this.bri,
+                     this.opacity);
+    }
+    else
+    {
+      this.layer.noFill();
+    }
+
+    for (PVector v : this.polyPoints)
+    {
+      this.layer.curveVertex(v.x - 20, v.y - 100);
+    }
+
+    this.layer.pushMatrix();
+    this.layer.scale(this.scaleValue);
+    this.layer.rotate(this.rotateValue);
+    if (this.isFilled)
+    {
+      this.layer.endShape(CLOSE);
+    }
+    else
+    {
+      this.layer.endShape();
+    }
+    this.layer.popMatrix();
+    this.layer.endDraw();
+  }
+}
 class Document
 {
 
@@ -620,6 +1018,10 @@ class Document
                         shapeList.add(newPoly);
                         currentlyDrawnShape = newPoly;
                         break;
+      case "Curve":   DrawShape newCurve = new Curve(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
+                        shapeList.add(newCurve);
+                        currentlyDrawnShape = newCurve;
+                        break;
     }
   }
 
@@ -647,13 +1049,13 @@ class DrawShape
 
   PVector mouseStart, mouseDrag, mouseEnd;
 
-  float hue, sat, bri, opacity, sWeight;
+  float hue, sat, bri, opacity, sWeight, rotateValue, scaleValue;
 
   boolean isSelected = false;
   boolean isDrawing = false;
   boolean isFilled = false;
 
-  ArrayList<PVector> polyPoints; 
+  ArrayList<PVector> polyPoints;
   Rect bounds;
 
   PGraphics layer;
@@ -674,6 +1076,8 @@ class DrawShape
     this.opacity = opacity;
     this.sWeight = sWeight;
     this.isFilled = filled;
+    this.rotateValue = 0;
+    this.scaleValue = 1;
   }
 
   public void WhileDrawingShape(PVector dragPoint)
@@ -778,6 +1182,7 @@ class DrawShape
 class GraphicsFunctions
 {
   float prevX, newChangeX, prevY, newChangeY;
+  float prevValue, newValue;
 
   GraphicsFunctions()
   {
@@ -801,24 +1206,94 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  public void Blur()
+  public void Blur(PGraphics photo)
   {
+    float[][] blur_matrix = { {0.1f,  0.1f,  0.1f },
+                              {0.1f,  0.1f,  0.1f },
+                              {0.1f,  0.1f,  0.1f } };
 
+    colorMode(RGB);
+    for(int y = 0; y < photo.height; y++)
+    {
+      for(int x = 0; x < photo.width; x++)
+      {
+        int c = Convolution(x, y, blur_matrix, 3, photo);
+        photo.set(x, y, c);
+      }
+    }
+    colorMode(HSB);
   }
 
-  public void Sharpen()
+  public void Sharpen(PGraphics photo)
   {
+    float[][] sharpen_matrix = { { 0, -1, 0 },
+                                 {-1, 5, -1 },
+                                 { 0, -1, 0 } };
 
+    colorMode(RGB);
+    for(int y = 0; y < photo.height; y++)
+    {
+      for(int x = 0; x < photo.width; x++)
+      {
+        int c = Convolution(x, y, sharpen_matrix, 3, photo);
+        photo.set(x, y, c);
+      }
+    }
+    colorMode(HSB);
   }
 
-  public void Greyscale()
+  public void Greyscale(PGraphics photo)
   {
+    colorMode(RGB);
+    for (int y = 0; y < photo.height; y++)
+    {
+      for (int x = 0; x < photo.width; x++)
+      {
 
+        int thisPix = photo.get(x,y);
+
+        int r = (int) red(thisPix);
+        int g = (int) green(thisPix);
+        int b = (int) blue(thisPix);
+        int grey = (int)((r + g + b) / 3);
+        int newColour = color(grey, grey, grey);
+        photo.set(x,y, newColour);
+      }
+    }
+    colorMode(HSB);
   }
 
-  public void Monochrome()
+  public void Monochrome(PGraphics photo)
   {
+    colorMode(RGB);
+    for (int y = 0; y < photo.height; y++)
+    {
+      for (int x = 0; x < photo.width; x++)
+      {
+        int thisPix = photo.get(x,y);
 
+        int r = (int) red(thisPix);
+        int g = (int) green(thisPix);
+        int b = (int) blue(thisPix);
+
+        if (r > 128|| g > 128 || b > 128)
+        {
+          r = 255;
+          g = 255;
+          b = 255;
+        }
+        else if (r <= 128 || g <= 128 || b <= 128)
+        {
+          r = 0;
+          g = 0;
+          b = 0;
+        }
+
+        int newColour = color(r, g, b);
+        photo.set(x,y, newColour);
+      }
+    }
+    colorMode(HSB);
   }
 
   public void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
@@ -921,7 +1396,7 @@ class GraphicsFunctions
     {
       if (s.isSelected)
       {
-        if (newChangeX != prevX)
+        if (newChangeX != prevX && s.polyPoints == null)
         {
           s.bounds.x1 += xPosChange;
           s.bounds.x2 += xPosChange;
@@ -929,7 +1404,7 @@ class GraphicsFunctions
           s.bounds.right += xPosChange;
         }
 
-        if (newChangeY != prevY)
+        if (newChangeY != prevY && s.polyPoints == null)
         {
           s.bounds.y1 += yPosChange;
           s.bounds.y2 += yPosChange;
@@ -956,19 +1431,39 @@ class GraphicsFunctions
     }
   }
 
-  public void Duplicate()
+  public void ScaleShape(Document doc, float scale)
   {
-
+    for (DrawShape s : doc.shapeList)
+    {
+      if (s.isSelected)
+      {
+        s.scaleValue = scale;
+      }
+    }
   }
 
-  public void ScaleShape()
+  public void RotateShape(Document doc, float rotate)
   {
-
+    for (DrawShape s : doc.shapeList)
+    {
+      if (s.isSelected)
+      {
+        s.rotateValue = radians(rotate);
+      }
+    }
   }
 
-  public void RotateShape()
+  public void DeleteShape(Document doc)
   {
-
+    Iterator itr = doc.shapeList.iterator();
+    while (itr.hasNext())
+    {
+      DrawShape s = (DrawShape)itr.next();
+      if (s.isSelected)
+      {
+        itr.remove();
+      }
+    }
   }
 
   public void ClearLayer(PGraphics layer, Button button, Document doc)
@@ -978,41 +1473,239 @@ class GraphicsFunctions
     button.localState = false;
   }
 
-  public void Resize()
+  public void Resize(PGraphics photo, PImage destination)
   {
+    photo.loadPixels();
+    destination.loadPixels();
 
+    destination.pixels = ResizeBilinear(photo.pixels, photo.width, photo.height, destination.width, destination.height);
+    destination.updatePixels();
   }
 
-  public void EdgeDetect()
+  public void EdgeDetect(PGraphics photo)
   {
+    float[][] edge_matrix = { { 0,  -2,  0 },
+                              { -2,  8, -2 },
+                              { 0,  -2,  0 } };
 
+    colorMode(RGB);
+    for(int y = 0; y < photo.height; y++)
+    {
+      for(int x = 0; x < photo.width; x++)
+      {
+        int c = Convolution(x, y, edge_matrix, 3, photo);
+        photo.set(x, y, c);
+      }
+    }
+    colorMode(HSB);
   }
 
-  public void Rotate()
+  public void Hue(PGraphics photo, ColourPicker colourpicker, boolean confirm)
   {
+    photo.loadPixels();
+    int numPixels = photo.width * photo.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      int c = photo.pixels[n];
 
+      float hue = hue(c);
+      float sat = saturation(c);
+      float bri = brightness(c);
+
+      float old = hue;
+      float change = colourPicker._hueVal;
+
+      float difference = change - old;
+      float result = change - (difference * 0.9f);
+
+      int newColor = color(result, sat, bri);
+
+      photo.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      photo.updatePixels();
+    }
   }
 
-  public void Hue()
+  public void Saturation(PGraphics photo, ColourPicker colourpicker, boolean confirm)
   {
+    photo.loadPixels();
+    int numPixels = photo.width * photo.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      int c = photo.pixels[n];
 
+      float hue = hue(c);
+      float sat = saturation(c);
+      float bri = brightness(c);
+
+      sat = colourPicker._satVal;
+
+      int newColor = color(hue, sat, bri);
+
+      photo.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      photo.updatePixels();
+    }
   }
 
-  public void Saturation()
+  public void Brightness(PGraphics photo, float brightnessValue, boolean confirm)
   {
-
+    colorMode(RGB);
+    int[] lut = makeFunctionLUT("ChangeBrightness", brightnessValue, 0);
+    applyPointProcessing(lut, lut, lut, photo, confirm);
+    colorMode(HSB);
   }
 
-  public void Brightness()
+  public void Contrast(PGraphics photo, float contrastValue, boolean confirm)
   {
-
+    colorMode(RGB);
+    int[] lut = makeFunctionLUT("ChangeContrast", contrastValue, 0);
+    applyPointProcessing(lut, lut, lut, photo, confirm);
+    colorMode(HSB);
   }
 
-  public void Contrast()
+  public void applyPointProcessing(int[] redLUT, int[] greenLUT, int[] blueLUT, PGraphics inputImage, boolean confirm)
   {
+    inputImage.loadPixels();
+    int numPixels = inputImage.width*inputImage.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      int c = inputImage.pixels[n];
 
+      int r = (int)red(c);
+      int g = (int)green(c);
+      int b = (int)blue(c);
+
+      r = redLUT[r];
+      g = greenLUT[g];
+      b = blueLUT[b];
+      int newColor = color(r, g, b);
+
+      inputImage.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      inputImage.updatePixels();
+    }
   }
 
+  public int[] makeFunctionLUT(String functionName, float parameter1, float parameter2)
+  {
+    int[] lut = new int[256];
+    for(int n = 0; n < 256; n++) {
+
+      float p = n/256.0f;
+      float val = 0;
+
+      switch(functionName)
+      {
+        case "ChangeBrightness": val = ChangeBrightness(p, parameter1);
+        break;
+        case "ChangeContrast": val = ChangeContrast(p, parameter1);
+        break;
+      }
+      lut[n] = (int)(val*255);
+    }
+
+    return lut;
+  }
+
+  public float ChangeBrightness(float value, float shift)
+  {
+    float shiftedValue = value + shift;
+    return shiftedValue;
+  }
+
+  public float ChangeContrast(float value, float conVal)
+  {
+    float contrastValue = (value - 0.5f) * conVal + 0.5f;
+    return contrastValue;
+  }
+
+  public int Convolution(int x, int y, float[][] matrix, int matrixsize, PGraphics photo)
+  {
+    float rtotal = 0.0f;
+    float gtotal = 0.0f;
+    float btotal = 0.0f;
+    int offset = matrixsize / 2;
+    for (int i = 0; i < matrixsize; i++)
+    {
+      for (int j= 0; j < matrixsize; j++)
+      {
+        // What pixel are we testing
+        int xloc = x+i-offset;
+        int yloc = y+j-offset;
+        int loc = xloc + photo.width * yloc;
+        // Make sure we haven't walked off our image, we could do better here
+        loc = constrain(loc, 0, photo.pixels.length-1);
+        // Calculate the convolution
+        rtotal += (red(photo.pixels[loc]) * matrix[i][j]);
+        gtotal += (green(photo.pixels[loc]) * matrix[i][j]);
+        btotal += (blue(photo.pixels[loc]) * matrix[i][j]);
+      }
+    }
+    // Make sure RGB is within range
+    rtotal = constrain(rtotal, 0, 255);
+    gtotal = constrain(gtotal, 0, 255);
+    btotal = constrain(btotal, 0, 255);
+    // Return the resulting color
+    return color(rtotal, gtotal, btotal);
+  }
+
+  public int[] ResizeBilinear(int[] pxls, int startWidth, int startHeight, int targetWidth, int targetHeight)
+  {
+    int[] temp = new int[targetWidth * targetHeight];
+    int a, b, c, d, x, y, index;
+    float xRatio = ((float)(startWidth - 1)) / targetWidth;
+    float yRatio = ((float)(startHeight - 1)) / targetHeight;
+    float xDiff, yDiff, red, green, blue;
+    int offset = 0;
+
+    for (int i = 0; i < targetHeight; i++)
+    {
+      for (int j = 0; j < targetWidth; j++)
+      {
+        x = (int)(xRatio * j);
+        y = (int)(yRatio * i);
+        xDiff = (xRatio * j) - x;
+        yDiff = (yRatio * i) - y;
+        index = (y * startWidth + x);
+        a = pxls[index];
+        b = pxls[index + 1];
+        c = pxls[index + startWidth];
+        d = pxls[index + startWidth + 1];
+
+        //blue
+        // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
+        blue = (a&0xff) * (1-xDiff) * (1-yDiff) + (b&0xff) * (xDiff) * (1-yDiff) +
+               (c&0xff) * (yDiff) * (1-xDiff) + (d&0xff) * (xDiff * yDiff);
+
+        green = ((a>>8)&0xff) * (1-xDiff) * (1-yDiff) + ((b>>8)&0xff) * (xDiff) * (1-yDiff) +
+                ((c>>8)&0xff) * (yDiff) * (1-xDiff) + ((d>>8)&0xff) * (xDiff * yDiff);
+
+        // red element
+        // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
+        red = ((a>>16)&0xff) * (1-xDiff)*(1-yDiff) + ((b>>16)&0xff) * (xDiff) * (1-yDiff) +
+              ((c>>16)&0xff) * (yDiff) * (1-xDiff) + ((d>>16)&0xff) * (xDiff * yDiff);
+
+        temp[offset++] = 0xff000000 | // hardcode alpha
+                         ((((int)red)<<16)&0xff0000) |
+                         ((((int)green)<<8)&0xff00) |
+                         ((int)blue);
+      }
+    }
+    return temp;
+  }
 }
 class Line extends DrawShape
 {
@@ -1029,10 +1722,7 @@ class Line extends DrawShape
     DrawSettings();
     if (isDrawing)
     {
-      // this.layer.stroke(this.hue,
-      //        this.sat,
-      //        this.bri,
-      //        this.opacity);
+
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float x2 = this.mouseDrag.x;
@@ -1048,9 +1738,13 @@ class Line extends DrawShape
 
       if (this.isSelected)
       {
-        // this.layer.strokeWeight(this.sWeight + 5);
-        // this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.strokeWeight(this.sWeight + 5);
+        this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
+        this.layer.popMatrix();
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -1058,7 +1752,11 @@ class Line extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
@@ -1211,8 +1909,13 @@ class Polygon extends DrawShape
         {
           this.poly.vertex(v.x - 20, v.y - 100);
         }
-        this.poly.endShape(CLOSE);
-        this.layer.shape(poly);}
+        this.poly.endShape();
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
+        this.layer.shape(poly);
+        this.layer.popMatrix();
+      }
     }
 
     this.poly = createShape();
@@ -1239,9 +1942,21 @@ class Polygon extends DrawShape
     {
       this.poly.vertex(v.x - 20, v.y - 100);
     }
-    this.poly.endShape(CLOSE);
-    this.layer.smooth();
+
+    if (this.isFilled)
+    {
+      this.poly.endShape(CLOSE);
+    }
+    else
+    {
+      this.poly.endShape();
+    }
+
+    this.layer.pushMatrix();
+    this.layer.scale(this.scaleValue);
+    this.layer.rotate(this.rotateValue);
     this.layer.shape(poly);
+    this.layer.popMatrix();
     this.layer.endDraw();
   }
 }
@@ -1318,6 +2033,7 @@ class Rectangle extends DrawShape
   {
     this.layer.beginDraw();
     this.layer.colorMode(HSB);
+
     DrawSettings();
     if (isDrawing)
     {
@@ -1338,7 +2054,11 @@ class Rectangle extends DrawShape
       {
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.popMatrix();
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -1346,7 +2066,11 @@ class Rectangle extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
@@ -1409,7 +2133,36 @@ class Slider
       fill(1);
       text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
     }
-    
+    else if (sliderName == "Rotation Angle")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Scale")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Brightness/Contrast")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Width")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
+    else if (sliderName == "Height")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+    }
 
     stroke(1);
     fill(50);
@@ -1731,8 +2484,8 @@ class Menu
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
     topBarPhotoEdit = new String[] {"Edit", "Resize", "Hue", "Saturation", "Brightness", "Contrast"};
 
-    drawShapeNames = new String[] {"Pencil", "Eraser", "Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
-    selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "Duplicate"};
+    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
+    selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "DeleteShape"};
 
     btnFont = createFont("arial.ttf", 16);
 
@@ -1845,6 +2598,16 @@ class Menu
       {
         topBarFilterBtns[0].localState = false;
         topBarPhotoEditBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          topBarFilterBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          topBarPhotoEditBtns[menu].localState = false;
+        }
+
         topBarFileBtns[0].TopMenuButtonPressed(topBarFileBtns);
         for (int menu = 1; menu < topBarFileBtns.length; menu++)
         {
@@ -1869,6 +2632,16 @@ class Menu
       {
         topBarFileBtns[0].localState = false;
         topBarPhotoEditBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          topBarFileBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
+        {
+          topBarPhotoEditBtns[menu].localState = false;
+        }
+
         topBarFilterBtns[0].TopMenuButtonPressed(topBarFilterBtns);
         for (int menu = 1; menu < topBarFilterBtns.length; menu++)
         {
@@ -1893,6 +2666,16 @@ class Menu
       {
         topBarFileBtns[0].localState = false;
         topBarFilterBtns[0].localState = false;
+
+        for (int menu = 1; menu < topBarFileBtns.length; menu++)
+        {
+          topBarFileBtns[menu].localState = false;
+        }
+        for (int menu = 1; menu < topBarFilterBtns.length; menu++)
+        {
+          topBarFilterBtns[menu].localState = false;
+        }
+
         topBarPhotoEditBtns[0].TopMenuButtonPressed(topBarPhotoEditBtns);
         for (int menu = 1; menu < topBarPhotoEditBtns.length; menu++)
         {

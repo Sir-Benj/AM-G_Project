@@ -10,6 +10,7 @@ class Rectangle extends DrawShape
   {
     this.layer.beginDraw();
     this.layer.colorMode(HSB);
+
     DrawSettings();
     if (isDrawing)
     {
@@ -30,7 +31,11 @@ class Rectangle extends DrawShape
       {
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.popMatrix();
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -38,7 +43,11 @@ class Rectangle extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }

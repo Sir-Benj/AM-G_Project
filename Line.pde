@@ -13,10 +13,7 @@ class Line extends DrawShape
     DrawSettings();
     if (isDrawing)
     {
-      // this.layer.stroke(this.hue,
-      //        this.sat,
-      //        this.bri,
-      //        this.opacity);
+
       float x1 = this.mouseStart.x;
       float y1 = this.mouseStart.y;
       float x2 = this.mouseDrag.x;
@@ -32,9 +29,13 @@ class Line extends DrawShape
 
       if (this.isSelected)
       {
-        // this.layer.strokeWeight(this.sWeight + 5);
-        // this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.strokeWeight(this.sWeight + 5);
+        this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
+        this.layer.pushMatrix();
+        this.layer.scale(this.scaleValue);
+        this.layer.rotate(this.rotateValue);
         this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
+        this.layer.popMatrix();
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -42,7 +43,11 @@ class Line extends DrawShape
                         this.sat,
                         this.bri,
                         this.opacity);
+      this.layer.pushMatrix();
+      this.layer.scale(this.scaleValue);
+      this.layer.rotate(this.rotateValue);
       this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
+      this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
