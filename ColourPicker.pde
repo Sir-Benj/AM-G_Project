@@ -1,13 +1,19 @@
+// ColourPickers class, diplays the colour picker in
+// the top right hand corner of the sketch. Using sliders
+// the user can choose a hue, saturation and brightness
+// value for their shapes.
 class ColourPicker
 {
+  // Fields
   float barWidth = 128;
   public float _hueVal = barWidth;
   public float _satVal = barWidth;
   public float _briVal = barWidth;
 
-
+  // Constructor
   ColourPicker() {}
 
+  // Method to draw all the sliders and get the values
   void DrawPicker(float colourMenuXInset, float colourMenuYInset)
   {
     _hueVal= DrawSlider(colourMenuXInset, colourMenuYInset + 190, barWidth, 40.0, _hueVal, _hueVal, "Hue");
@@ -17,6 +23,7 @@ class ColourPicker
     rect(colourMenuXInset, colourMenuYInset, 150, 160);
   }
 
+  // Method to draw each individual slider, depending on the string switch case.
   float DrawSlider(float xPos, float yPos, float sWidth, float sHeight, float hueVal, float hueActVal, String display)
   {
     float sliderPos = map(hueVal, 0.0, 255.0, 0.0, sWidth);
@@ -37,6 +44,8 @@ class ColourPicker
       }
         line(xPos + i, yPos, xPos + i, yPos + sHeight);
     }
+
+    // Checking if mouse is over the slider and pressed
     if(mousePressed && mouseX > xPos && mouseX < (xPos + sWidth)
        && mouseY > yPos && mouseY < yPos + sHeight)
     {
@@ -45,6 +54,8 @@ class ColourPicker
     }
 
     stroke(100);
+
+    // Displaying the correct information for each slider
     switch(display)
     {
       case "Hue": fill(_hueVal, 255, 255);

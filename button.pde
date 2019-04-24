@@ -1,11 +1,16 @@
+// The Button class - creates buttons based on what the user wants,
+// can specify if they are curved or rectangular, have text or and icon,
+// or both, etc.
 class Button
 {
+  // Fields
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted, menuDisplayed;
   protected color buttonColour = color(180), buttonHighlight = color(210);
   protected PImage iconImage, iconImageInverted;
 
+  // Constructor
   Button(int newX, int newY, int newWidth, int newHeight, boolean smooth,
          boolean border, String newName, boolean nameOnOff, Boolean iconOnOff)
   {
@@ -23,7 +28,8 @@ class Button
     smoothing = 8;
     localState = false;
     menuDisplayed = false;
-
+    // If button has an icon, load it and create an inverted version
+    // for when it is pressed.
     if (hasIcon)
     {
       iconImage = loadImage("Icon" + buttonName + ".png");
@@ -35,6 +41,7 @@ class Button
     }
   }
 
+  // Displays the button to the screen
   void DisplayButton()
   {
     //If mouse is over button highlight it
@@ -51,6 +58,7 @@ class Button
         fill(buttonHighlight);
       }
 
+      // Curved corners
       if (isSmooth)
       {
         rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
@@ -108,6 +116,7 @@ class Button
         }
       }
 
+      // Display Icon
       if (iconImage != null && hasIcon)
       {
         image(iconImage, buttonX, buttonY);
@@ -115,6 +124,7 @@ class Button
     }
   }
 
+  // Returns true if mouse is over the button
   boolean OverButton()
   {
     //Is mouse within the button area
@@ -129,6 +139,9 @@ class Button
         }
   }
 
+  // Checks for mouse press while over,
+  // and sets localstate accordingly.
+  // This function takes an array of buttons.
   void ButtonPressed(Button[] btns)
   {
     for (int i = 0; i < btns.length; i++)
@@ -151,6 +164,7 @@ class Button
     }
   }
 
+  // Specific function for the top menu buttons
   void TopMenuButtonPressed(Button[] btns)
   {
     for (int i = 1; i < btns.length; i++)
@@ -174,6 +188,8 @@ class Button
     }
   }
 
+  // For a single button press and not
+  // an array of them
   void SingleButtonPress()
   {
     if (OverButton() && !localState)
@@ -190,6 +206,7 @@ class Button
     }
   }
 
+  // Checks if not over a button
   void NotOverButton()
   {
     if (!OverButton() && localState)
@@ -198,7 +215,7 @@ class Button
     }
   }
 
-
+  // Unused Getters
   public int ButtonX()
   {
     return buttonX;

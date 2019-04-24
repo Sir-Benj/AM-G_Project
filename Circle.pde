@@ -1,11 +1,17 @@
+// The Circle class, sub class of the Drawshape class.
+// Allows the user to draw circles by dragging the mouse.
 class Circle extends DrawShape
 {
+  // Constructor
   Circle(String shapeType, PVector mouseStartLoc, PGraphics layer,
             float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
   }
 
+  // Draws the shape depending on when it is in the cycle,
+  // starting the draw, dragging the mouse to draw, and
+  // finally on release the completed shape.
   void drawThisShape()
   {
     this.layer.beginDraw();

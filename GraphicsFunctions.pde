@@ -1,30 +1,38 @@
+// The GraphicsFunctions class holds all of the methods needed
+// to manipulate shapes and images.
 class GraphicsFunctions
 {
+  // Fields
   float prevX, newChangeX, prevY, newChangeY;
   float prevValue, newValue;
 
+  // Constructor
   GraphicsFunctions()
   {
   }
 
+  // For clearing the photo layer
   void New(PGraphics layer, Button button)
   {
     layer.clear();
     button.localState = false;
   }
 
+  // For saving a combined image of the layers
   void Save(Button button, File newFile)
   {
     selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
+  // For loading in a photo
   void Load(Button button, File newFile)
   {
     selectInput("Select An Image To Edit", "fileChosen", newFile);
     button.localState = false;
   }
 
+  // Creating a blurred image
   void Blur(PGraphics photo)
   {
     float[][] blur_matrix = { {0.1,  0.1,  0.1 },
@@ -43,6 +51,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Sharpening the image
   void Sharpen(PGraphics photo)
   {
     float[][] sharpen_matrix = { { 0, -1, 0 },
@@ -61,6 +70,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Changing an image to greyscale
   void Greyscale(PGraphics photo)
   {
     colorMode(RGB);
@@ -82,6 +92,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Changing an image to monochrome
   void Monochrome(PGraphics photo)
   {
     colorMode(RGB);
@@ -115,6 +126,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Unused pencil tool
   void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
 
@@ -132,6 +144,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
+  // Unused eraser tool
   void Eraser(PGraphics layer, float sVOne)
   {
     layer.beginDraw();
@@ -148,6 +161,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
+  // Method for starting a shape
   void ShapeStart(String name, PVector mouseStart, PGraphics layer, Document doc,
                       ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
@@ -158,6 +172,7 @@ class GraphicsFunctions
                        sWeight, opacity, filled);
   }
 
+  // Method while drawing the shpe through dragging
   void ShapeDrag(Document doc, PVector mouseDrag)
   {
     if (doc.currentlyDrawnShape == null)
@@ -167,6 +182,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
   }
 
+  // Method for finalising a shape when the drawing is finished
   void ShapeFinal(Document doc, PVector mouseFinal)
   {
     if (doc.currentlyDrawnShape == null)
@@ -177,6 +193,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape = null;
   }
 
+  // Changing a shapes colour and strokeweight values
   void ChangeShapeHSB(Document doc, ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
     for (DrawShape s : doc.shapeList)
@@ -193,6 +210,7 @@ class GraphicsFunctions
     }
   }
 
+  // Changing shape(s) position through the use of sliders
   void ChangeShapePosition(Document doc, float xPosChange, float yPosChange)
   {
     prevX = newChangeX;
@@ -250,6 +268,7 @@ class GraphicsFunctions
     }
   }
 
+  // Scaling a shape(s) through the use of a slider
   void ScaleShape(Document doc, float scale)
   {
     for (DrawShape s : doc.shapeList)
@@ -261,6 +280,7 @@ class GraphicsFunctions
     }
   }
 
+  // Rotating a shape(s) through the use of a slider
   void RotateShape(Document doc, float rotate)
   {
     for (DrawShape s : doc.shapeList)
@@ -272,6 +292,7 @@ class GraphicsFunctions
     }
   }
 
+  // Deleting a selected shape
   void DeleteShape(Document doc)
   {
     Iterator itr = doc.shapeList.iterator();

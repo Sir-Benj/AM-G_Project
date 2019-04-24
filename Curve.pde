@@ -1,10 +1,13 @@
+// The Curve class is a sub class of the Drawshape class,
+// and allows the user to specify points which are then connected
+// to form a curve.
 class Curve extends DrawShape
 {
-  //ArrayList<PVector> polyPoints;
   PVector newMousePos;
   PShape poly;
   Boolean pickFinished;
 
+  // Constructor
   Curve(String shapeType, PVector mouseStartLoc, PGraphics layer,
         float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
@@ -12,11 +15,14 @@ class Curve extends DrawShape
     polyPoints = new ArrayList<PVector>();
   }
 
+  // Add the created vertex points to the ArrayList
   void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
   }
 
+  // Complete the shape by finding the area size,
+  // and setting the isDrawing to false;
   void FinishDrawingShape(PVector endPoint)
   {
     PVector xyMin, xyMax;
@@ -61,12 +67,14 @@ class Curve extends DrawShape
 
   }
 
+  // Draws the shape depending on when it is in the cycle,
+  // starting the draw, clicking the points, and
+  // finally on right click or closing the shape,
+  // the completed shape.
   void drawThisShape()
   {
     this.layer.beginDraw();
-    //smooth();
     this.layer.colorMode(HSB);
-    //DrawSettings();
     if (isDrawing)
     {
       this.layer.beginShape();

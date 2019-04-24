@@ -1,22 +1,30 @@
+// The base class for all the shape classes, all the shape subclasses inherit
+// from this and thus it allows for them to be easily stored in a single ArrayList
 class DrawShape
 {
+  // Fields
+
+  // Shape type
   String shapeToDraw;
-
+  // Starting, dragging and final mouse coordinate vectors
   PVector mouseStart, mouseDrag, mouseEnd;
-
+  // All stroke and colour values of the shape
   float hue, sat, bri, opacity, sWeight, rotateValue, scaleValue;
-
+  // Selection, drawing and if the shape is filled or not
   boolean isSelected = false;
   boolean isDrawing = false;
   boolean isFilled = false;
-
+  // ArrayList for the vertex points in polygon and curve shapes
   ArrayList<PVector> polyPoints;
+  // For keeping the rectangular bounds of the shape
   Rect bounds;
-
+  // The layer onto which the shape is drawn
   PGraphics layer;
 
+  // Empty Constructor
   DrawShape() {}
 
+  // Main Constructor
   DrawShape(String shapeToDraw, PVector startPoint, PGraphics layer,
     float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
@@ -52,6 +60,7 @@ class DrawShape
     this.bounds = new Rect(vecOne, vecTwo);
   }
 
+  // For use in the polygon and curve classes
   void AddToPoints(PVector mouseStart) {}
 
   boolean SelectThis(PVector vec)
@@ -72,6 +81,7 @@ class DrawShape
     point(this.mouseStart.x, this.mouseStart.y);
   }
 
+  // Settings shared between shapes
   void DrawSettings()
   {
     if (isDrawing)

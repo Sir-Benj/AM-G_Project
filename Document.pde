@@ -1,3 +1,6 @@
+// The document class, only slightly modified from Simons code.
+// For the creation of shapes and their storage within a list.
+// this list then allows other functions to modify the shapes.
 class Document
 {
 
@@ -11,9 +14,11 @@ class Document
   {
   }
 
+  // Creation of a new shape
   public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
                             float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
+    // Draws the correct shape depending on the string handed in with the shapetype
     switch (shapeType)
     {
       case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
@@ -42,6 +47,7 @@ class Document
     }
   }
 
+  // Draws the shape list
   public void DrawMe()
   {
     for(DrawShape s : shapeList)
@@ -50,6 +56,7 @@ class Document
     }
   }
 
+  // Selects shapes on mouse click when in selection mode
   public void TrySelect(PVector p)
   {
     boolean selectionFound = false;
