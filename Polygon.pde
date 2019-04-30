@@ -1,30 +1,33 @@
+// Polygon class, subclass of DrawShape used to draw open and
+// closed polygons to the screen.
 class Polygon extends DrawShape
 {
-  //ArrayList<PVector> polyPoints;
   PVector newMousePos;
   PShape poly;
   Boolean pickFinished;
+
+  float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+  PVector xyMin, xyMax;
 
   Polygon(String shapeType, PVector mouseStartLoc, PGraphics layer,
           float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
     polyPoints = new ArrayList<PVector>();
+    xyMin = new PVector();
+    xyMax = new PVector();
   }
 
+  // Adds the vertex points to the poly list when drawing
   void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
   }
 
+  // Sets the shape bounds when drawing
   void FinishDrawingShape(PVector endPoint)
   {
-    PVector xyMin, xyMax;
-    xyMin = new PVector();
-    xyMax = new PVector();
-
-    float xMax = 0, xMin = width, yMax = 0, yMin = height;
-
     for (PVector v : polyPoints)
     {
       if (v.x > xMax)
@@ -52,15 +55,13 @@ class Polygon extends DrawShape
     xyMax.x = xMax;
     xyMax.y = yMax;
 
-    println(xyMin);
-    println(xyMax);
-
     setShapeBounds(xyMin, xyMax);
 
     this.isDrawing = false;
 
   }
 
+  // Draws the shape at the various stages of the draw
   void drawThisShape()
   {
     this.layer.beginDraw();
@@ -121,8 +122,10 @@ class Polygon extends DrawShape
         }
         this.poly.endShape();
         this.layer.pushMatrix();
+        this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
         this.layer.shape(poly);
         this.layer.popMatrix();
       }
@@ -163,8 +166,10 @@ class Polygon extends DrawShape
     }
 
     this.layer.pushMatrix();
+    this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
     this.layer.scale(this.scaleValue);
     this.layer.rotate(this.rotateValue);
+    this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
     this.layer.shape(poly);
     this.layer.popMatrix();
     this.layer.endDraw();

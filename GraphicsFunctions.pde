@@ -4,6 +4,8 @@ class GraphicsFunctions
 {
   // Fields
   float prevX, newChangeX, prevY, newChangeY;
+  float prevRotation, newRotation;
+  float prevScale, newScale;
   float prevValue, newValue;
 
   // Constructor
@@ -213,8 +215,18 @@ class GraphicsFunctions
   // Changing shape(s) position through the use of sliders
   void ChangeShapePosition(Document doc, float xPosChange, float yPosChange)
   {
+    if (xPosChange == 0)
+    {
+      newChangeX = 0;
+    }
+
     prevX = newChangeX;
     newChangeX = xPosChange;
+
+    if (yPosChange == 0)
+    {
+      newChangeY = 0;
+    }
 
     prevY = newChangeY;
     newChangeY = yPosChange;
@@ -233,23 +245,24 @@ class GraphicsFunctions
     {
       if (s.isSelected)
       {
-        if (newChangeX != prevX && s.polyPoints == null)
+        if (s.polyPoints == null)
         {
-          s.bounds.x1 += xPosChange;
-          s.bounds.x2 += xPosChange;
-          s.bounds.left += xPosChange;
-          s.bounds.right += xPosChange;
+          if (newChangeX != prevX)
+          {
+            s.bounds.x1 += xPosChange;
+            s.bounds.x2 += xPosChange;
+            s.bounds.left += xPosChange;
+            s.bounds.right += xPosChange;
+          }
+          if (newChangeY != prevY)
+          {
+            s.bounds.y1 += yPosChange;
+            s.bounds.y2 += yPosChange;
+            s.bounds.top += yPosChange;
+            s.bounds.bottom += yPosChange;
+          }
         }
-
-        if (newChangeY != prevY && s.polyPoints == null)
-        {
-          s.bounds.y1 += yPosChange;
-          s.bounds.y2 += yPosChange;
-          s.bounds.top += yPosChange;
-          s.bounds.bottom += yPosChange;
-        }
-
-        if (s.polyPoints != null)
+        else if (s.polyPoints != null)
         {
           for (PVector v : s.polyPoints)
           {
@@ -271,6 +284,7 @@ class GraphicsFunctions
   // Scaling a shape(s) through the use of a slider
   void ScaleShape(Document doc, float scale)
   {
+
     for (DrawShape s : doc.shapeList)
     {
       if (s.isSelected)
@@ -283,6 +297,7 @@ class GraphicsFunctions
   // Rotating a shape(s) through the use of a slider
   void RotateShape(Document doc, float rotate)
   {
+
     for (DrawShape s : doc.shapeList)
     {
       if (s.isSelected)
@@ -306,6 +321,7 @@ class GraphicsFunctions
     }
   }
 
+  // Clear the shape layer
   void ClearLayer(PGraphics layer, Button button, Document doc)
   {
     layer.clear();
@@ -313,6 +329,7 @@ class GraphicsFunctions
     button.localState = false;
   }
 
+  // Resize an image (bilinear)
   void Resize(PGraphics photo, PImage destination)
   {
     photo.loadPixels();
@@ -322,6 +339,7 @@ class GraphicsFunctions
     destination.updatePixels();
   }
 
+  // Edge-Detect method on an image to highlight edges
   void EdgeDetect(PGraphics photo)
   {
     float[][] edge_matrix = { { 0,  -2,  0 },
@@ -340,7 +358,8 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
-  void Hue(PGraphics photo, ColourPicker colourpicker, boolean confirm)
+  // Change the Hue of a selected image
+  void Hue(PGraphics photo, float sliderValue, boolean confirm)
   {
     photo.loadPixels();
     int numPixels = photo.width * photo.height;
@@ -353,12 +372,12 @@ class GraphicsFunctions
       float bri = brightness(c);
 
       float old = hue;
-      float change = colourPicker._hueVal;
+      float change =  old + sliderValue;
 
-      float difference = change - old;
-      float result = change - (difference * 0.9);
+      // float difference = change - old;
+      // float result = change - (difference * 0.9);
 
-      color newColor = color(result, sat, bri);
+      color newColor = color(change, sat, bri);
 
       photo.pixels[n] = newColor;
     }
@@ -370,7 +389,8 @@ class GraphicsFunctions
     }
   }
 
-  void Saturation(PGraphics photo, ColourPicker colourpicker, boolean confirm)
+  // Change the saturation of a selected image
+  void Saturation(PGraphics photo, float sliderValue, boolean confirm)
   {
     photo.loadPixels();
     int numPixels = photo.width * photo.height;
@@ -382,9 +402,9 @@ class GraphicsFunctions
       float sat = saturation(c);
       float bri = brightness(c);
 
-      sat = colourPicker._satVal;
+      float change = sat + sliderValue;
 
-      color newColor = color(hue, sat, bri);
+      color newColor = color(hue, change, bri);
 
       photo.pixels[n] = newColor;
     }
@@ -396,12 +416,30 @@ class GraphicsFunctions
     }
   }
 
-  void Brightness(PGraphics photo, float brightnessValue, boolean confirm)
+  void Brightness(PGraphics photo, float sliderValue, boolean confirm)
   {
-    colorMode(RGB);
-    int[] lut = makeFunctionLUT("ChangeBrightness", brightnessValue, 0);
-    applyPointProcessing(lut, lut, lut, photo, confirm);
-    colorMode(HSB);
+    photo.loadPixels();
+    int numPixels = photo.width * photo.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      color c = photo.pixels[n];
+
+      float hue = hue(c);
+      float sat = saturation(c);
+      float bri = brightness(c);
+
+      float change = bri + sliderValue;
+
+      color newColor = color(hue, sat, change);
+
+      photo.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      photo.updatePixels();
+    }
   }
 
   void Contrast(PGraphics photo, float contrastValue, boolean confirm)
@@ -412,6 +450,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Method for applying point processing operations
   void applyPointProcessing(int[] redLUT, int[] greenLUT, int[] blueLUT, PGraphics inputImage, boolean confirm)
   {
     inputImage.loadPixels();
@@ -439,6 +478,41 @@ class GraphicsFunctions
     }
   }
 
+  void applyPointProcessingHSB(int[] hueLUT, int[] satLUT, int[] briLUT, PGraphics inputImage, boolean confirm, String type)
+  {
+    inputImage.loadPixels();
+    int numPixels = inputImage.width*inputImage.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      color c = inputImage.pixels[n];
+
+      int h = (int)hue(c);
+      int s = (int)saturation(c);
+      int b = (int)brightness(c);
+
+      switch (type)
+      {
+        case "Hue" : h = hueLUT[h];
+        break;
+        case "Sat" : s = satLUT[s];
+        break;
+        case "Bri" : b = briLUT[b];
+        break;
+      }
+
+      color newColor = color(h, s, b);
+
+      inputImage.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      inputImage.updatePixels();
+    }
+  }
+
+  // Look up table for point processing
   int[] makeFunctionLUT(String functionName, float parameter1, float parameter2)
   {
     int[] lut = new int[256];
@@ -449,29 +523,47 @@ class GraphicsFunctions
 
       switch(functionName)
       {
-        case "ChangeBrightness": val = ChangeBrightness(p, parameter1);
-        break;
         case "ChangeContrast": val = ChangeContrast(p, parameter1);
         break;
       }
-      lut[n] = (int)(val*255);
+      lut[n] = (int)(val * 255);
     }
 
     return lut;
   }
 
+  // Point processing Brightness
   float ChangeBrightness(float value, float shift)
   {
     float shiftedValue = value + shift;
     return shiftedValue;
   }
 
+  // Point processing Contrast
   float ChangeContrast(float value, float conVal)
   {
-    float contrastValue = (value - 0.5) * conVal + 0.5;
-    return contrastValue;
+    float upperBound = 255;
+    float lowerBound = 0;
+
+    upperBound -= conVal;
+    lowerBound += conVal;
+
+    upperBound /= 255;
+    lowerBound /= 255;
+
+    if (value >= upperBound)
+    {
+      value = 1;
+    }
+    else if (value <= lowerBound)
+    {
+      value = 0;
+    }
+
+    return value;
   }
 
+  // Method for processing convolution filters
   color Convolution(int x, int y, float[][] matrix, int matrixsize, PGraphics photo)
   {
     float rtotal = 0.0;
@@ -502,6 +594,7 @@ class GraphicsFunctions
     return color(rtotal, gtotal, btotal);
   }
 
+  // Method for the Bilinear resize
   int[] ResizeBilinear(int[] pxls, int startWidth, int startHeight, int targetWidth, int targetHeight)
   {
     int[] temp = new int[targetWidth * targetHeight];

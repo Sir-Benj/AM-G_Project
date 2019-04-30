@@ -17,14 +17,19 @@ import java.io.IOException;
 
 public class main extends PApplet {
 
+// Applied Maths and Graphics
+// Simple illustrator and editor tool
+// Created by Ben Harding
 
 
 
+// Fields
 int xFirstClick, yFirstClick, xSecondCLick, ySecondClick,
     xOnPress, yOnPress, xOffset, yOffset;
 
 int xInset = 245, yInset = 120;
 
+// Initial slider values
 float sliderOneValue = 5;
 float sliderTwoValue = 255;
 float sliderXValue = 0;
@@ -33,14 +38,19 @@ float sliderChangeX = 0;
 float sliderChangeY = 0;
 float sliderRotateValue = 0;
 float sliderScaleValue = 1;
-float sliderPointInputvalue = 0.1f;
+float sliderPointInputvalue = 100;
 float sliderNewXValue = 100;
 float sliderNewYValue = 100;
+float sliderValueHSB = 0;
 
+// Buttons used for control
 Button control;
 Button[] btns;
 Button[][] buttonMenu;
+Button confirm;
+Button cancel;
 
+// Sliders
 Slider sliderStrokeW;
 Slider sliderOpacity;
 Slider sliderX;
@@ -52,10 +62,9 @@ Slider sliderScale;
 Slider sliderPointInput;
 Slider sliderNewX;
 Slider sliderNewY;
+Slider hueSatBri;
 
-Button confirm;
-Button cancel;
-
+// Booleans for checks
 boolean clicked, left, right, newPoly = false, isFinished = true;
 boolean isFilterBlur, isFilterSharpen, isFilterGreyscale, isFilterMonochrome, isFilterEdgeDetect;
 boolean isEditResize, isEditHue, isEditSaturation, isEditBrightness, isEditContrast;
@@ -63,11 +72,13 @@ boolean isEditResize, isEditHue, isEditSaturation, isEditBrightness, isEditContr
 Menu menu;
 ColourPicker colourPicker;
 
+// Layers
 PGraphics background;
 PGraphics photoLayer;
 PGraphics paintLayer;
 PGraphics combineLayers;
 
+// Images for output and manipulation
 PImage imageToLoad;
 PImage imageToSaveOne;
 PImage imageToSaveTwo;
@@ -101,6 +112,7 @@ public void setup()
   colorMode(HSB);
   background(255);
 
+  // Layers created
   background = createGraphics(width - xInset, height - yInset);
   photoLayer = createGraphics(width - xInset, height - yInset);
   paintLayer = createGraphics(width - xInset, height - yInset);
@@ -109,6 +121,7 @@ public void setup()
   imageToSaveTwo = createImage(width - xInset, height - yInset, HSB);
   imageToSaveCombined = createImage(width - xInset, height - yInset, HSB);
 
+  // Components initialised
   menu = new Menu();
   menu.InitialiseMenu();
   colourPicker = new ColourPicker();
@@ -116,8 +129,9 @@ public void setup()
   graphicsFunctions = new GraphicsFunctions();
   path = "";
   selectOne = new File(sketchPath("") + "/*.png");
-
   doc = new Document();
+
+  // Mouse Vectors initialised
   mouseStart = new PVector();
   mouseDrag = new PVector();
   mouseFinal = new PVector();
@@ -125,6 +139,7 @@ public void setup()
 
   moveShape = new DrawShape();
 
+  // Instantiate Sliders
   sliderStrokeW = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 25,
                          140, 10, 1, 400, "Stroke Weight", "px");
 
@@ -147,14 +162,18 @@ public void setup()
   sliderScale = new Slider(width - menu.sideMenuXInset + 10, menu.sideMenuSelYInset + 65,
                          140, 10, 0.1f, 5, "Scale", "Multiplier");
 
-  sliderPointInput = new Slider(600, 50, 140, 10, -1, 3, "Brightness/Contrast", "Value");
+  sliderPointInput = new Slider(600, 75, 140, 10, 0, 128, "Contrast", "");
 
-  sliderNewX = new Slider(600, 40, 140, 10, 1, width, "Width", "px");
+  sliderNewX = new Slider(600, 55, 140, 10, 1, width, "Width", "px");
 
-  sliderNewY = new Slider(600, 60, 140, 10, 1, height, "Height", "px");
+  sliderNewY = new Slider(600, 75, 140, 10, 1, height, "Height", "px");
+
+  hueSatBri = new Slider(600, 75, 140, 10, -255, 255, "HSB Value", "");
 
   confirm = new Button(750, 50, 140, 40, false, true, "  Confirm Changes", true, false);
 
+
+  // Make the layers do an initial draw
   background.beginDraw();
   background.colorMode(HSB);
   background.background(255);
@@ -173,6 +192,7 @@ public void setup()
   combineLayers.endDraw();
 }
 
+// All mouse pressed checks
 public void mousePressed()
 {
   menu.TopMenuPressed();
@@ -181,6 +201,7 @@ public void mousePressed()
 
   mouseStart = new PVector();
 
+  // Starting positions
   if (menu.selectShape.localState)
   {
     doc.TrySelect(new PVector(mouseX, mouseY));
@@ -219,8 +240,14 @@ public void mousePressed()
   pressed = true;
   released = false;
 
+  // Checks for selected menu items
   for (int i = 0; i < menu.drawShapeMenu.length; i++)
   {
+    if (!OverCanvas() && newPoly)
+    {
+      graphicsFunctions.ShapeFinal(doc, mouseFinal);
+      newPoly = false;
+    }
     if (menu.drawShapeMenu[i].buttonName == "Rectangle" && menu.drawShapeMenu[i].localState == true && OverCanvas())
     {
       graphicsFunctions.ShapeStart("Rectangle", mouseStart, paintLayer,
@@ -295,12 +322,14 @@ public void mousePressed()
   }
 }
 
+// All mouse dragged checks
 public void mouseDragged()
 {
   if (pressed && !released)
   {
     mouseDrag.x = mouseX;
     mouseDrag.y = mouseY;
+    // Check for all shapes if pressed that have a drag element
     for (int i = 0; i < menu.drawShapeMenu.length; i++)
     {
       if (menu.drawShapeMenu[i].buttonName == "Rectangle" && menu.drawShapeMenu[i].localState == true)
@@ -319,8 +348,10 @@ public void mouseDragged()
   }
 }
 
+// All mouse released checks
 public void mouseReleased()
 {
+  // Only activate if the mouse was pressed first and not just on release
   if (pressed)
   {
     mouseFinal.x = mouseX;
@@ -328,6 +359,7 @@ public void mouseReleased()
     pressed = false;
     released = true;
 
+    // Check which shape is pressed and perform the correct finalisation
     for (int i = 0; i < menu.drawShapeMenu.length; i++)
     {
       if (menu.drawShapeMenu[i].buttonName == "Rectangle" && menu.drawShapeMenu[i].localState == true)
@@ -366,6 +398,7 @@ public void mouseReleased()
 
 public void draw()
 {
+  // Prime the layers
   paintLayer.beginDraw();
   paintLayer.clear();
   paintLayer.endDraw();
@@ -374,22 +407,38 @@ public void draw()
   combineLayers.beginDraw();
   combineLayers.endDraw();
 
+  // To prevent null pointer errors
+  if (!OverCanvas() && newPoly)
+  {
+    graphicsFunctions.ShapeFinal(doc, mouseFinal);
+    newPoly = false;
+  }
+
+  if (!selectingShape)
+  {
+    sliderRotateValue = 0;
+    sliderChangeX = 0;
+    sliderChangeY = 0;
+  }
+
   for (int i = 0; i < menu.drawShapeMenu.length; i++)
   {
-    if (menu.drawShapeMenu[i].buttonName == "Pencil" && menu.drawShapeMenu[i].localState == true && OverCanvas())
-    {
-      graphicsFunctions.Pencil(paintLayer, colourPicker, sliderOneValue, sliderTwoValue);
-    }
-    if (menu.drawShapeMenu[i].buttonName == "Eraser" && menu.drawShapeMenu[i].localState == true)
-    {
-      graphicsFunctions.Eraser(paintLayer, sliderOneValue);
-    }
+    // Unused draw functions
+    // if (menu.drawShapeMenu[i].buttonName == "Pencil" && menu.drawShapeMenu[i].localState == true && OverCanvas())
+    // {
+    //   graphicsFunctions.Pencil(paintLayer, colourPicker, sliderOneValue, sliderTwoValue);
+    // }
+    // if (menu.drawShapeMenu[i].buttonName == "Eraser" && menu.drawShapeMenu[i].localState == true)
+    // {
+    //   graphicsFunctions.Eraser(paintLayer, sliderOneValue);
+    // }
     if (menu.drawShapeMenu[i].buttonName == "ClearLayer" && menu.drawShapeMenu[i].localState == true)
     {
       graphicsFunctions.ClearLayer(paintLayer, menu.drawShapeMenu[i], doc);
     }
   }
 
+  // Select shape manu items
   for (int i = 0; i < menu.selectShapeMenu.length; i++)
   {
     if (menu.selectShapeMenu[i].buttonName == "ChangeColour" && menu.selectShapeMenu[i].localState == true)
@@ -418,6 +467,7 @@ public void draw()
     }
   }
 
+  // Top menu File button checks
   for (int i = 1; i < menu.topBarFileBtns.length; i++)
   {
     if (menu.topBarFileBtns[i].buttonName == "New" && menu.topBarFileBtns[i].localState == true)
@@ -434,6 +484,7 @@ public void draw()
     }
   }
 
+  // Top menu Filter button checks
   for (int i = 1; i < menu.topBarFilterBtns.length; i++)
   {
     if (menu.topBarFilterBtns[i].buttonName == "Blur" && menu.topBarFilterBtns[i].localState == true)
@@ -463,12 +514,14 @@ public void draw()
     }
   }
 
+  // Top menu Edit button checks
   for (int i = 1; i < menu.topBarPhotoEditBtns.length; i++)
   {
     if (menu.topBarPhotoEditBtns[i].buttonName == "Resize" && menu.topBarPhotoEditBtns[i].localState == true)
     {
       if (confirm.localState)
       {
+        // Resize changes the canvas, photolayer has to be resized along with it
         colorMode(RGB);
         destination = createImage((int)sliderNewXValue, (int)sliderNewYValue, RGB);
         graphicsFunctions.Resize(photoLayer, destination);
@@ -487,12 +540,12 @@ public void draw()
       if (confirm.localState)
       {
         menu.topBarPhotoEditBtns[i].localState = false;
-        graphicsFunctions.Hue(photoLayer, colourPicker, confirm.localState);
+        graphicsFunctions.Hue(photoLayer, sliderValueHSB, confirm.localState);
         confirm.localState = false;
       }
       else
       {
-        graphicsFunctions.Hue(photoLayer, colourPicker, confirm.localState);
+        graphicsFunctions.Hue(photoLayer, sliderValueHSB, confirm.localState);
       }
     }
     else if (menu.topBarPhotoEditBtns[i].buttonName == "Saturation" && menu.topBarPhotoEditBtns[i].localState == true)
@@ -500,12 +553,12 @@ public void draw()
       if (confirm.localState)
       {
         menu.topBarPhotoEditBtns[i].localState = false;
-        graphicsFunctions.Saturation(photoLayer, colourPicker, confirm.localState);
+        graphicsFunctions.Saturation(photoLayer, sliderValueHSB, confirm.localState);
         confirm.localState = false;
       }
       else
       {
-        graphicsFunctions.Saturation(photoLayer, colourPicker, confirm.localState);
+        graphicsFunctions.Saturation(photoLayer, sliderValueHSB, confirm.localState);
       }
     }
     else if (menu.topBarPhotoEditBtns[i].buttonName == "Brightness" && menu.topBarPhotoEditBtns[i].localState == true)
@@ -513,12 +566,12 @@ public void draw()
       if (confirm.localState)
       {
         menu.topBarPhotoEditBtns[i].localState = false;
-        graphicsFunctions.Brightness(photoLayer, sliderPointInputvalue, confirm.localState);
+        graphicsFunctions.Brightness(photoLayer, sliderValueHSB, confirm.localState);
         confirm.localState = false;
       }
       else
       {
-        graphicsFunctions.Brightness(photoLayer, sliderPointInputvalue, confirm.localState);
+        graphicsFunctions.Brightness(photoLayer, sliderValueHSB, confirm.localState);
       }
     }
     else if (menu.topBarPhotoEditBtns[i].buttonName == "Contrast" && menu.topBarPhotoEditBtns[i].localState == true)
@@ -536,6 +589,7 @@ public void draw()
     }
   }
 
+  // Draw all the layers and shapes after they have been manipulated
   background(200);
   image(background, 20, 100);
   image(photoLayer, 20 - sliderXValue, 100 - sliderYValue);
@@ -546,6 +600,7 @@ public void draw()
   imageToSaveTwo = paintLayer.get(0, 0, paintLayer.width, paintLayer.height);
 
   combineLayers.beginDraw();
+  combineLayers.clear();
   combineLayers.image(imageToSaveOne, 0, 0);
   combineLayers.image(imageToSaveTwo, 0, 0);
   combineLayers.endDraw();
@@ -562,6 +617,7 @@ public void draw()
   menu.DisplayMenu();
   colourPicker.DrawPicker(width - menu.sideMenuXInset + 5, menu.sideMenuColYInset + 5);
 
+  // Display screen position sliders if layer is above starting canvas size.
   if (photoLayer.width > width - 245)
   {
     sliderXValue = sliderX.DrawSliderHorizontal(sliderXValue);
@@ -572,6 +628,7 @@ public void draw()
     sliderYValue = sliderY.DrawSliderVertical(sliderYValue);
   }
 
+  // Update slider values
   for (int i = 1; i < menu.topBarPhotoEditBtns.length; i++)
   {
     if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Contrast")
@@ -581,15 +638,18 @@ public void draw()
     }
     else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Brightness")
     {
-      sliderPointInputvalue = sliderPointInput.DrawSliderMenu(sliderPointInputvalue);
+      //sliderPointInputvalue = sliderPointInput.DrawSliderMenu(sliderPointInputvalue);
+      sliderValueHSB = hueSatBri.DrawSliderMenu(sliderValueHSB);
       confirm.DisplayButton();
     }
     else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Saturation")
     {
+      sliderValueHSB = hueSatBri.DrawSliderMenu(sliderValueHSB);
       confirm.DisplayButton();
     }
     else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Hue")
     {
+      sliderValueHSB = hueSatBri.DrawSliderMenu(sliderValueHSB);
       confirm.DisplayButton();
     }
     else if (menu.topBarPhotoEditBtns[i].localState == true && menu.topBarPhotoEditBtns[i].buttonName == "Resize")
@@ -639,6 +699,7 @@ public void draw()
   }
 }
 
+// Saving the image
 public void fileSelected(File selection)
 {
   if (selection == null)
@@ -653,6 +714,7 @@ public void fileSelected(File selection)
   }
 }
 
+// Loading an image
 public void fileChosen(File selection)
 {
   if (selection == null)
@@ -662,10 +724,12 @@ public void fileChosen(File selection)
   else
   {
     photoLayer.clear();
+    paintLayer.clear();
     messageQueue.put(selection);
     path = selection.getAbsolutePath();
     imageToLoad = loadImage(path);
     photoLayer = createGraphics(imageToLoad.width, imageToLoad.height);
+    paintLayer = createGraphics(imageToLoad.width, imageToLoad.height);
     photoLayer.beginDraw();
     photoLayer.image(imageToLoad, 0, 0);
     photoLayer.endDraw();
@@ -675,19 +739,26 @@ public void fileChosen(File selection)
   }
 }
 
+// If mouse is over the canvas check
 public boolean OverCanvas()
 {
   return (mouseX >= 20 && mouseX <= width - menu.sideMenuInset
           && mouseY >= 95 && mouseY <= height - 20);
 }
+// The Circle class, sub class of the Drawshape class.
+// Allows the user to draw circles by dragging the mouse.
 class Circle extends DrawShape
 {
+  // Constructor
   Circle(String shapeType, PVector mouseStartLoc, PGraphics layer,
             float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
   }
 
+  // Draws the shape depending on when it is in the cycle,
+  // starting the draw, dragging the mouse to draw, and
+  // finally on release the completed shape.
   public void drawThisShape()
   {
     this.layer.beginDraw();
@@ -715,9 +786,11 @@ class Circle extends DrawShape
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
         this.layer.pushMatrix();
+        this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
-        this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
+        this.layer.ellipse(x1 - 20, y1 -100, wid, hgt);
         this.layer.popMatrix();
       }
 
@@ -728,24 +801,32 @@ class Circle extends DrawShape
                         this.bri,
                         this.opacity);
       this.layer.pushMatrix();
+      this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
       this.layer.scale(this.scaleValue);
       this.layer.rotate(this.rotateValue);
+      this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
       this.layer.ellipse(x1 - 20, y1 - 100, wid, hgt);
       this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
 }
+// ColourPickers class, diplays the colour picker in
+// the top right hand corner of the sketch. Using sliders
+// the user can choose a hue, saturation and brightness
+// value for their shapes.
 class ColourPicker
 {
+  // Fields
   float barWidth = 128;
   public float _hueVal = barWidth;
   public float _satVal = barWidth;
   public float _briVal = barWidth;
 
-
+  // Constructor
   ColourPicker() {}
 
+  // Method to draw all the sliders and get the values
   public void DrawPicker(float colourMenuXInset, float colourMenuYInset)
   {
     _hueVal= DrawSlider(colourMenuXInset, colourMenuYInset + 190, barWidth, 40.0f, _hueVal, _hueVal, "Hue");
@@ -755,6 +836,7 @@ class ColourPicker
     rect(colourMenuXInset, colourMenuYInset, 150, 160);
   }
 
+  // Method to draw each individual slider, depending on the string switch case.
   public float DrawSlider(float xPos, float yPos, float sWidth, float sHeight, float hueVal, float hueActVal, String display)
   {
     float sliderPos = map(hueVal, 0.0f, 255.0f, 0.0f, sWidth);
@@ -775,6 +857,8 @@ class ColourPicker
       }
         line(xPos + i, yPos, xPos + i, yPos + sHeight);
     }
+
+    // Checking if mouse is over the slider and pressed
     if(mousePressed && mouseX > xPos && mouseX < (xPos + sWidth)
        && mouseY > yPos && mouseY < yPos + sHeight)
     {
@@ -783,6 +867,8 @@ class ColourPicker
     }
 
     stroke(100);
+
+    // Displaying the correct information for each slider
     switch(display)
     {
       case "Hue": fill(_hueVal, 255, 255);
@@ -816,33 +902,39 @@ class ColourPicker
     return hueVal;
   }
 }
+// The Curve class is a sub class of the Drawshape class,
+// and allows the user to specify points which are then connected
+// to form a curve.
 class Curve extends DrawShape
 {
-  //ArrayList<PVector> polyPoints;
   PVector newMousePos;
   PShape poly;
   Boolean pickFinished;
 
+  float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+  PVector xyMin, xyMax;
+
+  // Constructor
   Curve(String shapeType, PVector mouseStartLoc, PGraphics layer,
         float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
     polyPoints = new ArrayList<PVector>();
+    xyMin = new PVector();
+    xyMax = new PVector();
   }
 
+  // Add the created vertex points to the ArrayList
   public void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
   }
 
+  // Complete the shape by finding the area size,
+  // and setting the isDrawing to false;
   public void FinishDrawingShape(PVector endPoint)
   {
-    PVector xyMin, xyMax;
-    xyMin = new PVector();
-    xyMax = new PVector();
-
-    float xMax = 0, xMin = width, yMax = 0, yMin = height;
-
     for (PVector v : polyPoints)
     {
       if (v.x > xMax)
@@ -870,21 +962,20 @@ class Curve extends DrawShape
     xyMax.x = xMax;
     xyMax.y = yMax;
 
-    println(xyMin);
-    println(xyMax);
-
     setShapeBounds(xyMin, xyMax);
 
     this.isDrawing = false;
 
   }
 
+  // Draws the shape depending on when it is in the cycle,
+  // starting the draw, clicking the points, and
+  // finally on right click or closing the shape,
+  // the completed shape.
   public void drawThisShape()
   {
     this.layer.beginDraw();
-    //smooth();
     this.layer.colorMode(HSB);
-    //DrawSettings();
     if (isDrawing)
     {
       this.layer.beginShape();
@@ -907,8 +998,8 @@ class Curve extends DrawShape
 
       for (PVector v : this.polyPoints)
       {
+        this.layer.point(v.x - 20, v.y - 100);
         this.layer.curveVertex(v.x - 20, v.y - 100);
-        println(v);
       }
 
       if (isFilled)
@@ -935,8 +1026,10 @@ class Curve extends DrawShape
           this.layer.curveVertex(v.x - 20, v.y - 100);
         }
         this.layer.pushMatrix();
+        this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
         this.layer.endShape();
         this.layer.popMatrix();
       }
@@ -967,8 +1060,10 @@ class Curve extends DrawShape
     }
 
     this.layer.pushMatrix();
+    this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
     this.layer.scale(this.scaleValue);
     this.layer.rotate(this.rotateValue);
+    this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
     if (this.isFilled)
     {
       this.layer.endShape(CLOSE);
@@ -981,6 +1076,9 @@ class Curve extends DrawShape
     this.layer.endDraw();
   }
 }
+// The document class, only slightly modified from Simons code.
+// For the creation of shapes and their storage within a list.
+// this list then allows other functions to modify the shapes.
 class Document
 {
 
@@ -994,9 +1092,11 @@ class Document
   {
   }
 
+  // Creation of a new shape
   public void StartNewShape(String shapeType, PVector mouseStartLoc, PGraphics layer,
                             float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
+    // Draws the correct shape depending on the string handed in with the shapetype
     switch (shapeType)
     {
       case "Rectangle": DrawShape newRectangle = new Rectangle(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
@@ -1025,6 +1125,7 @@ class Document
     }
   }
 
+  // Draws the shape list
   public void DrawMe()
   {
     for(DrawShape s : shapeList)
@@ -1033,6 +1134,7 @@ class Document
     }
   }
 
+  // Selects shapes on mouse click when in selection mode
   public void TrySelect(PVector p)
   {
     boolean selectionFound = false;
@@ -1043,25 +1145,33 @@ class Document
     }
   }
 }
+// The base class for all the shape classes, all the shape subclasses inherit
+// from this and thus it allows for them to be easily stored in a single ArrayList
 class DrawShape
 {
+  // Fields
+
+  // Shape type
   String shapeToDraw;
-
+  // Starting, dragging and final mouse coordinate vectors
   PVector mouseStart, mouseDrag, mouseEnd;
-
+  // All stroke and colour values of the shape
   float hue, sat, bri, opacity, sWeight, rotateValue, scaleValue;
-
+  // Selection, drawing and if the shape is filled or not
   boolean isSelected = false;
   boolean isDrawing = false;
   boolean isFilled = false;
-
+  // ArrayList for the vertex points in polygon and curve shapes
   ArrayList<PVector> polyPoints;
+  // For keeping the rectangular bounds of the shape
   Rect bounds;
-
+  // The layer onto which the shape is drawn
   PGraphics layer;
 
+  // Empty Constructor
   DrawShape() {}
 
+  // Main Constructor
   DrawShape(String shapeToDraw, PVector startPoint, PGraphics layer,
     float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
@@ -1097,6 +1207,7 @@ class DrawShape
     this.bounds = new Rect(vecOne, vecTwo);
   }
 
+  // For use in the polygon and curve classes
   public void AddToPoints(PVector mouseStart) {}
 
   public boolean SelectThis(PVector vec)
@@ -1117,6 +1228,7 @@ class DrawShape
     point(this.mouseStart.x, this.mouseStart.y);
   }
 
+  // Settings shared between shapes
   public void DrawSettings()
   {
     if (isDrawing)
@@ -1179,33 +1291,43 @@ class DrawShape
     }
   }
 }
+// The GraphicsFunctions class holds all of the methods needed
+// to manipulate shapes and images.
 class GraphicsFunctions
 {
+  // Fields
   float prevX, newChangeX, prevY, newChangeY;
+  float prevRotation, newRotation;
+  float prevScale, newScale;
   float prevValue, newValue;
 
+  // Constructor
   GraphicsFunctions()
   {
   }
 
+  // For clearing the photo layer
   public void New(PGraphics layer, Button button)
   {
     layer.clear();
     button.localState = false;
   }
 
+  // For saving a combined image of the layers
   public void Save(Button button, File newFile)
   {
     selectOutput("Select Output", "fileSelected", newFile);
     button.localState = false;
   }
 
+  // For loading in a photo
   public void Load(Button button, File newFile)
   {
     selectInput("Select An Image To Edit", "fileChosen", newFile);
     button.localState = false;
   }
 
+  // Creating a blurred image
   public void Blur(PGraphics photo)
   {
     float[][] blur_matrix = { {0.1f,  0.1f,  0.1f },
@@ -1224,6 +1346,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Sharpening the image
   public void Sharpen(PGraphics photo)
   {
     float[][] sharpen_matrix = { { 0, -1, 0 },
@@ -1242,6 +1365,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Changing an image to greyscale
   public void Greyscale(PGraphics photo)
   {
     colorMode(RGB);
@@ -1263,6 +1387,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Changing an image to monochrome
   public void Monochrome(PGraphics photo)
   {
     colorMode(RGB);
@@ -1296,6 +1421,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Unused pencil tool
   public void Pencil(PGraphics layer, ColourPicker colourPicker, float sVOne, float sVTwo)
   {
 
@@ -1313,6 +1439,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
+  // Unused eraser tool
   public void Eraser(PGraphics layer, float sVOne)
   {
     layer.beginDraw();
@@ -1329,6 +1456,7 @@ class GraphicsFunctions
     layer.endDraw();
   }
 
+  // Method for starting a shape
   public void ShapeStart(String name, PVector mouseStart, PGraphics layer, Document doc,
                       ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
@@ -1339,6 +1467,7 @@ class GraphicsFunctions
                        sWeight, opacity, filled);
   }
 
+  // Method while drawing the shpe through dragging
   public void ShapeDrag(Document doc, PVector mouseDrag)
   {
     if (doc.currentlyDrawnShape == null)
@@ -1348,6 +1477,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape.WhileDrawingShape(mouseDrag);
   }
 
+  // Method for finalising a shape when the drawing is finished
   public void ShapeFinal(Document doc, PVector mouseFinal)
   {
     if (doc.currentlyDrawnShape == null)
@@ -1358,6 +1488,7 @@ class GraphicsFunctions
     doc.currentlyDrawnShape = null;
   }
 
+  // Changing a shapes colour and strokeweight values
   public void ChangeShapeHSB(Document doc, ColourPicker colourPicker, float sWeight, float opacity, boolean filled)
   {
     for (DrawShape s : doc.shapeList)
@@ -1374,10 +1505,21 @@ class GraphicsFunctions
     }
   }
 
+  // Changing shape(s) position through the use of sliders
   public void ChangeShapePosition(Document doc, float xPosChange, float yPosChange)
   {
+    if (xPosChange == 0)
+    {
+      newChangeX = 0;
+    }
+
     prevX = newChangeX;
     newChangeX = xPosChange;
+
+    if (yPosChange == 0)
+    {
+      newChangeY = 0;
+    }
 
     prevY = newChangeY;
     newChangeY = yPosChange;
@@ -1396,23 +1538,24 @@ class GraphicsFunctions
     {
       if (s.isSelected)
       {
-        if (newChangeX != prevX && s.polyPoints == null)
+        if (s.polyPoints == null)
         {
-          s.bounds.x1 += xPosChange;
-          s.bounds.x2 += xPosChange;
-          s.bounds.left += xPosChange;
-          s.bounds.right += xPosChange;
+          if (newChangeX != prevX)
+          {
+            s.bounds.x1 += xPosChange;
+            s.bounds.x2 += xPosChange;
+            s.bounds.left += xPosChange;
+            s.bounds.right += xPosChange;
+          }
+          if (newChangeY != prevY)
+          {
+            s.bounds.y1 += yPosChange;
+            s.bounds.y2 += yPosChange;
+            s.bounds.top += yPosChange;
+            s.bounds.bottom += yPosChange;
+          }
         }
-
-        if (newChangeY != prevY && s.polyPoints == null)
-        {
-          s.bounds.y1 += yPosChange;
-          s.bounds.y2 += yPosChange;
-          s.bounds.top += yPosChange;
-          s.bounds.bottom += yPosChange;
-        }
-
-        if (s.polyPoints != null)
+        else if (s.polyPoints != null)
         {
           for (PVector v : s.polyPoints)
           {
@@ -1431,8 +1574,10 @@ class GraphicsFunctions
     }
   }
 
+  // Scaling a shape(s) through the use of a slider
   public void ScaleShape(Document doc, float scale)
   {
+
     for (DrawShape s : doc.shapeList)
     {
       if (s.isSelected)
@@ -1442,8 +1587,10 @@ class GraphicsFunctions
     }
   }
 
+  // Rotating a shape(s) through the use of a slider
   public void RotateShape(Document doc, float rotate)
   {
+
     for (DrawShape s : doc.shapeList)
     {
       if (s.isSelected)
@@ -1453,6 +1600,7 @@ class GraphicsFunctions
     }
   }
 
+  // Deleting a selected shape
   public void DeleteShape(Document doc)
   {
     Iterator itr = doc.shapeList.iterator();
@@ -1466,6 +1614,7 @@ class GraphicsFunctions
     }
   }
 
+  // Clear the shape layer
   public void ClearLayer(PGraphics layer, Button button, Document doc)
   {
     layer.clear();
@@ -1473,6 +1622,7 @@ class GraphicsFunctions
     button.localState = false;
   }
 
+  // Resize an image (bilinear)
   public void Resize(PGraphics photo, PImage destination)
   {
     photo.loadPixels();
@@ -1482,6 +1632,7 @@ class GraphicsFunctions
     destination.updatePixels();
   }
 
+  // Edge-Detect method on an image to highlight edges
   public void EdgeDetect(PGraphics photo)
   {
     float[][] edge_matrix = { { 0,  -2,  0 },
@@ -1500,7 +1651,8 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
-  public void Hue(PGraphics photo, ColourPicker colourpicker, boolean confirm)
+  // Change the Hue of a selected image
+  public void Hue(PGraphics photo, float sliderValue, boolean confirm)
   {
     photo.loadPixels();
     int numPixels = photo.width * photo.height;
@@ -1513,12 +1665,12 @@ class GraphicsFunctions
       float bri = brightness(c);
 
       float old = hue;
-      float change = colourPicker._hueVal;
+      float change =  old + sliderValue;
 
-      float difference = change - old;
-      float result = change - (difference * 0.9f);
+      // float difference = change - old;
+      // float result = change - (difference * 0.9);
 
-      int newColor = color(result, sat, bri);
+      int newColor = color(change, sat, bri);
 
       photo.pixels[n] = newColor;
     }
@@ -1530,7 +1682,8 @@ class GraphicsFunctions
     }
   }
 
-  public void Saturation(PGraphics photo, ColourPicker colourpicker, boolean confirm)
+  // Change the saturation of a selected image
+  public void Saturation(PGraphics photo, float sliderValue, boolean confirm)
   {
     photo.loadPixels();
     int numPixels = photo.width * photo.height;
@@ -1542,9 +1695,9 @@ class GraphicsFunctions
       float sat = saturation(c);
       float bri = brightness(c);
 
-      sat = colourPicker._satVal;
+      float change = sat + sliderValue;
 
-      int newColor = color(hue, sat, bri);
+      int newColor = color(hue, change, bri);
 
       photo.pixels[n] = newColor;
     }
@@ -1556,12 +1709,30 @@ class GraphicsFunctions
     }
   }
 
-  public void Brightness(PGraphics photo, float brightnessValue, boolean confirm)
+  public void Brightness(PGraphics photo, float sliderValue, boolean confirm)
   {
-    colorMode(RGB);
-    int[] lut = makeFunctionLUT("ChangeBrightness", brightnessValue, 0);
-    applyPointProcessing(lut, lut, lut, photo, confirm);
-    colorMode(HSB);
+    photo.loadPixels();
+    int numPixels = photo.width * photo.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      int c = photo.pixels[n];
+
+      float hue = hue(c);
+      float sat = saturation(c);
+      float bri = brightness(c);
+
+      float change = bri + sliderValue;
+
+      int newColor = color(hue, sat, change);
+
+      photo.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      photo.updatePixels();
+    }
   }
 
   public void Contrast(PGraphics photo, float contrastValue, boolean confirm)
@@ -1572,6 +1743,7 @@ class GraphicsFunctions
     colorMode(HSB);
   }
 
+  // Method for applying point processing operations
   public void applyPointProcessing(int[] redLUT, int[] greenLUT, int[] blueLUT, PGraphics inputImage, boolean confirm)
   {
     inputImage.loadPixels();
@@ -1599,6 +1771,41 @@ class GraphicsFunctions
     }
   }
 
+  public void applyPointProcessingHSB(int[] hueLUT, int[] satLUT, int[] briLUT, PGraphics inputImage, boolean confirm, String type)
+  {
+    inputImage.loadPixels();
+    int numPixels = inputImage.width*inputImage.height;
+    for(int n = 0; n < numPixels; n++)
+    {
+      int c = inputImage.pixels[n];
+
+      int h = (int)hue(c);
+      int s = (int)saturation(c);
+      int b = (int)brightness(c);
+
+      switch (type)
+      {
+        case "Hue" : h = hueLUT[h];
+        break;
+        case "Sat" : s = satLUT[s];
+        break;
+        case "Bri" : b = briLUT[b];
+        break;
+      }
+
+      int newColor = color(h, s, b);
+
+      inputImage.pixels[n] = newColor;
+    }
+
+    if (confirm)
+    {
+      println("Confirmed");
+      inputImage.updatePixels();
+    }
+  }
+
+  // Look up table for point processing
   public int[] makeFunctionLUT(String functionName, float parameter1, float parameter2)
   {
     int[] lut = new int[256];
@@ -1609,29 +1816,47 @@ class GraphicsFunctions
 
       switch(functionName)
       {
-        case "ChangeBrightness": val = ChangeBrightness(p, parameter1);
-        break;
         case "ChangeContrast": val = ChangeContrast(p, parameter1);
         break;
       }
-      lut[n] = (int)(val*255);
+      lut[n] = (int)(val * 255);
     }
 
     return lut;
   }
 
+  // Point processing Brightness
   public float ChangeBrightness(float value, float shift)
   {
     float shiftedValue = value + shift;
     return shiftedValue;
   }
 
+  // Point processing Contrast
   public float ChangeContrast(float value, float conVal)
   {
-    float contrastValue = (value - 0.5f) * conVal + 0.5f;
-    return contrastValue;
+    float upperBound = 255;
+    float lowerBound = 0;
+
+    upperBound -= conVal;
+    lowerBound += conVal;
+
+    upperBound /= 255;
+    lowerBound /= 255;
+
+    if (value >= upperBound)
+    {
+      value = 1;
+    }
+    else if (value <= lowerBound)
+    {
+      value = 0;
+    }
+
+    return value;
   }
 
+  // Method for processing convolution filters
   public int Convolution(int x, int y, float[][] matrix, int matrixsize, PGraphics photo)
   {
     float rtotal = 0.0f;
@@ -1662,6 +1887,7 @@ class GraphicsFunctions
     return color(rtotal, gtotal, btotal);
   }
 
+  // Method for the Bilinear resize
   public int[] ResizeBilinear(int[] pxls, int startWidth, int startHeight, int targetWidth, int targetHeight)
   {
     int[] temp = new int[targetWidth * targetHeight];
@@ -1707,6 +1933,8 @@ class GraphicsFunctions
     return temp;
   }
 }
+// Line class, subclass of DrawShape, allows the user
+// to draw lines by dragging the mouse.
 class Line extends DrawShape
 {
   Line(String shapeType, PVector mouseStartLoc, PGraphics layer,
@@ -1741,10 +1969,14 @@ class Line extends DrawShape
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
         this.layer.pushMatrix();
+        this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
         this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
         this.layer.popMatrix();
+
+
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -1753,10 +1985,13 @@ class Line extends DrawShape
                         this.bri,
                         this.opacity);
       this.layer.pushMatrix();
+      this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
       this.layer.scale(this.scaleValue);
       this.layer.rotate(this.rotateValue);
+      this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
       this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
       this.layer.popMatrix();
+
     }
     this.layer.endDraw();
   }
@@ -1788,33 +2023,36 @@ class MessageQueue
     return queue.removeFirst();
   }
 }
+// Polygon class, subclass of DrawShape used to draw open and
+// closed polygons to the screen.
 class Polygon extends DrawShape
 {
-  //ArrayList<PVector> polyPoints;
   PVector newMousePos;
   PShape poly;
   Boolean pickFinished;
+
+  float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+  PVector xyMin, xyMax;
 
   Polygon(String shapeType, PVector mouseStartLoc, PGraphics layer,
           float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
     polyPoints = new ArrayList<PVector>();
+    xyMin = new PVector();
+    xyMax = new PVector();
   }
 
+  // Adds the vertex points to the poly list when drawing
   public void AddToPoints(PVector mousePos)
   {
     this.polyPoints.add(mousePos);
   }
 
+  // Sets the shape bounds when drawing
   public void FinishDrawingShape(PVector endPoint)
   {
-    PVector xyMin, xyMax;
-    xyMin = new PVector();
-    xyMax = new PVector();
-
-    float xMax = 0, xMin = width, yMax = 0, yMin = height;
-
     for (PVector v : polyPoints)
     {
       if (v.x > xMax)
@@ -1842,15 +2080,13 @@ class Polygon extends DrawShape
     xyMax.x = xMax;
     xyMax.y = yMax;
 
-    println(xyMin);
-    println(xyMax);
-
     setShapeBounds(xyMin, xyMax);
 
     this.isDrawing = false;
 
   }
 
+  // Draws the shape at the various stages of the draw
   public void drawThisShape()
   {
     this.layer.beginDraw();
@@ -1911,8 +2147,10 @@ class Polygon extends DrawShape
         }
         this.poly.endShape();
         this.layer.pushMatrix();
+        this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
         this.layer.shape(poly);
         this.layer.popMatrix();
       }
@@ -1953,24 +2191,29 @@ class Polygon extends DrawShape
     }
 
     this.layer.pushMatrix();
+    this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
     this.layer.scale(this.scaleValue);
     this.layer.rotate(this.rotateValue);
+    this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
     this.layer.shape(poly);
     this.layer.popMatrix();
     this.layer.endDraw();
   }
 }
+// Rect class, makes for a simple way of keeping track of
+// shape bounds.
 class Rect
 {
   float left, top, right, bottom;
   float x1, y1, x2, y2;
 
+  // Constructor by individual floats
   Rect(float xOne, float yOne, float xTwo, float yTwo)
   {
     setRect(xOne, yOne, xTwo, yTwo);
     OriginalMousePos(xOne, yOne, xTwo, yTwo);
   }
-
+  // Constructor using Vectors
   Rect(PVector vecOne, PVector vecTwo)
   {
     setRect(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
@@ -1993,6 +2236,7 @@ class Rect
     this.bottom = max(yOne, yTwo);
   }
 
+  // Centre of the bounds
   public PVector getCentre()
   {
     PVector centre = new PVector();
@@ -2001,6 +2245,7 @@ class Rect
     return centre;
   }
 
+  // Check if inside the bounds
   public boolean isInsideThis(PVector vec)
   {
     return (isBetween(vec.x, this.left, this.right) && isBetween(vec.y, this.top, this.bottom));
@@ -2021,6 +2266,7 @@ public boolean isBetween(float value, float low, float high)
 {
   return (value >= low && value <= high);
 }
+// Rectangle class, subclass of DrawShape class used to draw rectangles to the screen
 class Rectangle extends DrawShape
 {
   Rectangle(String shapeType, PVector mouseStartLoc, PGraphics layer,
@@ -2055,9 +2301,11 @@ class Rectangle extends DrawShape
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
         this.layer.pushMatrix();
+        this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
-        this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
+        this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
+        this.layer.rect(x1 - 20, y1 -100, wid, hgt);
         this.layer.popMatrix();
       }
 
@@ -2067,14 +2315,18 @@ class Rectangle extends DrawShape
                         this.bri,
                         this.opacity);
       this.layer.pushMatrix();
+      this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
       this.layer.scale(this.scaleValue);
       this.layer.rotate(this.rotateValue);
+      this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
       this.layer.rect(x1 - 20, y1 - 100, wid, hgt);
       this.layer.popMatrix();
     }
     this.layer.endDraw();
   }
 }
+// Slider class, creates UI slider elements which can be used
+// to manipulate various pieces of data.
 class Slider
 {
   float xBarPos, yBarPos, barWidth, barHeight, mapValueLow, mapValueHigh,
@@ -2094,6 +2346,7 @@ class Slider
     sNameValue = sNValue;
   }
 
+  // Draws the slider depending on what is required for display
   public float DrawSliderMenu(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
@@ -2145,23 +2398,35 @@ class Slider
       fill(1);
       text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
     }
-    else if (sliderName == "Brightness/Contrast")
+    else if (sliderName == "Contrast")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (float)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
     }
     else if (sliderName == "Width")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos - 90, yBarPos + 10);
     }
     else if (sliderName == "Height")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos - 95, yBarPos + 10);
+    }
+    else if (sliderName == "HSB Value")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
+    }
+    else if (sliderName == "Contrast")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
     }
 
     stroke(1);
@@ -2171,6 +2436,7 @@ class Slider
     return retValue;
   }
 
+  // Draws a horizontal slider
   public float DrawSliderHorizontal(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barWidth);
@@ -2193,6 +2459,7 @@ class Slider
     return retValue;
   }
 
+  // Draws a vertical slider
   public float DrawSliderVertical(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0f, barHeight);
@@ -2215,14 +2482,19 @@ class Slider
     return retValue;
   }
 }
+// The Button class - creates buttons based on what the user wants,
+// can specify if they are curved or rectangular, have text or and icon,
+// or both, etc.
 class Button
 {
+  // Fields
   protected int buttonX, buttonY, buttonWidth, buttonHeight, smoothing;
   protected String buttonName;
   protected boolean isSmooth, hasBorder, showName, hasIcon, localState, invert, inverted, menuDisplayed;
   protected int buttonColour = color(180), buttonHighlight = color(210);
   protected PImage iconImage, iconImageInverted;
 
+  // Constructor
   Button(int newX, int newY, int newWidth, int newHeight, boolean smooth,
          boolean border, String newName, boolean nameOnOff, Boolean iconOnOff)
   {
@@ -2240,7 +2512,8 @@ class Button
     smoothing = 8;
     localState = false;
     menuDisplayed = false;
-
+    // If button has an icon, load it and create an inverted version
+    // for when it is pressed.
     if (hasIcon)
     {
       iconImage = loadImage("Icon" + buttonName + ".png");
@@ -2252,6 +2525,7 @@ class Button
     }
   }
 
+  // Displays the button to the screen
   public void DisplayButton()
   {
     //If mouse is over button highlight it
@@ -2268,6 +2542,7 @@ class Button
         fill(buttonHighlight);
       }
 
+      // Curved corners
       if (isSmooth)
       {
         rect(buttonX, buttonY, buttonWidth, buttonHeight, smoothing);
@@ -2325,6 +2600,7 @@ class Button
         }
       }
 
+      // Display Icon
       if (iconImage != null && hasIcon)
       {
         image(iconImage, buttonX, buttonY);
@@ -2332,6 +2608,7 @@ class Button
     }
   }
 
+  // Returns true if mouse is over the button
   public boolean OverButton()
   {
     //Is mouse within the button area
@@ -2346,6 +2623,9 @@ class Button
         }
   }
 
+  // Checks for mouse press while over,
+  // and sets localstate accordingly.
+  // This function takes an array of buttons.
   public void ButtonPressed(Button[] btns)
   {
     for (int i = 0; i < btns.length; i++)
@@ -2368,6 +2648,7 @@ class Button
     }
   }
 
+  // Specific function for the top menu buttons
   public void TopMenuButtonPressed(Button[] btns)
   {
     for (int i = 1; i < btns.length; i++)
@@ -2391,6 +2672,8 @@ class Button
     }
   }
 
+  // For a single button press and not
+  // an array of them
   public void SingleButtonPress()
   {
     if (OverButton() && !localState)
@@ -2407,6 +2690,7 @@ class Button
     }
   }
 
+  // Checks if not over a button
   public void NotOverButton()
   {
     if (!OverButton() && localState)
@@ -2415,7 +2699,7 @@ class Button
     }
   }
 
-
+  // Unused Getters
   public int ButtonX()
   {
     return buttonX;
@@ -2448,7 +2732,7 @@ class Button
 }
 class Menu
 {
-  // Arrays for holding button string names and buttons
+  // Arrays for holding buttons for the top bars
   String[] topBarFile;
   String[] topBarFilter;
   String[] topBarPhotoEdit;
@@ -2457,13 +2741,16 @@ class Menu
   Button[] topBarFilterBtns;
   Button[] topBarPhotoEditBtns;
 
+  // Individual buttons
   Button drawShape;
   Button selectShape;
   Button filledShape;
 
+  // String arrays for shape names
   String[] drawShapeNames;
   String[] selectShapeNames;
 
+  // Button arrays for the side menus
   Button[] drawShapeMenu;
   Button[] selectShapeMenu;
 
@@ -2480,11 +2767,12 @@ class Menu
 
   Menu()
   {
+    // Setting up button names, adding names creates more buttons
     topBarFile = new String[] {"File", "New", "Save", "Load"};
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
     topBarPhotoEdit = new String[] {"Edit", "Resize", "Hue", "Saturation", "Brightness", "Contrast"};
 
-    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
+    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "ClearLayer"};
     selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "DeleteShape"};
 
     btnFont = createFont("arial.ttf", 16);
@@ -2505,6 +2793,7 @@ class Menu
 
   }
 
+  // Creates the menus
   public void InitialiseMenu()
   {
     MenuButtonsInitialise(topBarFile, topBarFileBtns, topBarXStart, topBarYStart, topBarWidth, topBarHeight);
@@ -2551,6 +2840,7 @@ class Menu
     DrawSideMenu();
   }
 
+  // Displays menus to the screen
   public void DisplayMenu()
   {
     noStroke();
@@ -2590,6 +2880,7 @@ class Menu
     selectShape.DisplayButton();
   }
 
+  // Check if the top menu is pressed and react accordingly
   public void TopMenuPressed()
   {
     topBarFileBtns[0].SingleButtonPress();
@@ -2697,6 +2988,7 @@ class Menu
     shapeMenuBtns[0].ButtonPressed(shapeMenuBtns);
   }
 
+  // Check if side menu is pressed and act accordingly
   public void SideMenuPressed()
   {
     if (drawShape.localState)
@@ -2720,6 +3012,7 @@ class Menu
     }
   }
 
+  // Draws the top bar background rectangle
   public void DrawTopBar()
   {
     noStroke();
@@ -2728,6 +3021,7 @@ class Menu
     textFont(btnFont, btnFontSize);
   }
 
+  // Draw the side menu background rectangle
   public void DrawSideMenu()
   {
     noStroke();
@@ -2736,6 +3030,7 @@ class Menu
     textFont(btnFont, btnFontSize);
   }
 
+  // Used by the main InitialiseMenu method to initialise the top bar menu
   public void MenuButtonsInitialise(String[] names, Button[] buttons, int tXstart, int tYstart, int tWidth, int tHeight)
   {
     for (int topMenu = 0; topMenu < names.length; topMenu++)
@@ -2755,6 +3050,7 @@ class Menu
     }
   }
 
+  // Displays the top bar
   public void TopBarDisplay(Button[] topBarBtns1, Button[] topBarBtns2, Button[] topBarBtns3)
   {
     for (int topMenu = 0; topMenu < topBarBtns1.length; topMenu++)

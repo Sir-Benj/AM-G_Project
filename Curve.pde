@@ -7,12 +7,18 @@ class Curve extends DrawShape
   PShape poly;
   Boolean pickFinished;
 
+  float xMax = 0, xMin = width, yMax = 0, yMin = height;
+
+  PVector xyMin, xyMax;
+
   // Constructor
   Curve(String shapeType, PVector mouseStartLoc, PGraphics layer,
         float hue, float sat, float bri, float sWeight, float opacity, boolean filled)
   {
     super(shapeType, mouseStartLoc, layer, hue, sat, bri, sWeight, opacity, filled);
     polyPoints = new ArrayList<PVector>();
+    xyMin = new PVector();
+    xyMax = new PVector();
   }
 
   // Add the created vertex points to the ArrayList
@@ -25,12 +31,6 @@ class Curve extends DrawShape
   // and setting the isDrawing to false;
   void FinishDrawingShape(PVector endPoint)
   {
-    PVector xyMin, xyMax;
-    xyMin = new PVector();
-    xyMax = new PVector();
-
-    float xMax = 0, xMin = width, yMax = 0, yMin = height;
-
     for (PVector v : polyPoints)
     {
       if (v.x > xMax)
@@ -57,9 +57,6 @@ class Curve extends DrawShape
 
     xyMax.x = xMax;
     xyMax.y = yMax;
-
-    println(xyMin);
-    println(xyMax);
 
     setShapeBounds(xyMin, xyMax);
 
@@ -97,8 +94,8 @@ class Curve extends DrawShape
 
       for (PVector v : this.polyPoints)
       {
+        this.layer.point(v.x - 20, v.y - 100);
         this.layer.curveVertex(v.x - 20, v.y - 100);
-        println(v);
       }
 
       if (isFilled)
@@ -125,8 +122,10 @@ class Curve extends DrawShape
           this.layer.curveVertex(v.x - 20, v.y - 100);
         }
         this.layer.pushMatrix();
+        this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
         this.layer.endShape();
         this.layer.popMatrix();
       }
@@ -157,8 +156,10 @@ class Curve extends DrawShape
     }
 
     this.layer.pushMatrix();
+    this.layer.translate((xyMin.x + xyMax.x) / 2 , (xyMin.y + xyMax.y) / 2);
     this.layer.scale(this.scaleValue);
     this.layer.rotate(this.rotateValue);
+    this.layer.translate(-((xyMin.x + xyMax.x) / 2) , -((xyMin.y + xyMax.y) / 2));
     if (this.isFilled)
     {
       this.layer.endShape(CLOSE);

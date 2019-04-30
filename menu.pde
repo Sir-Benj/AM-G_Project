@@ -1,6 +1,6 @@
 class Menu
 {
-  // Arrays for holding button string names and buttons
+  // Arrays for holding buttons for the top bars
   String[] topBarFile;
   String[] topBarFilter;
   String[] topBarPhotoEdit;
@@ -9,13 +9,16 @@ class Menu
   Button[] topBarFilterBtns;
   Button[] topBarPhotoEditBtns;
 
+  // Individual buttons
   Button drawShape;
   Button selectShape;
   Button filledShape;
 
+  // String arrays for shape names
   String[] drawShapeNames;
   String[] selectShapeNames;
 
+  // Button arrays for the side menus
   Button[] drawShapeMenu;
   Button[] selectShapeMenu;
 
@@ -32,11 +35,12 @@ class Menu
 
   Menu()
   {
+    // Setting up button names, adding names creates more buttons
     topBarFile = new String[] {"File", "New", "Save", "Load"};
     topBarFilter = new String[] {"Filter", "Blur", "Sharpen", "Greyscale", "Monochrome", "Edge-Detect"};
     topBarPhotoEdit = new String[] {"Edit", "Resize", "Hue", "Saturation", "Brightness", "Contrast"};
 
-    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "Arc", "ClearLayer"};
+    drawShapeNames = new String[] {"Line", "Curve", "Rectangle", "Circle", "Polygon", "ClearLayer"};
     selectShapeNames = new String[] {"ChangeColour", "ChangePosition", "ScaleShape", "RotateShape", "DeleteShape"};
 
     btnFont = createFont("arial.ttf", 16);
@@ -57,6 +61,7 @@ class Menu
 
   }
 
+  // Creates the menus
   void InitialiseMenu()
   {
     MenuButtonsInitialise(topBarFile, topBarFileBtns, topBarXStart, topBarYStart, topBarWidth, topBarHeight);
@@ -103,6 +108,7 @@ class Menu
     DrawSideMenu();
   }
 
+  // Displays menus to the screen
   void DisplayMenu()
   {
     noStroke();
@@ -142,6 +148,7 @@ class Menu
     selectShape.DisplayButton();
   }
 
+  // Check if the top menu is pressed and react accordingly
   void TopMenuPressed()
   {
     topBarFileBtns[0].SingleButtonPress();
@@ -249,6 +256,7 @@ class Menu
     shapeMenuBtns[0].ButtonPressed(shapeMenuBtns);
   }
 
+  // Check if side menu is pressed and act accordingly
   void SideMenuPressed()
   {
     if (drawShape.localState)
@@ -272,6 +280,7 @@ class Menu
     }
   }
 
+  // Draws the top bar background rectangle
   void DrawTopBar()
   {
     noStroke();
@@ -280,6 +289,7 @@ class Menu
     textFont(btnFont, btnFontSize);
   }
 
+  // Draw the side menu background rectangle
   void DrawSideMenu()
   {
     noStroke();
@@ -288,6 +298,7 @@ class Menu
     textFont(btnFont, btnFontSize);
   }
 
+  // Used by the main InitialiseMenu method to initialise the top bar menu
   void MenuButtonsInitialise(String[] names, Button[] buttons, int tXstart, int tYstart, int tWidth, int tHeight)
   {
     for (int topMenu = 0; topMenu < names.length; topMenu++)
@@ -307,6 +318,7 @@ class Menu
     }
   }
 
+  // Displays the top bar
   void TopBarDisplay(Button[] topBarBtns1, Button[] topBarBtns2, Button[] topBarBtns3)
   {
     for (int topMenu = 0; topMenu < topBarBtns1.length; topMenu++)

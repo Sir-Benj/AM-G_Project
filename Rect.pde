@@ -1,14 +1,17 @@
+// Rect class, makes for a simple way of keeping track of
+// shape bounds.
 class Rect
 {
   float left, top, right, bottom;
   float x1, y1, x2, y2;
 
+  // Constructor by individual floats
   Rect(float xOne, float yOne, float xTwo, float yTwo)
   {
     setRect(xOne, yOne, xTwo, yTwo);
     OriginalMousePos(xOne, yOne, xTwo, yTwo);
   }
-
+  // Constructor using Vectors
   Rect(PVector vecOne, PVector vecTwo)
   {
     setRect(vecOne.x, vecOne.y, vecTwo.x, vecTwo.y);
@@ -31,6 +34,7 @@ class Rect
     this.bottom = max(yOne, yTwo);
   }
 
+  // Centre of the bounds
   PVector getCentre()
   {
     PVector centre = new PVector();
@@ -39,6 +43,7 @@ class Rect
     return centre;
   }
 
+  // Check if inside the bounds
   boolean isInsideThis(PVector vec)
   {
     return (isBetween(vec.x, this.left, this.right) && isBetween(vec.y, this.top, this.bottom));

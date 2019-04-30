@@ -1,3 +1,5 @@
+// Slider class, creates UI slider elements which can be used
+// to manipulate various pieces of data.
 class Slider
 {
   float xBarPos, yBarPos, barWidth, barHeight, mapValueLow, mapValueHigh,
@@ -17,6 +19,7 @@ class Slider
     sNameValue = sNValue;
   }
 
+  // Draws the slider depending on what is required for display
   float DrawSliderMenu(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barWidth);
@@ -68,23 +71,35 @@ class Slider
       fill(1);
       text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos + 10, yBarPos - 10);
     }
-    else if (sliderName == "Brightness/Contrast")
+    else if (sliderName == "Contrast")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (float)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
     }
     else if (sliderName == "Width")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos - 90, yBarPos + 10);
     }
     else if (sliderName == "Height")
     {
       textSize(14);
       fill(1);
-      text(sliderName + ": " + (int)retValue + "    " + sNameValue, xBarPos + 10, yBarPos - 10);
+      text(sliderName + ": " + (int)retValue + " " + sNameValue, xBarPos - 95, yBarPos + 10);
+    }
+    else if (sliderName == "HSB Value")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
+    }
+    else if (sliderName == "Contrast")
+    {
+      textSize(14);
+      fill(1);
+      text(sliderName + ": " + (float)retValue + " " + sNameValue, xBarPos - 10, yBarPos - 10);
     }
 
     stroke(1);
@@ -94,6 +109,7 @@ class Slider
     return retValue;
   }
 
+  // Draws a horizontal slider
   float DrawSliderHorizontal(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barWidth);
@@ -116,6 +132,7 @@ class Slider
     return retValue;
   }
 
+  // Draws a vertical slider
   float DrawSliderVertical(float retValue)
   {
     float sliderPos = map(retValue, mapValueLow, mapValueHigh, 0.0, barHeight);

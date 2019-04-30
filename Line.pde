@@ -1,3 +1,5 @@
+// Line class, subclass of DrawShape, allows the user
+// to draw lines by dragging the mouse.
 class Line extends DrawShape
 {
   Line(String shapeType, PVector mouseStartLoc, PGraphics layer,
@@ -32,10 +34,14 @@ class Line extends DrawShape
         this.layer.strokeWeight(this.sWeight + 5);
         this.layer.stroke(255 - this.hue, 255 - this.sat, 255 - this.bri);
         this.layer.pushMatrix();
+        this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
         this.layer.scale(this.scaleValue);
         this.layer.rotate(this.rotateValue);
+        this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
         this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
         this.layer.popMatrix();
+
+
       }
 
       this.layer.strokeWeight(this.sWeight);
@@ -44,10 +50,13 @@ class Line extends DrawShape
                         this.bri,
                         this.opacity);
       this.layer.pushMatrix();
+      this.layer.translate((x1 + wid) / 2 , (y1 + hgt) / 2);
       this.layer.scale(this.scaleValue);
       this.layer.rotate(this.rotateValue);
+      this.layer.translate(-((x1 + wid) / 2) , -((y1 + hgt) / 2));
       this.layer.line(x1 - 20, y1 - 100, wid - 20, hgt - 100);
       this.layer.popMatrix();
+
     }
     this.layer.endDraw();
   }
